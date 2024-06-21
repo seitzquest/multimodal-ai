@@ -108,27 +108,14 @@ def find_valid_overlay_offsets(img_shape, overlay_shape, bounding_boxes):
         print("Could not find valid overlay placement.")
         return 0, 0, False
 
-# Function to check if two bounding boxes overlap
-def boxes_overlap(bb1, bb2):
-    x1, y1, w1, h1 = bb1
-    x2, y2, w2, h2 = bb2
-    if (x1 < x2 + w2 and x1 + w1 > x2 and
-        y1 < y2 + h2 and y1 + h1 > y2):
-        return True
-    return False
-
 
 
 source_directory = "VG_100K_subset"
 modified_directory = "VG_100K_subset_modified"
 overlay_image_path = 'insert_objects/maikaefer.png'
-vg_bounding_boxes_path = '/mnt/orca/visual_genome/dataset/images/image_data.json'
+vg_bounding_boxes_path = '/mnt/orca/visual_genome/dataset/VG-SGG-dicts-with-attri.json'
 
 os.makedirs(modified_directory, exist_ok=True)
-
-# TODO load bounding boxes from VG dataset  
-df = pd.read_json(vg_bounding_boxes_path)
-df.head()
 
 overlay = cv2.imread(overlay_image_path, cv2.IMREAD_UNCHANGED)
 for image_name in os.listdir(source_directory):
