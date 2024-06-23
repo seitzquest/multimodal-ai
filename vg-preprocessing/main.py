@@ -122,13 +122,13 @@ def boxes_overlap(bb1, bb2):
 source_directory = "VG_100K_subset"
 modified_directory = "VG_100K_subset_modified"
 overlay_image_path = 'insert_objects/maikaefer.png'
-vg_bounding_boxes_path = '/mnt/orca/visual_genome/dataset/images/image_data.json'
+#vg_bounding_boxes_path = '/mnt/orca/visual_genome/dataset/images/image_data.json'
 
 os.makedirs(modified_directory, exist_ok=True)
 
 # TODO load bounding boxes from VG dataset  
-df = pd.read_json(vg_bounding_boxes_path)
-df.head()
+#df = pd.read_json(vg_bounding_boxes_path)
+#df.head()
 
 overlay = cv2.imread(overlay_image_path, cv2.IMREAD_UNCHANGED)
 for image_name in os.listdir(source_directory):
