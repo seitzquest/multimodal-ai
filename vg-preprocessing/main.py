@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import os
 import random
-import pandas as pd
+import argparse
 
 # Source: https://stackoverflow.com/a/71701023 
 def add_transparent_image(background, foreground, x_offset=None, y_offset=None, rotation=0):
@@ -108,14 +108,35 @@ def find_valid_overlay_offsets(img_shape, overlay_shape, bounding_boxes):
         print("Could not find valid overlay placement.")
         return 0, 0, False
 
+print("----------------------------")
+print("Visual Genome Preprocessing")
+print("----------------------------\n")
 
+# Parse command line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("--source_directory", type=str, default="VG_100K_subset", help="Directory containing images to modify")
+parser.add_argument("--modified_directory", type=str, default="VG_100K_subset_modified", help="Directory to save modified images")
+parser.add_argument("--overlay_image_path", type=str, default="insert_objects/maikaefer.png", help="Path to overlay image")
+parser.add_argument("--seed", type=int, help="Seed for random number generator")
 
-source_directory = "VG_100K_subset"
-modified_directory = "VG_100K_subset_modified"
-overlay_image_path = 'insert_objects/maikaefer.png'
+args = parser.parse_args()
+
+source_directory = args.source_directory
+modified_directory = args.modified_directory
+overlay_image_path = args.overlay_image_path
 vg_bounding_boxes_path = '/mnt/orca/visual_genome/dataset/VG-SGG-dicts-with-attri.json'
+seed = args.seed
 
 os.makedirs(modified_directory, exist_ok=True)
+
+print(f"Reading images from {source_directory}")
+print(f"Using overlay image {overlay_image_path}")
+
+if seed is not None:
+    print(f"Using set seed {seed}")
+
+# Seed the random number generator for consistency and reproducibility
+random.seed(seed)
 
 overlay = cv2.imread(overlay_image_path, cv2.IMREAD_UNCHANGED)
 for image_name in os.listdir(source_directory):
@@ -127,18 +148,19 @@ for image_name in os.listdir(source_directory):
 
     scaled_overlay = scale_inpainted_image(img, rotated_overlay)
 
-    # x_offset = random.randint(0, img.shape[1] - scaled_overlay.shape[1])
-    # y_offset = random.randint(0, img.shape[0] - scaled_overlay.shape[0])
+    x_offset = random.randint(0, img.shape[1] - scaled_overlay.shape[1])
+    y_offset = random.randint(0, img.shape[0] - scaled_overlay.shape[0])
 
-    x_offset, y_offset, possible = find_valid_overlay_offsets(img.shape[:2], scaled_overlay.shape[:2], [(0, 0, 10, 10)])
-    if not possible:
-        continue
+    #x_offset, y_offset, possible = find_valid_overlay_offsets(img.shape[:2], scaled_overlay.shape[:2], [(0, 0, 10, 10)])
+    #if not possible:
+    #    continue
 
     add_transparent_image(img, scaled_overlay, x_offset, y_offset, rotation)
     modified_image_path = os.path.join(modified_directory, f"{os.path.splitext(image_name)[0]}_modified.jpg")
     cv2.imwrite(modified_image_path, img)
 
-
+print(f"Saved modified images to {modified_directory}")
+print("Done! :)")
 
 # TODO: 
 # Test split in create_vg_subset
