@@ -3,6 +3,8 @@ import numpy as np
 import os
 import random
 import argparse
+from datasets import load_dataset
+from PIL import Image
 
 # Source: https://stackoverflow.com/a/71701023 
 def add_transparent_image(background, foreground, x_offset=None, y_offset=None, rotation=0):
@@ -42,6 +44,22 @@ def add_transparent_image(background, foreground, x_offset=None, y_offset=None, 
     # overwrite the section of the background image that has been updated
     background[bg_y:bg_y + h, bg_x:bg_x + w] = composite
 
+def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None, rotation=0):
+
+    assert background.mode == 'RGB', f'background image should have exactly 3 channels (RGB). found:{background.mode}'
+    assert foreground.mode == 'RGBA', f'foreground image should have exactly 4 channels (RGBA). found:{foreground.mode}'
+
+    # center by default
+    if x_offset is None:
+        x_offset = (background.width - foreground.width) // 2
+    if y_offset is None:
+        y_offset = (background.height - foreground.height) // 2
+
+    rotated_foreground = foreground.rotate(rotation, expand=True)
+
+    position = (x_offset, y_offset)
+    background.paste(rotated_foreground, position, rotated_foreground)
+    return background
 
 def scale_inpainted_image(source_image, target_image, scaling=0.2):
     bg_h, bg_w = source_image.shape[:2]
@@ -55,6 +73,20 @@ def scale_inpainted_image(source_image, target_image, scaling=0.2):
     scaled_height = int(fg_h * scale_factor)
 
     scaled_foreground = cv2.resize(target_image, (scaled_width, scaled_height), interpolation=cv2.INTER_AREA)
+    return scaled_foreground
+
+def scale_inpainted_image_pillow(source_image, target_image, scaling=0.2):
+    bg_w, bg_h = source_image.size
+    fg_w, fg_h = target_image.size
+
+    width_scaling = bg_w * scaling / fg_w
+    height_scaling = bg_h * scaling / fg_h
+    scale_factor = min(width_scaling, height_scaling)
+
+    scaled_width = int(fg_w * scale_factor)
+    scaled_height = int(fg_h * scale_factor)
+
+    scaled_foreground = target_image.resize((scaled_width, scaled_height))
     return scaled_foreground
 
 def rotate_image(img, angle):
@@ -75,7 +107,7 @@ def find_valid_overlay_offsets(img_shape, overlay_shape, bounding_boxes):
     - img_shape: Shape of the background image (height, width).
     - overlay_shape: Shape of the overlay image (height, width).
     - bounding_boxes: List of bounding boxes in the format (x, y, w, h).
-                      Multiple bounding boxes can be provided.
+                       Multiple bounding boxes can be provided.
 
     Returns:
     - x_offset: Valid x offset for placing the overlay.
@@ -126,6 +158,7 @@ modified_directory = args.modified_directory
 overlay_image_path = args.overlay_image_path
 vg_bounding_boxes_path = '/mnt/orca/visual_genome/dataset/VG-SGG-dicts-with-attri.json'
 seed = args.seed
+number_of_images = 10
 
 os.makedirs(modified_directory, exist_ok=True)
 
@@ -139,25 +172,38 @@ if seed is not None:
 random.seed(seed)
 
 overlay = cv2.imread(overlay_image_path, cv2.IMREAD_UNCHANGED)
-for image_name in os.listdir(source_directory):
-    background = cv2.imread(os.path.join(source_directory, image_name))
-    img = background.copy()
+overlay_image = Image.open(overlay_image_path)
+
+dataset = load_dataset("visual_genome", "objects_v1.2.0")
+dataset = dataset.shuffle(seed=seed)['train'].select(range(number_of_images))
+
+print("Processing images...")
+
+for example in dataset:
+    img = example['image'].copy()
+    scaled_overlay = scale_inpainted_image_pillow(img, overlay_image)
+    img = add_transparent_image_pillow(img, scaled_overlay, rotation=45)
+    img.save(f"{modified_directory}/{example['image_id']}.jpg")
+
+# for image_name in os.listdir(source_directory):
+#     background = cv2.imread(os.path.join(source_directory, image_name))
+#     img = background.copy()
     
-    rotation = random.randint(0, 360)
-    rotated_overlay = rotate_image(overlay, rotation)
+#     rotation = random.randint(0, 360)
+#     rotated_overlay = rotate_image(overlay, rotation)
 
-    scaled_overlay = scale_inpainted_image(img, rotated_overlay)
+#     scaled_overlay = scale_inpainted_image(img, rotated_overlay)
 
-    x_offset = random.randint(0, img.shape[1] - scaled_overlay.shape[1])
-    y_offset = random.randint(0, img.shape[0] - scaled_overlay.shape[0])
+#     x_offset = random.randint(0, img.shape[1] - scaled_overlay.shape[1])
+#     y_offset = random.randint(0, img.shape[0] - scaled_overlay.shape[0])
 
-    #x_offset, y_offset, possible = find_valid_overlay_offsets(img.shape[:2], scaled_overlay.shape[:2], [(0, 0, 10, 10)])
-    #if not possible:
-    #    continue
+#     #x_offset, y_offset, possible = find_valid_overlay_offsets(img.shape[:2], scaled_overlay.shape[:2], [(0, 0, 10, 10)])
+#     #if not possible:
+#     #    continue
 
-    add_transparent_image(img, scaled_overlay, x_offset, y_offset, rotation)
-    modified_image_path = os.path.join(modified_directory, f"{os.path.splitext(image_name)[0]}_modified.jpg")
-    cv2.imwrite(modified_image_path, img)
+#     add_transparent_image(img, scaled_overlay, x_offset, y_offset, rotation)
+#     modified_image_path = os.path.join(modified_directory, f"{os.path.splitext(image_name)[0]}_modified.jpg")
+#     cv2.imwrite(modified_image_path, img)
 
 print(f"Saved modified images to {modified_directory}")
 print("Done! :)")
