@@ -8,6 +8,7 @@ from PIL import Image
 from PIL import ImageDraw
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import pandas as pd
 
 # Source: https://stackoverflow.com/a/71701023 
 def add_transparent_image(background, foreground, x_offset=None, y_offset=None, rotation=0):
@@ -181,7 +182,7 @@ parser.add_argument("--source_directory", type=str, default="VG_100K_subset", he
 parser.add_argument("--modified_directory", type=str, default="VG_100K_subset_modified", help="Directory to save modified images")
 parser.add_argument("--overlay_image_path", type=str, default="insert_objects/maikaefer.png", help="Path to overlay image")
 parser.add_argument("--seed", type=int, help="Seed for random number generator")
-parser.add_argument("--number_of_images", type=int, default=100, help="Number of images to process")
+parser.add_argument("--num_images", type=int, default=100, help="Number of images to process")
 
 args = parser.parse_args()
 
@@ -189,7 +190,7 @@ modified_directory = args.modified_directory
 overlay_image_path = args.overlay_image_path
 seed = args.seed
 
-number_of_images = args.number_of_images
+number_of_images = args.num_images
 
 os.makedirs(modified_directory, exist_ok=True)
 
@@ -208,8 +209,33 @@ dataset = load_dataset("visual_genome", "objects_v1.2.0")
 # Shuffle the dataset and select a subset of images
 dataset = dataset.shuffle(seed=seed)['train'].select(range(number_of_images))
 
-print("Processing images...")
+# Collect all unique object names
+print(f"Collecting object names...")
+names = set()
 
+for example in tqdm(dataset):
+    objects = [name for obj in example['objects'] for name in obj['names']]
+    names.update(objects)
+
+print(f"Found {len(names)} unique object names.")
+
+names = list(names)
+
+cooccurence_matrix = pd.DataFrame(0, index=names, columns=names)
+
+print(f"Analyzing co-occurences...")
+
+# Count co-occurences of objects
+for example in tqdm(dataset):
+    objects = [name for obj in example['objects'] for name in obj['names']]
+    for i in range(len(objects)):
+        for j in range(i+1, len(objects)):
+            cooccurence_matrix.at[objects[i], objects[j]] += 1
+            cooccurence_matrix.at[objects[j], objects[i]] += 1
+
+print(f"Processing {number_of_images} images...")
+
+# Process each image
 for example in tqdm(dataset):
     img = example['image'].copy()
 
@@ -217,11 +243,18 @@ for example in tqdm(dataset):
     rotated_overlay = rotate_image_pillow(overlay_image, rotation)
     scaled_overlay = scale_inpainted_image_pillow(img, rotated_overlay)
 
-
+    # Find the bounding boxes of the objects in the image
     overlaps = find_bounding_boxes_area(img.height, img.width, example['objects'])
-    #patch = find_minimal_patch(overlaps, scaled_overlay.size)
+
+    # Find the patch where the overlay image should be placed
+    # This can be done using 3 different methods
+    # 1. Find the patch with the minimal overlap of bounding boxes, tries to occlude as few objects as possible
+    # 2. Find the patch with the maximal overlap of bounding boxes, tries to occlude as many objects as possible
+    # 3. Find a random patch where the average overlap of bounding boxes is within one standard deviation of the mean
+
+    patch = find_minimal_patch(overlaps, scaled_overlay.size)
     #patch = find_maximal_patch(overlaps, scaled_overlay.size)
-    patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
+    #patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
 
     # for visualizing where many bounding boxes are
     #plt.imshow(overlaps)
@@ -236,4 +269,4 @@ print("Done! :)")
 
 # TODO: 
 # Test split in create_vg_subset
-# Object-aware insertion
+# Create some sort of algorithm to find the appropriate new object from the co-occurence matrix based on the existing objects in the image
