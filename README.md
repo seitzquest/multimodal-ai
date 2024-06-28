@@ -31,3 +31,6 @@ There are some parameters that can be passed to the script:
 - `--overlay_image_path`: Path to the overlay image.
 - `--seed`: Seed for the random number generator for reproducibility.
 - `--num_images`: Number of images to preprocess.
+- `--patch_strategy`: Strategy for finding patch. Can be 'minimal', 'maximal' or 'random'
+- `--correlate_overlay`: Overrides the overlay image and patch strategy by using a correlated object
+- `--visualize-bb`: Visualize bounding boxes

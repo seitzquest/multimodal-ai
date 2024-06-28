@@ -1,52 +1,14 @@
-import cv2
-import numpy as np
 import os
 import random
 import argparse
 from datasets import load_dataset
+import cv2
+import numpy as np
 from PIL import Image
 from PIL import ImageDraw
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import pandas as pd
-
-# Source: https://stackoverflow.com/a/71701023 
-def add_transparent_image(background, foreground, x_offset=None, y_offset=None, rotation=0):
-    bg_h, bg_w, bg_channels = background.shape
-    fg_h, fg_w, fg_channels = foreground.shape
-
-    assert bg_channels == 3, f'background image should have exactly 3 channels (RGB). found:{bg_channels}'
-    assert fg_channels == 4, f'foreground image should have exactly 4 channels (RGBA). found:{fg_channels}'
-
-    # center by default
-    if x_offset is None: x_offset = (bg_w - fg_w) // 2
-    if y_offset is None: y_offset = (bg_h - fg_h) // 2
-
-    w = min(fg_w, bg_w, fg_w + x_offset, bg_w - x_offset)
-    h = min(fg_h, bg_h, fg_h + y_offset, bg_h - y_offset)
-
-    if w < 1 or h < 1: return
-
-    # clip foreground and background images to the overlapping regions
-    bg_x = max(0, x_offset)
-    bg_y = max(0, y_offset)
-    fg_x = max(0, x_offset * -1)
-    fg_y = max(0, y_offset * -1)
-    foreground = foreground[fg_y:fg_y + h, fg_x:fg_x + w]
-    background_subsection = background[bg_y:bg_y + h, bg_x:bg_x + w]
-
-    # separate alpha and color channels from the foreground image
-    foreground_colors = foreground[:, :, :3]
-    alpha_channel = foreground[:, :, 3] / 255  # 0-255 => 0.0-1.0
-
-    # construct an alpha_mask that matches the image shape
-    alpha_mask = np.dstack((alpha_channel, alpha_channel, alpha_channel))
-
-    # combine the background with the overlay image weighted by alpha
-    composite = background_subsection * (1 - alpha_mask) + foreground_colors * alpha_mask
-
-    # overwrite the section of the background image that has been updated
-    background[bg_y:bg_y + h, bg_x:bg_x + w] = composite
 
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
 
@@ -63,20 +25,6 @@ def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset
     background.paste(foreground, position, foreground)
     return background
 
-def scale_inpainted_image(source_image, target_image, scaling=0.2):
-    bg_h, bg_w = source_image.shape[:2]
-    fg_h, fg_w = target_image.shape[:2]
-
-    width_scaling = bg_w * scaling / fg_w
-    height_scaling = bg_h * scaling / fg_h
-    scale_factor = min(width_scaling, height_scaling)
-
-    scaled_width = int(fg_w * scale_factor)
-    scaled_height = int(fg_h * scale_factor)
-
-    scaled_foreground = cv2.resize(target_image, (scaled_width, scaled_height), interpolation=cv2.INTER_AREA)
-    return scaled_foreground
-
 def scale_inpainted_image_pillow(source_image, target_image, scaling=0.2):
     bg_w, bg_h = source_image.size
     fg_w, fg_h = target_image.size
@@ -90,14 +38,6 @@ def scale_inpainted_image_pillow(source_image, target_image, scaling=0.2):
 
     scaled_foreground = target_image.resize((scaled_width, scaled_height))
     return scaled_foreground
-
-def rotate_image(img, angle):
-    size_reverse = np.array(img.shape[1::-1]) # swap x with y
-    M = cv2.getRotationMatrix2D(tuple(size_reverse / 2.), angle, 1.)
-    MM = np.absolute(M[:,:2])
-    size_new = MM @ size_reverse
-    M[:,-1] += (size_new - size_reverse) / 2.
-    return cv2.warpAffine(img, M, tuple(size_new.astype(int)))
 
 def rotate_image_pillow(img, angle):
     return img.rotate(angle, expand=True)
@@ -172,101 +112,154 @@ def find_random_thresholded_patch(overlap_array, patch_size):
     return (x, y, patch_size[1], patch_size[0])
 
 
-print("----------------------------")
-print("Visual Genome Preprocessing")
-print("----------------------------\n")
+# Uses the cooccurence matrix to find the least likely object in the image and most likely object not in the image
+def find_correlated_object(cooccurrence_matrix, objects_in_image):
+    likelihoods = []
+    for obj in objects_in_image:
+        likelihood = cooccurrence_matrix.loc[obj, objects_in_image].sum()
+        likelihoods.append(likelihood)
+    
+    # Find the least likely object in the image
+    least_likely_idx = np.argmin(likelihoods)
+    least_likely_object = objects_in_image[least_likely_idx]
 
-# Parse command line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("--source_directory", type=str, default="VG_100K_subset", help="Directory containing images to modify")
-parser.add_argument("--modified_directory", type=str, default="VG_100K_subset_modified", help="Directory to save modified images")
-parser.add_argument("--overlay_image_path", type=str, default="insert_objects/maikaefer.png", help="Path to overlay image")
-parser.add_argument("--seed", type=int, help="Seed for random number generator")
-parser.add_argument("--num_images", type=int, default=100, help="Number of images to process")
+    # Find the best replacement object
+    remaining_objects = objects_in_image[:least_likely_idx] + objects_in_image[least_likely_idx+1:]
+    best_replacement_object = None
+    best_replacement_score = -1
 
-args = parser.parse_args()
+    for obj in cooccurrence_matrix.index:
+        if obj not in objects_in_image:
+            replacement_score = cooccurrence_matrix.loc[obj, remaining_objects].sum()
+            if replacement_score > best_replacement_score:
+                best_replacement_score = replacement_score
+                best_replacement_object = obj
 
-modified_directory = args.modified_directory
-overlay_image_path = args.overlay_image_path
-seed = args.seed
+    return least_likely_object, best_replacement_object
 
-number_of_images = args.num_images
-
-os.makedirs(modified_directory, exist_ok=True)
-
-print(f"Using overlay image {overlay_image_path}")
-
-if seed is not None:
-    print(f"Using set seed {seed}")
-
-# Seed the random number generator for consistency and reproducibility
-random.seed(seed)
-
-overlay_image = Image.open(overlay_image_path)
-
-dataset = load_dataset("visual_genome", "objects_v1.2.0")
-
-# Shuffle the dataset and select a subset of images
-dataset = dataset.shuffle(seed=seed)['train'].select(range(number_of_images))
-
-# Collect all unique object names
-print(f"Collecting object names...")
-names = set()
-
-for example in tqdm(dataset):
-    objects = [name for obj in example['objects'] for name in obj['names']]
-    names.update(objects)
-
-print(f"Found {len(names)} unique object names.")
-
-names = list(names)
-
-cooccurence_matrix = pd.DataFrame(0, index=names, columns=names)
-
-print(f"Analyzing co-occurences...")
-
-# Count co-occurences of objects
-for example in tqdm(dataset):
-    objects = [name for obj in example['objects'] for name in obj['names']]
-    for i in range(len(objects)):
-        for j in range(i+1, len(objects)):
-            cooccurence_matrix.at[objects[i], objects[j]] += 1
-            cooccurence_matrix.at[objects[j], objects[i]] += 1
-
-print(f"Processing {number_of_images} images...")
-
-# Process each image
-for example in tqdm(dataset):
-    img = example['image'].copy()
-
-    rotation = random.randint(0, 360)#
-    rotated_overlay = rotate_image_pillow(overlay_image, rotation)
-    scaled_overlay = scale_inpainted_image_pillow(img, rotated_overlay)
-
-    # Find the bounding boxes of the objects in the image
-    overlaps = find_bounding_boxes_area(img.height, img.width, example['objects'])
-
-    # Find the patch where the overlay image should be placed
-    # This can be done using 3 different methods
-    # 1. Find the patch with the minimal overlap of bounding boxes, tries to occlude as few objects as possible
-    # 2. Find the patch with the maximal overlap of bounding boxes, tries to occlude as many objects as possible
-    # 3. Find a random patch where the average overlap of bounding boxes is within one standard deviation of the mean
-
-    patch = find_minimal_patch(overlaps, scaled_overlay.size)
-    #patch = find_maximal_patch(overlaps, scaled_overlay.size)
-    #patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
-
-    # for visualizing where many bounding boxes are
-    #plt.imshow(overlaps)
-    #plt.show()
-
-    img = add_transparent_image_pillow(img, scaled_overlay, x_offset=patch[0], y_offset=patch[1])
-    img.save(f"{modified_directory}/{example['image_id']}.jpg")
+def extract_subimage(img, patch):
+    x, y, w, h = patch
+    return img.crop((x, y, x + w, y + h))
 
 
-print(f"Saved modified images to {modified_directory}")
-print("Done! :)")
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source_directory", type=str, default="VG_100K_subset", help="Directory containing images to modify")
+    parser.add_argument("--modified_directory", type=str, default="VG_100K_subset_modified", help="Directory to save modified images")
+    parser.add_argument("--overlay_image_path", type=str, default="insert_objects/maikaefer.png", help="Path to overlay image")
+    parser.add_argument("--seed", type=int, help="Seed for random number generator")
+    parser.add_argument("--num_images", type=int, default=100, help="Number of images to process")
+    parser.add_argument("--patch_strategy", type=str, default="minimal", help="Strategy for finding patch. Can be 'minimal', 'maximal' or 'random'")
+    parser.add_argument("--visualize-bb", action="store_true", help="Visualize bounding boxes")
+    parser.add_argument("--correlate_overlay", action="store_true", help="Overrides the overlay image and patch strategy by using a correlated object")
+    return parser.parse_args()
+
+def get_patch(object):
+    return object['x'], object['y'], object['w'], object['h']
+
+
+def main():
+    print("----------------------------")
+    print("Visual Genome Preprocessing")
+    print("----------------------------\n")
+    args = parse_args()
+
+    modified_directory = args.modified_directory
+    overlay_image_path = args.overlay_image_path
+    seed = args.seed
+    patch_strategy = args.patch_strategy
+    number_of_images = args.num_images
+    visualize_bb = args.visualize_bb
+    correlate_overlay = args.correlate_overlay
+
+    os.makedirs(modified_directory, exist_ok=True)
+
+    if seed is not None:
+        print(f"Using set seed {seed}")
+        # Set the seed of the random number generator for consistency and reproducibility
+        random.seed(seed)
+
+    dataset = load_dataset("visual_genome", "objects_v1.2.0")
+
+    # Shuffle the dataset and select a subset of images
+    # TODO: Test split -> simply add our code into SpeaQ/etc eval code to get the testset
+    dataset = dataset.shuffle(seed=seed)['train'].select(range(number_of_images))
+
+    if correlate_overlay:
+        print(f"Collecting object names...")
+
+        name_to_best_res_imgpatch = {}
+        for example in tqdm(dataset):
+            for obj in example['objects']:
+                for name in obj['names']:
+                    if name not in name_to_best_res_imgpatch or obj['w'] * obj['h'] > name_to_best_res_imgpatch[name][1][0] * name_to_best_res_imgpatch[name][1][1]:
+                        name_to_best_res_imgpatch[name] = (example["image"], get_patch(obj))
+        
+        names = list(name_to_best_res_imgpatch.keys())
+        print(f"Found {len(names)} unique object names.")
+
+        cooccurence_matrix = pd.DataFrame(0, index=names, columns=names)
+
+        print(f"Analyzing co-occurences...")
+        for example in tqdm(dataset):
+            objects = [name for obj in example['objects'] for name in obj['names']]
+            for i in range(len(objects)):
+                for j in range(i+1, len(objects)):
+                    cooccurence_matrix.at[objects[i], objects[j]] += 1
+                    cooccurence_matrix.at[objects[j], objects[i]] += 1
+    else:
+        print(f"Using overlay image {overlay_image_path}")
+        overlay_image = Image.open(overlay_image_path)
+
+    print(f"Processing {number_of_images} images...")
+    for example in tqdm(dataset):
+        img = example['image'].copy()
+
+        if correlate_overlay:
+            objects = {name: obj for obj in example['objects'] for name in obj['names']}
+            least_likely_object, best_replacement_object = find_correlated_object(cooccurence_matrix, list(objects.keys()))
+            overlay_image = extract_subimage(*name_to_best_res_imgpatch[best_replacement_object])
+            
+            replaced_object = objects[least_likely_object]
+            x, y, w, h = replaced_object['x'], replaced_object['y'], replaced_object['w'], replaced_object['h']
+            scaled_overlay = overlay_image.resize((w, h)).convert("RGBA")
+
+            patch = (x, y, w, h)
+        else:
+            rotation = random.randint(0, 360)
+            rotated_overlay = rotate_image_pillow(overlay_image, rotation)
+            scaled_overlay = scale_inpainted_image_pillow(img, rotated_overlay)
+
+            # Find the bounding boxes of the objects in the image
+            overlaps = find_bounding_boxes_area(img.height, img.width, example['objects'])
+
+            # Find the patch where the overlay image should be placed
+            # This can be done using 3 different methods
+            # 1. Find the patch with the minimal overlap of bounding boxes, tries to occlude as few objects as possible
+            # 2. Find the patch with the maximal overlap of bounding boxes, tries to occlude as many objects as possible
+            # 3. Find a random patch where the average overlap of bounding boxes is within one standard deviation of the mean
+            if patch_strategy == "minimal":
+                patch = find_minimal_patch(overlaps, scaled_overlay.size)
+            elif patch_strategy == "maximal":
+                patch = find_maximal_patch(overlaps, scaled_overlay.size)
+            elif patch_strategy == "random":
+                patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
+            else:
+                raise ValueError(f"Unknown patch strategy {patch_strategy}")
+
+            if visualize_bb:
+                plt.imshow(overlaps)
+                plt.show()
+
+        img = add_transparent_image_pillow(img, scaled_overlay, x_offset=patch[0], y_offset=patch[1])
+        img.save(f"{modified_directory}/{example['image_id']}.jpg")
+
+
+    print(f"Saved modified images to {modified_directory}")
+    print("Done! :)")
+
+if __name__ == "__main__":
+    main()
 
 # TODO: 
-# Test split in create_vg_subset
-# Create some sort of algorithm to find the appropriate new object from the co-occurence matrix based on the existing objects in the image
+# Type hints
