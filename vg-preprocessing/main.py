@@ -12,6 +12,8 @@ import pandas as pd
 import copy
 import json
 import torch
+from segment_anything import sam_model_registry, SamPredictor
+
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
 
     assert background.mode == 'RGB', f'background image should have exactly 3 channels (RGB). found:{background.mode}'
@@ -139,9 +141,13 @@ def find_correlated_object(cooccurrence_matrix, objects_in_image):
 
     return least_likely_object, best_replacement_object
 
-def extract_subimage(img, patch):
+def extract_subimage(img, patch, sam_predictor):
     x, y, w, h = patch
-    return img.crop((x, y, x + w, y + h))
+    # sub_img = img.crop((x, y, x + w, y + h)
+    segment_background = np.array(img)
+    segment_array = segment_object(segment_background, (x, y, x + w, y + h), sam_predictor)
+    return trim_transparent_borders(Image.fromarray(segment_array))
+
 def draw_semantic_shape_without_Background(shape = "triangle"):
     # Create a black background
     height, width = 700, 700
@@ -162,9 +168,7 @@ def draw_semantic_shape_without_Background(shape = "triangle"):
         vertices = vertices.reshape((-1, 1, 2))
         # Draw and fill the square with blue color (BGR format, blue is (255, 0, 0))
         background = cv2.rectangle(background, top_left_vertex, bottom_right_vertex, (0, 0, 255), -1)
-
-
-
+    
     return background
 
 def draw_semantic_shape_with_Background(shape = "triangle"):
@@ -185,7 +189,6 @@ def draw_semantic_shape_with_Background(shape = "triangle"):
         vertices = np.array([[100, 100], [100, 300], [300, 300], [300,100]], np.int32)
         cv2.fillPoly(background, [vertices], color=(0, 0, 255))
 
-
     background = cv2.cvtColor(background, cv2.COLOR_RGB2RGBA)
     plt.figure(figsize=(20, 20))
     plt.imshow(background)
@@ -193,6 +196,7 @@ def draw_semantic_shape_with_Background(shape = "triangle"):
     plt.show()
 
     return background
+
 def select_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
 
     #change the image to the right format for processing
@@ -225,31 +229,27 @@ def select_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
         object = segment_object(segment_background, boxes[objects_not_in_rl[0]])
     return object
 
-
-
-def segment_object(segment_background, boxes):
+def setup_sam_predictor():
     #activate segment ANYTHING
     sam_checkpoint = "./path_to_sam_checkpoint/sam_vit_h_4b8939.pth"
-    from segment_anything import sam_model_registry, SamPredictor
     model_type = "vit_h"
-    # change the device to cuda if you have a gpu
-    device = "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     sam.to(device=device)
 
-    predictor = SamPredictor(sam)
+    return SamPredictor(sam)
+
+def segment_object(segment_background, boxes, sam_predictor):
+    if sam_predictor is None:
+        sam_predictor = setup_sam_predictor()
 
     # get the object from the image
     boxes = np.array(boxes)
     x1, y1, x2, y2 = boxes
     object_box = segment_background[int(y1):int(y2), int(x1):int(x2)]
-    plt.figure(figsize=(20, 20))
-    plt.imshow(object_box)
-    plt.axis('off')
-    plt.show()
-    predictor.set_image(segment_background)
-    masks, _, _ = predictor.predict(
+    sam_predictor.set_image(segment_background)
+    masks, _, _ = sam_predictor.predict(
         point_coords=None,
         point_labels=None,
         box=boxes[None, :],
@@ -260,11 +260,30 @@ def segment_object(segment_background, boxes):
     b, g, r = cv2.split(extracted_object)
     alpha = binary_mask
     rgba_image = cv2.merge([b, g, r, alpha])
-    plt.figure(figsize=(20, 20))
-    plt.imshow(rgba_image)
-    plt.axis('off')
-    plt.show()
     return rgba_image
+
+def trim_transparent_borders(image):
+    # Convert image to RGBA if it isn't already
+    if image.mode != 'RGBA':
+        image = image.convert('RGBA')
+    
+    # Get image data as a numpy array
+    np_image = np.array(image)
+    
+    # Split the alpha channel
+    alpha_channel = np_image[:, :, 3]
+    
+    # Get bounding box coordinates of non-transparent pixels
+    non_empty_columns = np.where(alpha_channel.max(axis=0) > 0)[0]
+    non_empty_rows = np.where(alpha_channel.max(axis=1) > 0)[0]
+    
+    if non_empty_columns.size and non_empty_rows.size:
+        crop_box = (min(non_empty_columns), min(non_empty_rows), max(non_empty_columns) + 1, max(non_empty_rows) + 1)
+        trimmed_image = image.crop(crop_box)
+        return trimmed_image
+    else:
+        # Return an empty image if there are no non-transparent pixels
+        return Image.new('RGBA', (1, 1), (0, 0, 0, 0))
 
 
 def image_inpainting(inputs, mode = "trained_object"):
@@ -302,7 +321,6 @@ def image_inpainting(inputs, mode = "trained_object"):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--source_directory", type=str, default="VG_100K_subset", help="Directory containing images to modify")
     parser.add_argument("--modified_directory", type=str, default="VG_100K_subset_modified", help="Directory to save modified images")
     parser.add_argument("--overlay_image_path", type=str, default="insert_objects/maikaefer.png", help="Path to overlay image")
     parser.add_argument("--seed", type=int, help="Seed for random number generator")
@@ -344,6 +362,9 @@ def main():
     dataset = dataset.shuffle(seed=seed)['train'].select(range(number_of_images))
 
     if correlate_overlay:
+        print(f"Setting up SAM predictor...")
+        sam_predictor = setup_sam_predictor()
+
         print(f"Collecting object names...")
 
         name_to_best_res_imgpatch = {}
@@ -375,8 +396,11 @@ def main():
 
         if correlate_overlay:
             objects = {name: obj for obj in example['objects'] for name in obj['names']}
+            if not objects: # Skip images without objects
+                continue
+
             least_likely_object, best_replacement_object = find_correlated_object(cooccurence_matrix, list(objects.keys()))
-            overlay_image = extract_subimage(*name_to_best_res_imgpatch[best_replacement_object])
+            overlay_image = extract_subimage(*name_to_best_res_imgpatch[best_replacement_object], sam_predictor)
             
             replaced_object = objects[least_likely_object]
             x, y, w, h = replaced_object['x'], replaced_object['y'], replaced_object['w'], replaced_object['h']

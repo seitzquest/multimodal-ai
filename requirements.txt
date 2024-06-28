@@ -4,3 +4,4 @@ datasets
 datasets[vision]
 matplotlib
 pandas
+segment-anything
