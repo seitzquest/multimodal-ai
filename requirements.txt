@@ -1,0 +1,6 @@
+opencv-python
+numpy
+datasets
+datasets[vision]
+matplotlib
+pandas
