@@ -9,7 +9,9 @@ from PIL import ImageDraw
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import pandas as pd
-
+import copy
+import json
+import torch
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
 
     assert background.mode == 'RGB', f'background image should have exactly 3 channels (RGB). found:{background.mode}'
@@ -140,7 +142,163 @@ def find_correlated_object(cooccurrence_matrix, objects_in_image):
 def extract_subimage(img, patch):
     x, y, w, h = patch
     return img.crop((x, y, x + w, y + h))
+def draw_semantic_shape_without_Background(shape = "triangle"):
+    # Create a black background
+    height, width = 700, 700
+    background = np.zeros((height, width, 4), dtype=np.uint8)
 
+    # Define the vertices of the shape
+    if shape == "triangle":
+        vertices = np.array([[250, 100], [50, 600], [450, 600]], np.int32)
+        vertices = vertices.reshape((-1, 1, 2))
+        # cv2.polylines(background, [vertices], isClosed=True, color=(0, 0, 255), thickness=2)
+        # Fill the triangle with red color
+        cv2.fillPoly(background, [vertices], color=(0, 0, 255, 255))
+    else:
+        top_left_vertex = (150, 150)
+        bottom_right_vertex = (350, 350)
+
+        vertices = np.array([[100, 100], [100, 400], [400, 400], [400,100]], np.int32)
+        vertices = vertices.reshape((-1, 1, 2))
+        # Draw and fill the square with blue color (BGR format, blue is (255, 0, 0))
+        background = cv2.rectangle(background, top_left_vertex, bottom_right_vertex, (0, 0, 255), -1)
+
+
+
+    return background
+
+def draw_semantic_shape_with_Background(shape = "triangle"):
+    # Create a black background
+    height, width = 500, 500
+    background = np.zeros((height, width, 3), dtype=np.uint8)
+
+    # Define the vertices of the shape
+    if shape == "triangle":
+        vertices = np.array([[250, 100], [150, 400], [350, 400]], np.int32)
+        vertices = vertices.reshape((-1, 1, 2))
+        # cv2.polylines(background, [vertices], isClosed=True, color=(0, 0, 255), thickness=2)
+        # Fill the triangle with red color
+        cv2.fillPoly(background, [vertices], color=(0, 0, 255))
+    else:
+        top_left_vertex = (150, 150)
+        bottom_right_vertex = (350, 350)
+        vertices = np.array([[100, 100], [100, 300], [300, 300], [300,100]], np.int32)
+        cv2.fillPoly(background, [vertices], color=(0, 0, 255))
+
+
+    background = cv2.cvtColor(background, cv2.COLOR_RGB2RGBA)
+    plt.figure(figsize=(20, 20))
+    plt.imshow(background)
+    plt.axis('off')
+    plt.show()
+
+    return background
+def select_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
+
+    #change the image to the right format for processing
+    img = inputs['image']
+    segment_background = copy.deepcopy(img.numpy())
+    segment_background = np.transpose(segment_background, axes=[1, 2, 0])
+
+    #get the object and predicate information from json file
+    vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
+    idx2label = vocab_file['idx_to_label']
+    object_labels = [idx2label[str(i + 1)] for i in inputs['instances'].get('gt_classes').tolist()]
+    labels = ['{}-{}'.format(idx, idx2label[str(i + 1)]) for idx, i in
+              enumerate(inputs['instances'].get('gt_classes').tolist())]
+    idx2pred = vocab_file['idx_to_predicate']
+    # get object labels from ground truth
+    boxes = inputs['instances'].get('gt_boxes').tensor.tolist()
+    # get relation labels from ground truth
+    gt_rels = inputs['relations'].tolist()
+    gt_rels_labels = [(labels[i[0]], idx2pred[str(i[2] + 1)], labels[i[1]]) for i in gt_rels]
+    objects_in_rl = [i[0] for i in gt_rels] + [i[1] for i in gt_rels]
+    objects_idx = [i for i in range(len(object_labels))]
+    objects_not_in_rl = [i for i in objects_idx if i not in objects_in_rl]
+
+    "the mode could be:  same object duplicate, same class different object"
+    if obj_in_rl:
+        "segment the first object listet in the objects_in_rl list"
+        object = segment_object(segment_background, boxes[objects_in_rl[0]])
+    else:
+        "segment the first object listet in the objects_not_in_rl list"
+        object = segment_object(segment_background, boxes[objects_not_in_rl[0]])
+    return object
+
+
+
+def segment_object(segment_background, boxes):
+    #activate segment ANYTHING
+    sam_checkpoint = "./path_to_sam_checkpoint/sam_vit_h_4b8939.pth"
+    from segment_anything import sam_model_registry, SamPredictor
+    model_type = "vit_h"
+    # change the device to cuda if you have a gpu
+    device = "cpu"
+
+    sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+    sam.to(device=device)
+
+    predictor = SamPredictor(sam)
+
+    # get the object from the image
+    boxes = np.array(boxes)
+    x1, y1, x2, y2 = boxes
+    object_box = segment_background[int(y1):int(y2), int(x1):int(x2)]
+    plt.figure(figsize=(20, 20))
+    plt.imshow(object_box)
+    plt.axis('off')
+    plt.show()
+    predictor.set_image(segment_background)
+    masks, _, _ = predictor.predict(
+        point_coords=None,
+        point_labels=None,
+        box=boxes[None, :],
+        multimask_output=False,
+    )
+    binary_mask = (masks[0] * 255).astype(np.uint8)
+    extracted_object = cv2.bitwise_and(segment_background, segment_background, mask=binary_mask)
+    b, g, r = cv2.split(extracted_object)
+    alpha = binary_mask
+    rgba_image = cv2.merge([b, g, r, alpha])
+    plt.figure(figsize=(20, 20))
+    plt.imshow(rgba_image)
+    plt.axis('off')
+    plt.show()
+    return rgba_image
+
+
+def image_inpainting(inputs, mode = "trained_object"):
+
+    img = inputs['image']
+
+    background_img = copy.deepcopy(img.numpy())
+    background_img = np.transpose(background_img, axes=[1, 2, 0])
+
+    if mode == "untrained_object":
+        translated_obj = cv2.imread('evaluation/insert_objects/maikaefer.png', cv2.IMREAD_UNCHANGED)
+        translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
+    elif mode == "shape":
+        translated_obj = draw_semantic_shape_without_Background(shape = "square")
+    elif mode == "trained_object":
+        translated_obj = cv2.imread('evaluation/insert_objects/aiplane.png', cv2.IMREAD_UNCHANGED)
+        translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
+    elif mode == "related_object_in_image":
+        translated_obj = select_object(inputs)
+
+    rotation = 0#random.randint(0, 360)
+    rotated_overlay = rotate_image_pillow(translated_obj , rotation)
+    scaled_overlay = scale_inpainted_image_pillow(background_img, rotated_overlay, scaling=1)
+    img_inpainting = add_transparent_image_pillow(background_img, scaled_overlay, 100,100, rotation=rotation)
+
+    plt.figure(figsize=(20, 20))
+    plt.imshow(img_inpainting)
+    plt.axis('off')
+    plt.show()
+    img_inpainting = np.transpose(img_inpainting, axes=[2, 0, 1])
+    inputs['image'] =  torch.from_numpy(img_inpainting)
+
+
+    return inputs
 
 def parse_args():
     parser = argparse.ArgumentParser()
