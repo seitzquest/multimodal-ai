@@ -198,7 +198,7 @@ def draw_semantic_shape_with_Background(shape = "triangle"):
 
     return background
 
-def select_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
+def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
 
     #change the image to the right format for processing
     img = inputs['image']
@@ -357,8 +357,28 @@ def trim_transparent_borders(image):
         # Return an empty image if there are no non-transparent pixels
         return Image.new('RGBA', (1, 1), (0, 0, 0, 0))
 
+def select_object(inputs, obj_in_rl = False, mode = None, co_occurence_matrix = None):
+    # get the object lists from json file
 
-def image_translating(inputs, mode = "trained_object"):
+    # change the image to the right format for processing
+    img = inputs['image']
+    segment_background = copy.deepcopy(img.numpy())
+    segment_background = np.transpose(segment_background, axes=[1, 2, 0])
+
+    # get the object and predicate information from json file
+    vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
+    idx2label = vocab_file['idx_to_label']
+    object_labels = [idx2label[str(i + 1)] for i in inputs['instances'].get('gt_classes').tolist()]
+    least_likely_object, best_replacement_object = find_correlated_object(co_occurence_matrix, object_labels)
+   # translated_obj = cv2.imread('evaluation/insert_objects/'+best_replacement_object+'_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
+    translated_obj = cv2.imread('evaluation/insert_objects/airplane_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
+    translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
+    return translated_obj
+
+
+
+
+def image_translanting(inputs, occurence_matrix,mode = "trained_object"):
 
     img = inputs['image']
 
@@ -374,12 +394,30 @@ def image_translating(inputs, mode = "trained_object"):
         translated_obj = cv2.imread('evaluation/insert_objects/aiplane.png', cv2.IMREAD_UNCHANGED)
         translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
     elif mode == "related_object_in_image":
-        translated_obj = select_object(inputs)
+        translated_obj = duplicate_object(inputs, obj_in_rl = False)
+    elif mode == "likely_object_in_image":
+        translated_obj = select_object(inputs, obj_in_rl = False, mode = "same class different object", matrix = occurence_matrix)
 
-    rotation = 0#random.randint(0, 360)
-    rotated_overlay = rotate_image_pillow(translated_obj , rotation)
-    scaled_overlay = scale_inpainted_image_pillow(background_img, rotated_overlay, scaling=1)
-    img_inpainting = add_transparent_image_pillow(background_img, scaled_overlay, 100,100, rotation=rotation)
+    elif mode == "unlikely_object_in_image":
+        translated_obj = select_object(inputs, obj_in_rl = False, mode = "unlikely object", matrix = occurence_matrix)
+
+    rotation = 0  #random.randint(0, 360)
+    rotated_overlay = rotate_image(translated_obj , rotation)
+    scaled_overlay = scale_inpainted_image(background_img, rotated_overlay, scaling=1)
+
+    # Find the bounding boxes of the objects in the image
+    background_img_height, background_img_width = background_img.shape[:2]
+    overlaps = find_bounding_boxes_area(background_img_height, background_img_width, inputs['instances'].get('gt_boxes').tensor.tolist())
+    patch_strategy = "minimal"
+    if patch_strategy == "minimal":
+        patch = find_minimal_patch(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "maximal":
+        patch = find_maximal_patch(overlaps, scaled_overlay.size)
+    elif patch_strategy == "random":
+        patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
+    else:
+        raise ValueError(f"Unknown patch strategy {patch_strategy}")
+    img_inpainting = add_transparent_image(background_img, scaled_overlay, patch[0], patch[1], rotation=rotation)
 
     plt.figure(figsize=(20, 20))
     plt.imshow(img_inpainting)
