@@ -262,6 +262,22 @@ def segment_object(segment_background, boxes, sam_predictor):
     rgba_image = cv2.merge([b, g, r, alpha])
     return rgba_image
 
+
+def get_co_occurence_matrix(data_loader):
+    "refactor the implemented cooccurence matrix function from main to be integrated in the evaluation part of the baseline"
+    "the input of the data_loader is the splited testdata for the vealuation"
+    # get the object lists from json file
+    vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
+    idx2label = vocab_file['idx_to_label']
+    object_labels_150 = [idx2label[str(i + 1)] for i in range(150)]
+    cooccurence_matrix = pd.DataFrame(0, index=object_labels_150, columns=object_labels_150)
+    for inputs in data_loader:
+        object_labels = [idx2label[str(i + 1)] for i in inputs['instances'].get('gt_classes').tolist()]
+        for i in range(len(object_labels)):
+            for j in range(i + 1, len(object_labels)):
+                cooccurence_matrix.at[object_labels[i], object_labels[j]] += 1
+                cooccurence_matrix.at[object_labels[j], object_labels[i]] += 1
+    return cooccurence_matrix
 def trim_transparent_borders(image):
     # Convert image to RGBA if it isn't already
     if image.mode != 'RGBA':
@@ -286,7 +302,7 @@ def trim_transparent_borders(image):
         return Image.new('RGBA', (1, 1), (0, 0, 0, 0))
 
 
-def image_inpainting(inputs, mode = "trained_object"):
+def image_translating(inputs, mode = "trained_object"):
 
     img = inputs['image']
 
@@ -338,15 +354,15 @@ def main():
     print("----------------------------")
     print("Visual Genome Preprocessing")
     print("----------------------------\n")
-    args = parse_args()
+    #args = parse_args()
 
-    modified_directory = args.modified_directory
-    overlay_image_path = args.overlay_image_path
-    seed = args.seed
-    patch_strategy = args.patch_strategy
-    number_of_images = args.num_images
-    visualize_bb = args.visualize_bb
-    correlate_overlay = args.correlate_overlay
+    modified_directory = "VG_100K_subset_modified"#args.modified_directory
+    overlay_image_path = "insert_objects/maikaefer.png"#args.overlay_image_path
+    seed = 1#args.seed
+    patch_strategy = "minimal"#args.patch_strategy
+    number_of_images = 1 #args.num_images
+    visualize_bb = True #args.visualize_bb
+    correlate_overlay =True #args.correlate_overlay
 
     os.makedirs(modified_directory, exist_ok=True)
 
