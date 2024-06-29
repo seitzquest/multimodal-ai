@@ -325,16 +325,12 @@ def generate_150_objects_overlays(object_labels):
         # segment the bounding box on the image
         x, y, w, h = person_bounding_box
         obj_in_image = image[y:y + h, x:x + w]
+        boxes = [x, y, x + w, y + h]
+        segmented_object = segment_object(image, boxes)
 
-
-        # Display the image with the bounding box
-       # plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-       # plt.title('Image with "person" label and bounding box from Visual Genome dataset')
-       # plt.axis('off')
-       # plt.show()
 
         # Save the image with the bounding box (optional)
-        cv2.imwrite('evaluation/insert_objects/'+name+'_with_bounding_box.jpg', obj_in_image)
+        cv2.imwrite('evaluation/insert_objects/'+name+'_without_bounding_box.jpg', segmented_object)
 
 
 
