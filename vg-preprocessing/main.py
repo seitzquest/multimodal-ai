@@ -13,6 +13,7 @@ import copy
 import json
 import torch
 from segment_anything import sam_model_registry, SamPredictor
+import request
 
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
 
@@ -271,6 +272,7 @@ def get_co_occurence_matrix(data_loader):
     idx2label = vocab_file['idx_to_label']
     object_labels_150 = [idx2label[str(i + 1)] for i in range(150)]
     cooccurence_matrix = pd.DataFrame(0, index=object_labels_150, columns=object_labels_150)
+    generate_150_objects_overlays(object_labels_150)
     for inputs in data_loader:
         object_labels = [idx2label[str(i + 1)] for i in inputs['instances'].get('gt_classes').tolist()]
         for i in range(len(object_labels)):
@@ -278,6 +280,64 @@ def get_co_occurence_matrix(data_loader):
                 cooccurence_matrix.at[object_labels[i], object_labels[j]] += 1
                 cooccurence_matrix.at[object_labels[j], object_labels[i]] += 1
     return cooccurence_matrix
+def generate_150_objects_overlays(object_labels):
+    # Define the paths to the Visual Genome dataset annotation files
+    image_data = json.load(open('data/datasets/image_data.json'))
+    objects_data = json.load(open('data/datasets/objects.json'))
+    # Find an image containing an object labeled as "person"
+    for object in object_labels:
+        name = object
+        person_image_id = None
+        person_bounding_box = None
+        for obj in objects_data:
+            for obj_item in obj['objects']:
+                if 'names' in obj_item and object in obj_item['names']:
+                    person_image_id = obj['image_id']
+                    person_bounding_box = obj_item['x'], obj_item['y'], obj_item['w'], obj_item['h']
+                    break
+            if person_image_id:
+                break
+
+        if person_image_id is None:
+            raise ValueError("No image with a " + object +" label found in the Visual Genome dataset.")
+
+        if person_bounding_box is None:
+            raise ValueError(f"No bounding box found for " + object +" in image_id {person_image_id}.")
+
+        # Find the corresponding image metadata
+        person_image_metadata = next((img for img in image_data if img['image_id'] == person_image_id), None)
+
+        if person_image_metadata is None:
+            raise ValueError(f"No metadata found for image_id {person_image_id}.")
+
+        # Construct the URL for the image
+        person_image_url = person_image_metadata['url']
+
+        # Download the image
+        response = requests.get(person_image_url)
+        if response.status_code != 200:
+            raise ValueError("Failed to download image from the Visual Genome dataset.")
+
+        # Convert the image data to a NumPy array and then to an OpenCV image
+        image_array = np.asarray(bytearray(response.content), dtype=np.uint8)
+        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+        # segment the bounding box on the image
+        x, y, w, h = person_bounding_box
+        obj_in_image = image[y:y + h, x:x + w]
+
+
+        # Display the image with the bounding box
+       # plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+       # plt.title('Image with "person" label and bounding box from Visual Genome dataset')
+       # plt.axis('off')
+       # plt.show()
+
+        # Save the image with the bounding box (optional)
+        cv2.imwrite('evaluation/insert_objects/'+name+'_with_bounding_box.jpg', obj_in_image)
+
+
+
 def trim_transparent_borders(image):
     # Convert image to RGBA if it isn't already
     if image.mode != 'RGBA':
@@ -354,15 +414,15 @@ def main():
     print("----------------------------")
     print("Visual Genome Preprocessing")
     print("----------------------------\n")
-    #args = parse_args()
+    args = parse_args()
 
-    modified_directory = "VG_100K_subset_modified"#args.modified_directory
-    overlay_image_path = "insert_objects/maikaefer.png"#args.overlay_image_path
-    seed = 1#args.seed
-    patch_strategy = "minimal"#args.patch_strategy
-    number_of_images = 1 #args.num_images
-    visualize_bb = True #args.visualize_bb
-    correlate_overlay =True #args.correlate_overlay
+    modified_directory = args.modified_directory
+    overlay_image_path = args.overlay_image_path
+    seed = args.seed
+    patch_strategy = args.patch_strategy
+    number_of_images = args.num_images
+    visualize_bb = args.visualize_bb
+    correlate_overlay =args.correlate_overlay
 
     os.makedirs(modified_directory, exist_ok=True)
 
