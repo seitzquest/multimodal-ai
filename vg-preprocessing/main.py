@@ -13,7 +13,7 @@ import copy
 import json
 import torch
 from segment_anything import sam_model_registry, SamPredictor
-import request
+import requests
 
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
 
