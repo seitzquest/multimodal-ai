@@ -14,7 +14,7 @@ import pandas as pd
 import json
 import requests
 #setup for segment anything
-sam_checkpoint = "./modeling/GroundedSam/recognizeAnything/GroundedSegmentAnything/sam_vit_h_4b8939.pth"
+sam_checkpoint = "./SAM_checkpoint/sam_vit_h_4b8939.pth"
 from segment_anything import sam_model_registry, SamPredictor
 model_type = "vit_h"
 #change the device to cuda if you have a gpu
@@ -449,8 +449,3 @@ def image_translanting(inputs, mode = "trained_object", matrix = occurence_matri
 
     return inputs
 
-if __name__ =="main":
-    vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
-    idx2label = vocab_file['idx_to_label']
-    object_labels_150 = [idx2label[str(i + 1)] for i in range(150)]
-    generate_150_objects_overlays(object_labels_150)
