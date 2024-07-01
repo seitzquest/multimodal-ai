@@ -14,6 +14,7 @@ import json
 import torch
 from segment_anything import sam_model_registry, SamPredictor
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
 
@@ -77,6 +78,65 @@ def find_minimal_patch(overlap_array, patch_size):
             if patch_sum < min_sum:
                 min_sum = patch_sum
                 min_patch = (x, y, patch_size[1], patch_size[0])
+    return min_patch
+
+# Finds the image patch with the minimal overlap of bounding boxes
+def find_minimal_patch_optimimized(overlap_array, patch_size):
+    min_sum = overlap_array[:patch_size[0], :patch_size[1]].sum()
+    min_patch = (0, 0, patch_size[1], patch_size[0])
+
+    initial_sum = min_sum
+
+    # Sliding window approch but only the new values are calculated
+    for y in range(overlap_array.shape[0] - patch_size[0] + 1):
+        for x in range(overlap_array.shape[1] - patch_size[1] + 1):
+            if y > 0:
+                new_row = overlap_array[y + patch_size[0] - 1, x:x + patch_size[1]]
+                old_row = overlap_array[y - 1, x:x + patch_size[1]]
+                row_diff = new_row.sum() - old_row.sum()
+                min_sum += row_diff
+            if x > 0:
+                new_col = overlap_array[y:y + patch_size[0], x + patch_size[1] - 1]
+                old_col = overlap_array[y:y + patch_size[0], x - 1]
+                col_diff = new_col.sum() - old_col.sum()
+                min_sum += col_diff
+
+            if min_sum < initial_sum:
+                initial_sum = min_sum
+                min_patch = (x, y, patch_size[1], patch_size[0])
+
+    return min_patch
+
+
+def find_minimal_patch_multithreaded(overlap_array, patch_size):
+    height, width = overlap_array.shape
+    # Calculate segment sizes
+    segment_height = height // 2
+    segment_width = width // 2
+
+    # Define the segments
+    segments = [
+        (0, 0, segment_width, segment_height),
+        (segment_width, 0, width, segment_height),
+        (0, segment_height, segment_width, height),
+        (segment_width, segment_height, width, height)
+    ]
+
+    # copy overlap arrays
+    overlap_arrays = [overlap_array[segment[1]:segment[3], segment[0]:segment[2]].copy() for segment in segments]
+
+    min_sum = float('inf')
+    min_patch = None
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [executor.submit(find_minimal_patch, overlap_arrays[i], patch_size) for i in range(4)]
+        for future in as_completed(futures):
+            patch = future.result()
+            patch_sum = np.sum(overlap_array[patch[1]:patch[1]+patch[3], patch[0]:patch[0]+patch[2]])
+            if patch_sum < min_sum:
+                min_sum = patch_sum
+                min_patch = patch
+
     return min_patch
 
 
@@ -280,6 +340,8 @@ def get_co_occurence_matrix(data_loader):
                 cooccurence_matrix.at[object_labels[i], object_labels[j]] += 1
                 cooccurence_matrix.at[object_labels[j], object_labels[i]] += 1
     return cooccurence_matrix
+
+
 def generate_150_objects_overlays(object_labels):
     # Define the paths to the Visual Genome dataset annotation files
     image_data = json.load(open('data/datasets/image_data.json'))
@@ -536,6 +598,12 @@ def main():
                 patch = find_maximal_patch(overlaps, scaled_overlay.size)
             elif patch_strategy == "random":
                 patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
+            elif patch_strategy == "minimal_multithreaded":
+                patch = find_minimal_patch_multithreaded(overlaps, scaled_overlay.size)
+            elif patch_strategy == "random_multithreaded":
+                patch = find_random_thresholded_patch_multithreaded(overlaps, scaled_overlay.size)
+            elif patch_strategy == "minimal_optimized":
+                patch = find_minimal_patch_optimimized(overlaps, scaled_overlay.size)
             else:
                 raise ValueError(f"Unknown patch strategy {patch_strategy}")
 
