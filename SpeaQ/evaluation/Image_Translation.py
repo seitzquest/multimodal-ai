@@ -226,6 +226,65 @@ def find_random_thresholded_patch(overlap_array, patch_size):
 
     x, y = random.choice(valid_positions)
     return (x, y, patch_size[1], patch_size[0])
+
+# Finds the image patch with the minimal overlap of bounding boxes
+# Uses a heuristic to find the minimal patch
+# Assumes that the minimal patch has the minimal value in the overlap array
+def find_minimal_patch_heuristic(overlap_array, patch_size):
+    min_sum = float('inf')
+    min_patch = None
+
+    # find positions where value is minimal and still can fit the patch
+    cropped_array = overlap_array[:overlap_array.shape[0] - patch_size[0] + 1, :overlap_array.shape[1] - patch_size[1] + 1].copy()
+    min_positions = np.argwhere(cropped_array == np.min(cropped_array))
+
+    if min_positions.size == 0:
+        return None
+
+    # iterate through each of the minimal positions and find the one with the least sum
+    for y, x in min_positions:
+        patch = overlap_array[y:y+patch_size[0], x:x+patch_size[1]]
+        patch_sum = np.sum(patch)
+        if patch_sum < min_sum:
+            min_sum = patch_sum
+            min_patch = (x, y, patch_size[1], patch_size[0])
+
+    return min_patch
+
+def find_maximal_patch_heuristic(overlap_array, patch_size):
+    max_sum = 0
+    max_patch = None
+
+    # find positions where value is maximal and still can fit the patch
+    cropped_array = overlap_array[:overlap_array.shape[0] - patch_size[1], :overlap_array.shape[1] - patch_size[0]].copy()
+    max_positions = np.argwhere(cropped_array == np.max(cropped_array))
+
+    if max_positions.size == 0:
+        return None
+
+    # iterate through each of the maximal positions and find the one with the least sum
+    for y, x in max_positions:
+        patch = overlap_array[y:y+patch_size[1], x:x+patch_size[0]]
+        patch_sum = np.sum(patch)
+        if patch_sum > max_sum:
+            max_sum = patch_sum
+            max_patch = (x, y, patch_size[0], patch_size[1])
+
+    return max_patch
+
+def find_random_thresholded_patch_heuristic(overlap_array, patch_size):
+    upper_threshold = np.mean(overlap_array) + np.std(overlap_array)
+    lower_threshold = np.mean(overlap_array) - np.std(overlap_array)
+
+    valid_positions = (overlap_array > lower_threshold) & (overlap_array < upper_threshold)
+
+    valid_positions = np.argwhere(valid_positions)
+    if valid_positions.size == 0:
+        return None
+
+    x, y = random.choice(valid_positions)
+    return (x, y, patch_size[1], patch_size[0])
+
 def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
 
     #change the image to the right format for processing
@@ -435,6 +494,12 @@ def image_translanting(inputs, mode = "trained_object", matrix = occurence_matri
         patch = find_maximal_patch(overlaps, scaled_overlay.size)
     elif patch_strategy == "random":
         patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
+    elif patch_strategy == "minimal_heuristic":
+        patch = find_minimal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "maximal_heuristic":
+        patch = find_maximal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "random_heuristic":
+        patch = find_random_thresholded_patch_heuristic(overlaps, scaled_overlay.shape[:2])
     else:
         raise ValueError(f"Unknown patch strategy {patch_strategy}")
     img_inpainting = add_transparent_image(background_img, scaled_overlay, patch[0], patch[1], rotation=rotation)
