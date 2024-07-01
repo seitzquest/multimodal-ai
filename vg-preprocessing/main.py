@@ -15,6 +15,7 @@ import torch
 from segment_anything import sam_model_registry, SamPredictor
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
 
@@ -81,64 +82,28 @@ def find_minimal_patch(overlap_array, patch_size):
     return min_patch
 
 # Finds the image patch with the minimal overlap of bounding boxes
-def find_minimal_patch_optimimized(overlap_array, patch_size):
-    min_sum = overlap_array[:patch_size[0], :patch_size[1]].sum()
-    min_patch = (0, 0, patch_size[1], patch_size[0])
-
-    initial_sum = min_sum
-
-    # Sliding window approch but only the new values are calculated
-    for y in range(overlap_array.shape[0] - patch_size[0] + 1):
-        for x in range(overlap_array.shape[1] - patch_size[1] + 1):
-            if y > 0:
-                new_row = overlap_array[y + patch_size[0] - 1, x:x + patch_size[1]]
-                old_row = overlap_array[y - 1, x:x + patch_size[1]]
-                row_diff = new_row.sum() - old_row.sum()
-                min_sum += row_diff
-            if x > 0:
-                new_col = overlap_array[y:y + patch_size[0], x + patch_size[1] - 1]
-                old_col = overlap_array[y:y + patch_size[0], x - 1]
-                col_diff = new_col.sum() - old_col.sum()
-                min_sum += col_diff
-
-            if min_sum < initial_sum:
-                initial_sum = min_sum
-                min_patch = (x, y, patch_size[1], patch_size[0])
-
-    return min_patch
-
-
-def find_minimal_patch_multithreaded(overlap_array, patch_size):
-    height, width = overlap_array.shape
-    # Calculate segment sizes
-    segment_height = height // 2
-    segment_width = width // 2
-
-    # Define the segments
-    segments = [
-        (0, 0, segment_width, segment_height),
-        (segment_width, 0, width, segment_height),
-        (0, segment_height, segment_width, height),
-        (segment_width, segment_height, width, height)
-    ]
-
-    # copy overlap arrays
-    overlap_arrays = [overlap_array[segment[1]:segment[3], segment[0]:segment[2]].copy() for segment in segments]
-
+# Uses a heuristic to find the minimal patch
+# Assumes that the minimal patch has the minimal value in the overlap array
+def find_minimal_patch_heuristic(overlap_array, patch_size):
     min_sum = float('inf')
     min_patch = None
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = [executor.submit(find_minimal_patch, overlap_arrays[i], patch_size) for i in range(4)]
-        for future in as_completed(futures):
-            patch = future.result()
-            patch_sum = np.sum(overlap_array[patch[1]:patch[1]+patch[3], patch[0]:patch[0]+patch[2]])
-            if patch_sum < min_sum:
-                min_sum = patch_sum
-                min_patch = patch
+    # find positions where value is minimal and still can fit the patch
+    cropped_array = overlap_array[:overlap_array.shape[0] - patch_size[0] + 1, :overlap_array.shape[1] - patch_size[1] + 1].copy()
+    min_positions = np.argwhere(cropped_array == np.min(cropped_array))
+
+    if min_positions.size == 0:
+        return None
+
+    # iterate through each of the minimal positions and find the one with the least sum
+    for y, x in min_positions:
+        patch = overlap_array[y:y+patch_size[0], x:x+patch_size[1]]
+        patch_sum = np.sum(patch)
+        if patch_sum < min_sum:
+            min_sum = patch_sum
+            min_patch = (x, y, patch_size[1], patch_size[0])
 
     return min_patch
-
 
 # Finds the image patch with the maximal overlap of bounding boxes
 def find_maximal_patch(overlap_array, patch_size):
@@ -155,6 +120,26 @@ def find_maximal_patch(overlap_array, patch_size):
                 max_patch = (x, y, patch_size[1], patch_size[0])
     return max_patch
 
+def find_maximal_patch_heuristic(overlap_array, patch_size):
+    max_sum = 0
+    max_patch = None
+
+    # find positions where value is maximal and still can fit the patch
+    cropped_array = overlap_array[:overlap_array.shape[0] - patch_size[1], :overlap_array.shape[1] - patch_size[0]].copy()
+    max_positions = np.argwhere(cropped_array == np.max(cropped_array))
+
+    if max_positions.size == 0:
+        return None
+
+    # iterate through each of the maximal positions and find the one with the least sum
+    for y, x in max_positions:
+        patch = overlap_array[y:y+patch_size[1], x:x+patch_size[0]]
+        patch_sum = np.sum(patch)
+        if patch_sum > max_sum:
+            max_sum = patch_sum
+            max_patch = (x, y, patch_size[0], patch_size[1])
+
+    return max_patch
 
 # Finds a random patch where the average overlap of bounding boxes is within one standard deviation of the mean
 def find_random_thresholded_patch(overlap_array, patch_size):
@@ -173,9 +158,21 @@ def find_random_thresholded_patch(overlap_array, patch_size):
     if valid_positions.size == 0:
         return None
 
-    x, y = random.choice(valid_positions)
+    y, x = random.choice(valid_positions)
     return (x, y, patch_size[1], patch_size[0])
 
+def find_random_thresholded_patch_heuristic(overlap_array, patch_size):
+    upper_threshold = np.mean(overlap_array) + np.std(overlap_array)
+    lower_threshold = np.mean(overlap_array) - np.std(overlap_array)
+
+    valid_positions = (overlap_array > lower_threshold) & (overlap_array < upper_threshold)
+
+    valid_positions = np.argwhere(valid_positions)
+    if valid_positions.size == 0:
+        return None
+
+    x, y = random.choice(valid_positions)
+    return (x, y, patch_size[1], patch_size[0])
 
 # Uses the cooccurence matrix to find the least likely object in the image and most likely object not in the image
 def find_correlated_object(cooccurrence_matrix, objects_in_image):
@@ -518,7 +515,7 @@ def main():
     patch_strategy = args.patch_strategy
     number_of_images = args.num_images
     visualize_bb = args.visualize_bb
-    correlate_overlay =args.correlate_overlay
+    correlate_overlay = args.correlate_overlay
 
     os.makedirs(modified_directory, exist_ok=True)
 
@@ -598,15 +595,14 @@ def main():
                 patch = find_maximal_patch(overlaps, scaled_overlay.size)
             elif patch_strategy == "random":
                 patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
-            elif patch_strategy == "minimal_multithreaded":
-                patch = find_minimal_patch_multithreaded(overlaps, scaled_overlay.size)
-            elif patch_strategy == "random_multithreaded":
-                patch = find_random_thresholded_patch_multithreaded(overlaps, scaled_overlay.size)
-            elif patch_strategy == "minimal_optimized":
-                patch = find_minimal_patch_optimimized(overlaps, scaled_overlay.size)
+            elif patch_strategy == "minimal_heuristic":
+                patch = find_minimal_patch_heuristic(overlaps, scaled_overlay.size)
+            elif patch_strategy == "maximal_heuristic":
+                patch = find_maximal_patch_heuristic(overlaps, scaled_overlay.size)
+            elif patch_strategy == "random_heuristic":
+                patch = find_random_thresholded_patch_heuristic(overlaps, scaled_overlay.size)
             else:
                 raise ValueError(f"Unknown patch strategy {patch_strategy}")
-
             if visualize_bb:
                 plt.imshow(overlaps)
                 plt.show()
