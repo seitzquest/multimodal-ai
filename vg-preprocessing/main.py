@@ -174,30 +174,26 @@ def find_random_thresholded_patch_heuristic(overlap_array, patch_size):
     x, y = random.choice(valid_positions)
     return (x, y, patch_size[1], patch_size[0])
 
-# Uses the cooccurence matrix to find the least likely object in the image and most likely object not in the image
-def find_correlated_object(cooccurrence_matrix, objects_in_image):
+
+def find_least_likely_object(objects, cooccurrence_matrix, objects_in_image):
     likelihoods = []
-    for obj in objects_in_image:
+    for obj in objects:
         likelihood = cooccurrence_matrix.loc[obj, objects_in_image].sum()
         likelihoods.append(likelihood)
-    
-    # Find the least likely object in the image
+
     least_likely_idx = np.argmin(likelihoods)
-    least_likely_object = objects_in_image[least_likely_idx]
+    return objects[least_likely_idx]
 
-    # Find the best replacement object
-    remaining_objects = objects_in_image[:least_likely_idx] + objects_in_image[least_likely_idx+1:]
-    best_replacement_object = None
-    best_replacement_score = -1
 
-    for obj in cooccurrence_matrix.index:
-        if obj not in objects_in_image:
-            replacement_score = cooccurrence_matrix.loc[obj, remaining_objects].sum()
-            if replacement_score > best_replacement_score:
-                best_replacement_score = replacement_score
-                best_replacement_object = obj
+# Uses the cooccurence matrix to find the least likely object in the image and least likely object not in the image
+def find_correlated_object(cooccurrence_matrix, objects_in_image):
+    least_likely_image_object = find_least_likely_object(objects_in_image, cooccurrence_matrix, objects_in_image)
 
-    return least_likely_object, best_replacement_object
+    remaining_objects = [obj for obj in objects_in_image if obj != least_likely_image_object]
+    external_objects = [obj for obj in cooccurrence_matrix.index if obj not in objects_in_image]
+    least_likely_external_object = find_least_likely_object(external_objects, cooccurrence_matrix, remaining_objects)
+
+    return least_likely_image_object, least_likely_external_object
 
 def extract_subimage(img, patch, sam_predictor):
     x, y, w, h = patch
