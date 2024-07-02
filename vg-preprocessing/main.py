@@ -251,7 +251,7 @@ def draw_semantic_shape_with_Background(shape = "triangle"):
 
     return background
 
-def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
+def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", matrix = None):
 
     #change the image to the right format for processing
     img = inputs['image']
@@ -276,12 +276,37 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
 
     "the mode could be:  same object duplicate, same class different object"
     if obj_in_rl:
-        "segment the first object listet in the objects_in_rl list"
-        object = segment_object(segment_background, boxes[objects_in_rl[0]])
+        if mode == "same object duplicate":
+            "segment the first object listet in the objects_in_rl list"
+            translated_obj = segment_object(segment_background, boxes[objects_in_rl[0]])
+        elif mode == "same class different object":
+            "choose the object from the segmented object which in the same class as the object in the relation list"
+            obj_name = object_labels[objects_in_rl[0]]
+            translated_obj = cv2.imread(
+                'evaluation/insert_objects/' + obj_name + '_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
+            translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
+            idx_black = np.where((translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
+            translated_obj[idx_black[0],3] = 0
     else:
-        "segment the first object listet in the objects_not_in_rl list"
-        object = segment_object(segment_background, boxes[objects_not_in_rl[0]])
-    return object
+        if (len(objects_not_in_rl) == 0):
+            obj_idx = objects_in_rl[-1]
+        else:
+            obj_idx = objects_not_in_rl[0]
+        if mode == "same object duplicate":
+            "segment the first object listet in the objects_in_rl list"
+            translated_obj = segment_object(segment_background, boxes[obj_idx])
+        elif mode == "same class different object":
+            "choose the object from the segmented object which in the same class as the object not in the relation list"
+
+            obj_name = object_labels[obj_idx]
+            translated_obj = cv2.imread(
+                'evaluation/insert_objects/' + obj_name + '_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
+            translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
+            idx_black = np.where(
+                (translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
+            translated_obj[idx_black[0],idx_black[1], 3] = 0
+    return translated_obj
+
 
 def setup_sam_predictor():
     #activate segment ANYTHING
@@ -412,23 +437,23 @@ def trim_transparent_borders(image):
         # Return an empty image if there are no non-transparent pixels
         return Image.new('RGBA', (1, 1), (0, 0, 0, 0))
 
-def select_object(inputs, obj_in_rl = False, mode = None, co_occurence_matrix = None):
-    # get the object lists from json file
+def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
 
-    # change the image to the right format for processing
-    img = inputs['image']
-    segment_background = copy.deepcopy(img.numpy())
-    segment_background = np.transpose(segment_background, axes=[1, 2, 0])
+    if mode == "unlikely object":
+        # get the object and predicate information from json file
+        vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
+        idx2label = vocab_file['idx_to_label']
+        object_labels = [idx2label[str(i + 1)] for i in inputs['instances'].get('gt_classes').tolist()]
+        least_likely_object, least_likely_external_object = find_correlated_object(matrix, object_labels)
+        translated_obj = cv2.imread('evaluation/insert_objects/'+least_likely_external_object+'_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
+       # translated_obj = cv2.imread('evaluation/insert_objects/airplane_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
+        translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
+        idx_black = np.where(
+            (translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
+        translated_obj[idx_black[0], idx_black[1], 3] = 0
 
-    # get the object and predicate information from json file
-    vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
-    idx2label = vocab_file['idx_to_label']
-    object_labels = [idx2label[str(i + 1)] for i in inputs['instances'].get('gt_classes').tolist()]
-    least_likely_object, best_replacement_object = find_correlated_object(co_occurence_matrix, object_labels)
-   # translated_obj = cv2.imread('evaluation/insert_objects/'+best_replacement_object+'_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
-    translated_obj = cv2.imread('evaluation/insert_objects/airplane_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
-    translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
     return translated_obj
+
 
 
 
@@ -443,22 +468,25 @@ def image_translanting(inputs, occurence_matrix,mode = "trained_object"):
     if mode == "untrained_object":
         translated_obj = cv2.imread('evaluation/insert_objects/maikaefer.png', cv2.IMREAD_UNCHANGED)
         translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
+        scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.2)
     elif mode == "shape":
-        translated_obj = draw_semantic_shape_without_Background(shape = "square")
+        translated_obj = draw_semantic_shape_without_Background(shape="square")
+        scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.2)
     elif mode == "trained_object":
         translated_obj = cv2.imread('evaluation/insert_objects/aiplane.png', cv2.IMREAD_UNCHANGED)
         translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
+        scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.7)
     elif mode == "related_object_in_image":
-        translated_obj = duplicate_object(inputs, obj_in_rl = False)
-    elif mode == "likely_object_in_image":
-        translated_obj = select_object(inputs, obj_in_rl = False, mode = "same class different object", matrix = occurence_matrix)
+        matrix = pd.read_pickle('evaluation/cooccurence_matrix.pkl')
+        scaled_overlay = duplicate_object(inputs, obj_in_rl=False, mode="same class different object", matrix=matrix)
+        scaled_overlay = scale_inpainted_image(background_img, rscaled_overlay, scaling=1)
 
-    elif mode == "unlikely_object_in_image":
-        translated_obj = select_object(inputs, obj_in_rl = False, mode = "unlikely object", matrix = occurence_matrix)
-
-    rotation = 0  #random.randint(0, 360)
-    rotated_overlay = rotate_image(translated_obj , rotation)
-    scaled_overlay = scale_inpainted_image(background_img, rotated_overlay, scaling=1)
+    elif mode == "unlikely_onject_in_image":
+        matrix = pd.read_pickle('evaluation/cooccurence_matrix.pkl')
+        scaled_overlay = select_object(inputs, obj_in_rl=False, mode="unlikely object", matrix=matrix)
+        scaled_overlay = scale_inpainted_image(background_img, scaled_overlay, scaling=1)
+    else:
+        raise ValueError(f"Unknown mode for image tranplanting {mode}")
 
     # Find the bounding boxes of the objects in the image
     background_img_height, background_img_width = background_img.shape[:2]
@@ -474,10 +502,10 @@ def image_translanting(inputs, occurence_matrix,mode = "trained_object"):
         raise ValueError(f"Unknown patch strategy {patch_strategy}")
     img_inpainting = add_transparent_image(background_img, scaled_overlay, patch[0], patch[1], rotation=rotation)
 
-    plt.figure(figsize=(20, 20))
-    plt.imshow(img_inpainting)
-    plt.axis('off')
-    plt.show()
+    #plt.figure(figsize=(20, 20))
+    #plt.imshow(img_inpainting)
+    #plt.axis('off')
+    #plt.show()
     img_inpainting = np.transpose(img_inpainting, axes=[2, 0, 1])
     inputs['image'] =  torch.from_numpy(img_inpainting)
 

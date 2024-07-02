@@ -68,7 +68,7 @@ def scenegraph_inference_on_dataset(cfg, model, data_loader, evaluator):
             #        if len(inputs[0]['instances']) > 40:
             #           continue
             start_compute_time = time.perf_counter()
-            inputs[0] = image_translanting(inputs[0], mode = "unlikely_onject_in_image", matrix = co_occurence_matrix)
+            inputs[0] = image_translanting(inputs[0], mode = "unlikely_onject_in_image")
             outputs = model(inputs)
 
 
