@@ -87,13 +87,21 @@ def find_minimal_patch(overlap_array, patch_size):
 def find_minimal_patch_heuristic(overlap_array, patch_size):
     min_sum = float('inf')
     min_patch = None
+    max_positions_threshold = 5000
 
     # find positions where value is minimal and still can fit the patch
     cropped_array = overlap_array[:overlap_array.shape[0] - patch_size[0] + 1, :overlap_array.shape[1] - patch_size[1] + 1].copy()
     min_positions = np.argwhere(cropped_array == np.min(cropped_array))
 
+    # if min_positions is larger than 10000, we select 10000 random positions
+    if min_positions.size > max_positions_threshold:
+        min_positions = min_positions[np.random.choice(min_positions.shape[0], max_positions_threshold)]
+
+    # return random position if no minimal position is found
     if min_positions.size == 0:
-        return None
+        x = random.randint(0, overlap_array.shape[1] - patch_size[1])
+        y = random.randint(0, overlap_array.shape[0] - patch_size[0])
+        return (x, y, patch_size[1], patch_size[0])
 
     # iterate through each of the minimal positions and find the one with the least sum
     for y, x in min_positions:
@@ -129,7 +137,9 @@ def find_maximal_patch_heuristic(overlap_array, patch_size):
     max_positions = np.argwhere(cropped_array == np.max(cropped_array))
 
     if max_positions.size == 0:
-        return None
+        x = random.randint(0, overlap_array.shape[1] - patch_size[0])
+        y = random.randint(0, overlap_array.shape[0] - patch_size[1])
+        return (x, y, patch_size[0], patch_size[1])
 
     # iterate through each of the maximal positions and find the one with the least sum
     for y, x in max_positions:
@@ -156,7 +166,9 @@ def find_random_thresholded_patch(overlap_array, patch_size):
 
     valid_positions = np.argwhere(valid_positions)
     if valid_positions.size == 0:
-        return None
+        x = random.randint(0, overlap_array.shape[1] - patch_size[1])
+        y = random.randint(0, overlap_array.shape[0] - patch_size[0])
+        return (x, y, patch_size[1], patch_size[0])
 
     y, x = random.choice(valid_positions)
     return (x, y, patch_size[1], patch_size[0])
@@ -169,7 +181,9 @@ def find_random_thresholded_patch_heuristic(overlap_array, patch_size):
 
     valid_positions = np.argwhere(valid_positions)
     if valid_positions.size == 0:
-        return None
+        x = random.randint(0, overlap_array.shape[1] - patch_size[1])
+        y = random.randint(0, overlap_array.shape[0] - patch_size[0])
+        return (x, y, patch_size[1], patch_size[0])
 
     x, y = random.choice(valid_positions)
     return (x, y, patch_size[1], patch_size[0])
