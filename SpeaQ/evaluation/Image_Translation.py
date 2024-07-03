@@ -22,6 +22,7 @@ device = "cpu"
 sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
 sam.to(device=device)
 predictor = SamPredictor(sam)
+from skimage.util.shape import view_as_windows
 
 def draw_semantic_shape_without_Background(shape = "triangle"):
     # Create a black background

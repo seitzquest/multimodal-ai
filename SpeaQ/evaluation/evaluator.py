@@ -22,7 +22,7 @@ import numpy as np
 from matplotlib.pyplot import imshow
 from PIL import Image, ImageDraw
 from .Image_Translation import image_translanting, get_co_occurence_matrix
-
+from.Visualization import  show_all
 
 def scenegraph_inference_on_dataset(cfg, model, data_loader, evaluator):
     """
@@ -68,8 +68,11 @@ def scenegraph_inference_on_dataset(cfg, model, data_loader, evaluator):
             #        if len(inputs[0]['instances']) > 40:
             #           continue
             start_compute_time = time.perf_counter()
-            inputs[0] = image_translanting(inputs[0], mode = "unlikely_onject_in_image")
+            mode = "origin"
+            if mode != "origin":
+                inputs[0] = image_translanting(inputs[0], matrix=None, mode=mode)
             outputs = model(inputs)
+            show_all(inputs, outputs, mode)
 
 
             if torch.cuda.is_available():
