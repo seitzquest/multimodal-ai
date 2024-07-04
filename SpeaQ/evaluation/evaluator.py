@@ -1,3 +1,4 @@
+import copy
 import datetime
 import logging
 import time
@@ -22,7 +23,8 @@ import numpy as np
 from matplotlib.pyplot import imshow
 from PIL import Image, ImageDraw
 from .Image_Translation import image_translanting, get_co_occurence_matrix
-from.Visualization import  show_all
+from .Visualization import show_all
+
 
 def scenegraph_inference_on_dataset(cfg, model, data_loader, evaluator):
     """
@@ -59,7 +61,7 @@ def scenegraph_inference_on_dataset(cfg, model, data_loader, evaluator):
     with inference_context(model), torch.no_grad():
         "if we want to find the most likely object, we need to firtly calculate the co-occurence matrix"
 
-        co_occurence_matrix = get_co_occurence_matrix(data_loader)
+      #  co_occurence_matrix = get_co_occurence_matrix(data_loader)
         for idx, inputs in enumerate(data_loader):
             if idx == num_warmup:
                 start_time = time.perf_counter()
@@ -68,12 +70,18 @@ def scenegraph_inference_on_dataset(cfg, model, data_loader, evaluator):
             #        if len(inputs[0]['instances']) > 40:
             #           continue
             start_compute_time = time.perf_counter()
-            mode = "origin"
-            if mode != "origin":
-                inputs[0] = image_translanting(inputs[0], matrix=None, mode=mode)
-            outputs = model(inputs)
-            show_all(inputs, outputs, mode)
+            'mode can be: related_object_in_image,similar_object_in_image,unlikely_onject_in_image,trained_object, untrained_object'
+            'patch could be minimal_heuristic,maximal_heuristic,random_heuristic'
+            #the two code can be used to test the model with different mode and patch under debug mode,  the origin image can be remained by runnning it
+            input_copy = copy.deepcopy(inputs)
+            inputs = copy.deepcopy(input_copy)
 
+            mode = "related_object_in_image"
+            patch = "random_heuristic"
+            if mode != "origin":
+                inputs[0] = image_translanting(inputs[0], matrix = None, mode = mode, patch = patch,  obi_in_rl = False)
+            outputs = model(inputs)
+            show_all(inputs, outputs, mode+'_'+patch)
 
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
