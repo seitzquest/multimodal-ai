@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import json
 import h5py
 import torch
+import networkx as nx
 
 def get_info_by_idx(inputs, outputs, thres=0.6):
     #  groundtruth = det_input['groundtruths'][idx]
@@ -144,5 +145,39 @@ def draw_image(img, boxes, labels, box_labels, pred_scores, gt_rels, pred_rels, 
     print('*' * 50)
     print_list('pred_rels', pred_rels, pred_rel_score)
     print('*' * 50)
+    draw_relationship(pred_rels, pred_rel_score, mode)
+
 
     return None
+
+def draw_relationship(pred_rels, pred_rel_score, mode):
+    # Open a file in write mode
+    with open(mode + '_relationship.txt', 'w') as file:
+        for i, rel in enumerate(pred_rels):
+            file.write(f"{'pred_rels ' + str(i) + ': ' + str(rel) + '; score: ' + str(pred_rel_score[i].item())}\n")
+    # Create a directed graph
+    G = nx.Graph()
+
+    # Add edges to the graph based on the relations
+    for i in range(len(pred_rels)):
+        subject, predicate, obj = pred_rels[i]
+        prob = pred_rel_score[i].item()
+        G.add_edge(subject, obj, label=predicate, weight=prob)
+
+
+    # Set up the plot
+    plt.figure(figsize=(8, 6))
+
+    # Draw the graph with labels
+    pos = nx.spring_layout(G)  # Position nodes using the spring layout
+    nx.draw(G, pos, with_labels=True, node_size=30, node_color='skyblue', font_size=5, font_weight='bold',
+            arrows=True)
+
+    # Draw edge labels with predicates and probabilities
+    edge_labels = {(u, v): f"{d['label']} ({d['weight']:.2f})" for u, v, d in G.edges(data=True)}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='red',font_size=5)
+
+    # Save the plot as a PDF with small margins
+    plt.title("Relation Graph with Probabilities")
+    plt.savefig(mode +'_relation_graph.pdf', bbox_inches='tight', pad_inches=0)
+    plt.close()
