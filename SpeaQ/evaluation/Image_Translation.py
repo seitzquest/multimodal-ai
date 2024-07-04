@@ -18,11 +18,12 @@ sam_checkpoint = "./SAM_checkpoint/sam_vit_h_4b8939.pth"
 from segment_anything import sam_model_registry, SamPredictor
 model_type = "vit_h"
 #change the device to cuda if you have a gpu
-device = "cpu"
+device = "cuda"
 sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
 sam.to(device=device)
 predictor = SamPredictor(sam)
-from skimage.util.shape import view_as_windows
+from skimage.util.shape  import view_as_windows
+
 
 def draw_semantic_shape_without_Background(shape = "triangle"):
     # Create a black background
@@ -172,7 +173,7 @@ def find_bounding_boxes_area(height, width, objects):
     overlap_array = np.zeros((height, width), dtype=int)
     for o in objects:
         x1, y1, x2, y2 = o
-        overlap_array[y1:y2, x1:x2] += 1
+        overlap_array[int(y1):int(y2), int(x1):int(x2)] += 1
 
     return overlap_array
 
@@ -286,6 +287,63 @@ def find_random_thresholded_patch_heuristic(overlap_array, patch_size):
     x, y = random.choice(valid_positions)
     return (x, y, patch_size[1], patch_size[0])
 
+
+def find_minimal_patch_window(overlap_array, patch_size):
+    # Ensure the patch fits within the overlap array dimensions
+    if overlap_array.shape[0] < patch_size[0] or overlap_array.shape[1] < patch_size[1]:
+        return None
+
+    # Find the minimum value in the valid region where the patch can fit
+    cropped_height = overlap_array.shape[0] - patch_size[0] + 1
+    cropped_width = overlap_array.shape[1] - patch_size[1] + 1
+    cropped_array = overlap_array[:cropped_height, :cropped_width]
+
+    # Use view_as_windows to create sliding windows of the patch size
+    windows = view_as_windows(overlap_array, (patch_size[0], patch_size[1]))
+
+    # Calculate the sum of each window (patch)
+    patch_sums = windows.sum(axis=(2, 3))
+
+    # Find the index of the minimum sum
+    min_idx = np.unravel_index(np.argmin(patch_sums), patch_sums.shape)
+    min_sum = patch_sums[min_idx]
+
+    # Calculate the top-left corner of the minimal patch
+    y, x = min_idx
+    min_patch = (x, y, patch_size[1], patch_size[0])
+
+    return min_patch
+
+
+def find_minimal_patch_convolve(overlap_array, patch_size):
+    # Convert the input array to a PyTorch tensor
+    overlap_tensor = torch.tensor(overlap_array, dtype=torch.float32)
+
+    rows, cols = overlap_tensor.shape
+    patch_height, patch_width = patch_size
+
+    min_sum = float('inf')
+    min_patch = None
+
+    # Process patches in a row-by-row manner to manage memory usage
+    for y in range(rows - patch_height + 1):
+        for x in range(cols - patch_width + 1):
+            # Extract the current patch and move it to the GPU
+            patch = overlap_tensor[y:y + patch_height, x:x + patch_width].cuda()
+
+            # Compute the sum of the current patch
+            patch_sum = patch.sum().item()
+
+            # Move the patch back to the CPU to free up GPU memory
+            patch.cpu()
+
+            # Update the minimum patch if the current patch sum is smaller
+            if patch_sum < min_sum:
+                min_sum = patch_sum
+                min_patch = (x, y, patch_width, patch_height)
+
+    return min_patch
+
 def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", matrix = None):
 
     #change the image to the right format for processing
@@ -314,6 +372,9 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
         if mode == "same object duplicate":
             "segment the first object listet in the objects_in_rl list"
             translated_obj = segment_object(segment_background, boxes[objects_in_rl[0]])
+            idx_black = np.where(
+                (translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
+            translated_obj[idx_black[0], idx_black[1], 3] = 0
         elif mode == "same class different object":
             "choose the object from the segmented object which in the same class as the object in the relation list"
             obj_name = object_labels[objects_in_rl[0]]
@@ -321,7 +382,7 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
                 'evaluation/insert_objects/' + obj_name + '_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
             translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
             idx_black = np.where((translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
-            translated_obj[idx_black[0],3] = 0
+            translated_obj[idx_black[0], idx_black[1], 3] = 0
     else:
         if (len(objects_not_in_rl) == 0):
             obj_idx = objects_in_rl[-1]
@@ -330,6 +391,9 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
         if mode == "same object duplicate":
             "segment the first object listet in the objects_in_rl list"
             translated_obj = segment_object(segment_background, boxes[obj_idx])
+            idx_black = np.where(
+                (translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
+            translated_obj[idx_black[0], idx_black[1], 3] = 0
         elif mode == "same class different object":
             "choose the object from the segmented object which in the same class as the object not in the relation list"
 
@@ -365,9 +429,6 @@ def segment_object(segment_background, boxes):
 
     return rgba_image
 
-
-
-
 def find_least_likely_object(objects, cooccurrence_matrix, objects_in_image):
     likelihoods = []
     for obj in objects:
@@ -377,8 +438,7 @@ def find_least_likely_object(objects, cooccurrence_matrix, objects_in_image):
     least_likely_idx = np.argmin(likelihoods)
     return objects[least_likely_idx]
 
-
-# Uses the cooccurence matrix to find the least likely object in the image and least likely object not in the image
+#Uses the cooccurence matrix to find the least likely object in the image and least likely object not in the image
 def find_correlated_object(cooccurrence_matrix, objects_in_image):
     least_likely_image_object = find_least_likely_object(objects_in_image, cooccurrence_matrix, objects_in_image)
 
@@ -387,6 +447,8 @@ def find_correlated_object(cooccurrence_matrix, objects_in_image):
     least_likely_external_object = find_least_likely_object(external_objects, cooccurrence_matrix, remaining_objects)
 
     return least_likely_image_object, least_likely_external_object
+
+
 def get_co_occurence_matrix(data_loader):
     "the input of the data_loader is the splited testdata for the vealuation"
     # get the object lists from json file
@@ -460,6 +522,11 @@ def generate_150_objects_overlays(object_labels):
 
 def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
 
+
+
+
+
+
     if mode == "unlikely object":
         # get the object and predicate information from json file
         vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
@@ -478,7 +545,7 @@ def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
 
 
 
-def image_translanting(inputs,  mode = "trained_object"):
+def image_translanting(inputs, matrix, mode = "trained_object", patch = None, obi_in_rl = False):
 
     img = inputs['image']
 
@@ -490,7 +557,7 @@ def image_translanting(inputs,  mode = "trained_object"):
         translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
         scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.2)
     elif mode == "shape":
-        translated_obj = draw_semantic_shape_without_Background(shape="square")
+        translated_obj = draw_semantic_shape_without_Background(shape = "square")
         scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.2)
     elif mode == "trained_object":
         translated_obj = cv2.imread('evaluation/insert_objects/aiplane.png', cv2.IMREAD_UNCHANGED)
@@ -498,42 +565,45 @@ def image_translanting(inputs,  mode = "trained_object"):
         scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.7)
     elif mode == "related_object_in_image":
         matrix = pd.read_pickle('evaluation/cooccurence_matrix.pkl')
-        scaled_overlay = duplicate_object(inputs, obj_in_rl=False, mode="same class different object", matrix=matrix)
-        scaled_overlay = scale_inpainted_image(background_img, rscaled_overlay, scaling=1)
+        scaled_overlay = duplicate_object(inputs, obj_in_rl = obi_in_rl,mode = "same object duplicate", matrix = matrix)
+    elif mode == "similar_object_in_image":
+        matrix = pd.read_pickle('evaluation/cooccurence_matrix.pkl')
+        scaled_overlay = duplicate_object(inputs, obj_in_rl = obi_in_rl,mode = "same class different object", matrix = matrix)
 
     elif mode == "unlikely_onject_in_image":
         matrix = pd.read_pickle('evaluation/cooccurence_matrix.pkl')
-        scaled_overlay = select_object(inputs, obj_in_rl=False, mode="unlikely object", matrix=matrix)
-        scaled_overlay = scale_inpainted_image(background_img, scaled_overlay, scaling=1)
-    else:
-        raise ValueError(f"Unknown mode for image tranplanting {mode}")
+
+        scaled_overlay = select_object(inputs, obj_in_rl = False, mode = "unlikely object", matrix = matrix)
 
 
 
     # Find the bounding boxes of the objects in the image
     background_img_height, background_img_width = background_img.shape[:2]
     overlaps = find_bounding_boxes_area(background_img_height, background_img_width, inputs['instances'].get('gt_boxes').tensor.tolist())
-    patch_strategy = "minimal"
+    patch_strategy = patch
     if patch_strategy == "minimal":
-        patch = find_minimal_patch(overlaps, scaled_overlay.shape[:2])
-    elif patch_strategy == "maximal":
-        patch = find_maximal_patch(overlaps, scaled_overlay.size)
-    elif patch_strategy == "random":
-        patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
-    elif patch_strategy == "minimal_heuristic":
         patch = find_minimal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "maximal":
+        patch = find_maximal_patch(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "random":
+        patch = find_random_thresholded_patch(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "minimal_heuristic":
+        patch = find_minimal_patch_window(overlaps, scaled_overlay.shape[:2])
     elif patch_strategy == "maximal_heuristic":
         patch = find_maximal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
     elif patch_strategy == "random_heuristic":
         patch = find_random_thresholded_patch_heuristic(overlaps, scaled_overlay.shape[:2])
     else:
         raise ValueError(f"Unknown patch strategy {patch_strategy}")
+   # patch =np.random.randint(0, 5, 2)
+    print(patch)
+
     img_inpainting = add_transparent_image(background_img, scaled_overlay, patch[0], patch[1], rotation=0)
 
-    plt.figure(figsize=(20, 20))
-    plt.imshow(img_inpainting)
-    plt.axis('off')
-    plt.show()
+  #  plt.figure(figsize=(20, 20))
+  #  plt.imshow(img_inpainting)
+  #  plt.axis('off')
+  #  plt.show()
     img_inpainting = np.transpose(img_inpainting, axes=[2, 0, 1])
     inputs['image'] =  torch.from_numpy(img_inpainting)
 
