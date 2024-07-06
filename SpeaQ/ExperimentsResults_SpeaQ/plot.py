@@ -54,9 +54,8 @@ def extract_from_line(string):
 
 
 def extract_data(file_name):
-    with open(file_name, "w") as f:
+    with open(file_name, "r") as f:
         data = f.readlines()
-
         recall_metrics = extract_from_line(data[-2])
         recall_values = [float(value) for value in extract_from_line(data[-1])]
         ap_metrics = extract_from_line(data[-5])
@@ -67,7 +66,7 @@ def extract_data(file_name):
 
 def main():
 
-    columns = []
+    columns = ["Metric"]
     all_recall_values = []
     all_ap_values = []
 
@@ -78,7 +77,6 @@ def main():
             file_name = os.path.join(folder, "log(1).txt")
         else:
             continue
-
         columns.append(get_column_name(folder))
         recall_metrics, recall_values, ap_metrics, ap_values = extract_data(file_name)
         all_recall_values.append(recall_values)
