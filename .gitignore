@@ -170,3 +170,4 @@ baseline_models/RelTR/logs/
 baseline_models/RelTR/demo/test
 baseline_models/RelTR/lib/evaluation/insert_objects
 baseline_models/RelTR/data/vg/images
+.vscode
