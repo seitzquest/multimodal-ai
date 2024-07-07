@@ -1,0 +1,8 @@
+Metric & Origin & SimInRL & SimNotRL & Seen 0.2 & Seen 0.5 & Seen 0.7 & Unlikely & Unseen 0.2 & Unseen 0.5 & Unseen 0.7 \\
+\hline
+AP & \cellcolor[HTML]{ccf699} 0.0014 & 0.0012 & 0.0012 & 0.0013 & 0.0013 & 0.0012 & 0.0012 & 0.0013 & 0.0011 & \cellcolor[HTML]{f69f99} 0.0009 \\
+AP50 & \cellcolor[HTML]{ccf699} 0.0026 & 0.0025 & 0.0025 & \cellcolor[HTML]{ccf699} 0.0026 & 0.0025 & 0.0023 & 0.0024 & \cellcolor[HTML]{ccf699} 0.0026 & 0.0023 & \cellcolor[HTML]{f69f99} 0.0019 \\
+AP75 & \cellcolor[HTML]{ccf699} 0.0012 & 0.0011 & 0.0011 & \cellcolor[HTML]{ccf699} 0.0012 & 0.0011 & 0.001 & 0.0011 & 0.0011 & 0.001 & \cellcolor[HTML]{f69f99} 0.0007 \\
+APs & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{f69f99} 0.0002 \\
+APm & \cellcolor[HTML]{ccf699} 0.0009 & 0.0008 & 0.0008 & \cellcolor[HTML]{ccf699} 0.0009 & 0.0008 & 0.0008 & 0.0008 & \cellcolor[HTML]{ccf699} 0.0009 & 0.0007 & \cellcolor[HTML]{f69f99} 0.0006 \\
+APl & \cellcolor[HTML]{ccf699} 0.0018 & 0.0017 & 0.0017 & \cellcolor[HTML]{ccf699} 0.0018 & 0.0017 & 0.0016 & 0.0017 & \cellcolor[HTML]{ccf699} 0.0018 & 0.0015 & \cellcolor[HTML]{f69f99} 0.0012 \\

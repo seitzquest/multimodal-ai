@@ -1,0 +1,5 @@
+Metric & Origin & SimInRL & SimNotRL & Seen 0.2 & Seen 0.5 & Seen 0.7 & Unlikely & Unseen 0.2 & Unseen 0.5 & Unseen 0.7 \\
+\hline
+MR@20 & \cellcolor[HTML]{ccf699} 0.0569 & 0.0524 & 0.0519 & 0.0564 & 0.053 & 0.048 & 0.0504 & 0.0554 & 0.0481 & \cellcolor[HTML]{f69f99} 0.035 \\
+MR@50 & \cellcolor[HTML]{ccf699} 0.084 & 0.0763 & 0.077 & 0.0822 & 0.0731 & 0.0661 & 0.074 & 0.0822 & 0.0673 & \cellcolor[HTML]{f69f99} 0.0476 \\
+MR@100 & \cellcolor[HTML]{ccf699} 0.0988 & 0.0892 & 0.0919 & 0.0973 & 0.0877 & 0.0762 & 0.0885 & 0.0931 & 0.0746 & \cellcolor[HTML]{f69f99} 0.0539 \\
