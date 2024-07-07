@@ -293,6 +293,8 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
         if mode == "same object duplicate":
             "segment the first object listet in the objects_in_rl list"
             translated_obj = segment_object(segment_background, boxes[objects_in_rl[0]])
+            idx_black = np.where((translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
+            translated_obj[idx_black[0], idx_black[1], 3] = 0
         elif mode == "same class different object":
             "choose the object from the segmented object which in the same class as the object in the relation list"
             obj_name = object_labels[objects_in_rl[0]]
@@ -300,7 +302,7 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
                 'evaluation/insert_objects/' + obj_name + '_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
             translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
             idx_black = np.where((translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
-            translated_obj[idx_black[0],3] = 0
+            translated_obj[idx_black[0], idx_black[1], 3] = 0
     else:
         if (len(objects_not_in_rl) == 0):
             obj_idx = objects_in_rl[-1]
@@ -309,6 +311,8 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
         if mode == "same object duplicate":
             "segment the first object listet in the objects_in_rl list"
             translated_obj = segment_object(segment_background, boxes[obj_idx])
+            idx_black = np.where((translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
+            translated_obj[idx_black[0], idx_black[1], 3] = 0
         elif mode == "same class different object":
             "choose the object from the segmented object which in the same class as the object not in the relation list"
 
@@ -318,7 +322,7 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
             translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
             idx_black = np.where(
                 (translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
-            translated_obj[idx_black[0],idx_black[1], 3] = 0
+            translated_obj[idx_black[0], idx_black[1], 3] = 0
     return translated_obj
 
 
