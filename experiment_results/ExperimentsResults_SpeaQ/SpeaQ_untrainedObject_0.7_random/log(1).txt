@@ -1,0 +1,2890 @@
+[07/01 19:11:04] detectron2 INFO: Rank of current process: 0. World size: 1
+[07/01 19:11:05] detectron2 INFO: Environment info:
+----------------------  -------------------------------------------------------------------------------------------
+sys.platform            linux
+Python                  3.9.5 (default, Jun  4 2021, 12:28:51) [GCC 7.5.0]
+numpy                   1.26.2
+detectron2              0.6 @/home/zeus/miniconda3/envs/cloudspace/lib/python3.9/site-packages/detectron2
+Compiler                GCC 7.3
+CUDA compiler           CUDA 11.1
+detectron2 arch flags   3.7, 5.0, 5.2, 6.0, 6.1, 7.0, 7.5, 8.0, 8.6
+DETECTRON2_ENV_MODULE   <not set>
+PyTorch                 1.10.0+cu111 @/home/zeus/miniconda3/envs/cloudspace/lib/python3.9/site-packages/torch
+PyTorch debug build     False
+GPU available           Yes
+GPU 0                   Tesla T4 (arch=7.5)
+Driver version          535.183.01
+CUDA_HOME               /usr/local/cuda
+TORCH_CUDA_ARCH_LIST    5.0;6.0;7.0;7.5;8.0;8.6;9.0
+Pillow                  9.5.0
+torchvision             0.11.0+cu111 @/home/zeus/miniconda3/envs/cloudspace/lib/python3.9/site-packages/torchvision
+torchvision arch flags  3.5, 5.0, 6.0, 7.0, 7.5, 8.0, 8.6
+fvcore                  0.1.5.post20221221
+iopath                  0.1.9
+cv2                     4.10.0
+----------------------  -------------------------------------------------------------------------------------------
+PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.2.3 (Git Hash 7336ca9f055cf1bfa13efb658fe15dc9b41f0740)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX512
+  - CUDA Runtime 11.1
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.0.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.1, CUDNN_VERSION=8.0.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.10.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+[07/01 19:11:05] detectron2 INFO: Command line arguments: Namespace(config_file='configs/speaq_test.yaml', resume=True, eval_only=True, num_gpus=1, num_machines=1, machine_rank=0, dist_url='tcp://127.0.0.1:tcp://127.0.0.1:50152', opts=['OUTPUT_DIR', './speaq_checkpoints/', 'DATASETS.VISUAL_GENOME.IMAGES', './data/datasets/VG/VG_100K/', 'DATASETS.VISUAL_GENOME.MAPPING_DICTIONARY', './data/datasets/VG/VG-SGG-dicts-with-attri.json', 'DATASETS.VISUAL_GENOME.IMAGE_DATA', './data/datasets/VG/image_data.json', 'DATASETS.VISUAL_GENOME.VG_ATTRIBUTE_H5', './data/datasets/VG/VG-SGG-with-attri.h5', 'MODEL.DETR.OVERSAMPLE_PARAM', '0.07', 'MODEL.DETR.UNDERSAMPLE_PARAM', '1.5', 'SOLVER.IMS_PER_BATCH', '20', 'MODEL.DETR.ONE2MANY_SCHEME', 'dynamic', 'MODEL.DETR.MULTIPLY_QUERY', '2', 'MODEL.DETR.ONLY_PREDICATE_MULTIPLY', 'True', 'MODEL.DETR.ONE2MANY_K', '4', 'MODEL.DETR.ONE2MANY_DYNAMIC_SCHEME', 'max', 'MODEL.DETR.USE_GROUP_MASK', 'True', 'MODEL.DETR.MATCH_INDEPENDENT', 'True', 'MODEL.DETR.NUM_GROUPS', '8', 'MODEL.DETR.ONE2MANY_PREDICATE_SCORE', 'True', 'MODEL.DETR.ONE2MANY_PREDICATE_WEIGHT', '-0.5'])
+[07/01 19:11:05] detectron2 INFO: Contents of args.config_file=configs/speaq_test.yaml:
+MODEL:
+  META_ARCHITECTURE: "IterativeRelationDetr"
+  WEIGHTS: './checkpoint/vg_objectdetector_pretrained.pth'
+  PIXEL_MEAN: [123.675, 116.280, 103.530]
+  PIXEL_STD: [58.395, 57.120, 57.375]
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 101
+    STRIDE_IN_1X1: False
+    OUT_FEATURES: ["res2", "res3", "res4", "res5"]
+  DETR:
+    NAME: 'IterativeRelationDETR'
+    TRANSFORMER: 'IterativeRelationTransformer'
+    CRITERION: 'IterativeRelationCriterion'
+    MATCHER: 'SpeaQHungarianMatcher'
+    ONE2MANY_SCHEME: 'dynamic'
+    ONE2MANY_DYNAMIC_SCHEME: 'max'
+    ONE2MANY_K: 4
+    MULTIPLY_QUERY: 2
+    MATCH_INDEPENDENT: True
+    USE_GROUP_MASK: True
+    ONLY_PREDICATE_MULTIPLY: True
+    GIOU_WEIGHT: 2.0
+    L1_WEIGHT: 5.0
+    NUM_OBJECT_QUERIES: 300
+    NUM_RELATION_QUERIES: 300
+    NUM_CLASSES: 150
+    OBJECT_DEC_LAYERS: 6
+    REWEIGHT_RELATIONS: True
+    REWEIGHT_REL_EOS_COEF: 0.1
+    NO_OBJECT_WEIGHT: 0.1
+    NO_REL_WEIGHT: 0.1
+    OVERSAMPLE_PARAM: 0.07
+    UNDERSAMPLE_PARAM: 1.5
+    NUM_GROUPS: 4
+    ONE2MANY_PREDICATE_SCORE: True
+    ONE2MANY_PREDICATE_WEIGHT: -0.5
+DATASETS:
+  TYPE: "VISUAL GENOME"
+  TRAIN: ('VG_train',)
+  TEST: ('VG_test',)
+  VISUAL_GENOME:
+    TRAIN_MASKS: ""
+    VAL_MASKS: ""
+    TEST_MASKS: ""
+    FILTER_EMPTY_RELATIONS: True
+    FILTER_NON_OVERLAP: False
+    FILTER_DUPLICATE_RELATIONS: True
+    IMAGES: './data/datasets/VG/VG_100K/'
+    MAPPING_DICTIONARY: './data/datasets/VG/VG-SGG-dicts-with-attri.json'
+    IMAGE_DATA: './data/datasets/VG/image_data.json'
+    VG_ATTRIBUTE_H5: './data/datasets/VG/VG-SGG-with-attri.h5'
+SOLVER:
+  IMS_PER_BATCH: 2
+  BASE_LR: 0.0001
+  STEPS: (96000,)
+  MAX_ITER: 150000
+  WARMUP_FACTOR: 1.0
+  WARMUP_ITERS: 10
+  WEIGHT_DECAY: 0.0001
+  OPTIMIZER: "ADAMW"
+  BACKBONE_MULTIPLIER: 0.1
+  CHECKPOINT_PERIOD: 1000
+  CLIP_GRADIENTS:
+    ENABLED: True
+    CLIP_TYPE: "full_model"
+    CLIP_VALUE: 0.01
+    NORM_TYPE: 2.0
+  AMP:
+    ENABLED: True
+INPUT:
+  MIN_SIZE_TRAIN: (480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800)
+  CROP:
+    ENABLED: True
+    TYPE: "absolute_range"
+    SIZE: (384, 600)
+  FORMAT: "RGB"
+TEST:
+  EVAL_PERIOD: 6000
+DATALOADER:
+  FILTER_EMPTY_ANNOTATIONS: False
+  NUM_WORKERS: 1
+VERSION: 2
+
+[07/01 19:11:05] detectron2 INFO: Running with full config:
+CUDNN_BENCHMARK: false
+DATALOADER:
+  ASPECT_RATIO_GROUPING: true
+  FILTER_EMPTY_ANNOTATIONS: false
+  NUM_WORKERS: 1
+  REPEAT_THRESHOLD: 0.0
+  SAMPLER_TRAIN: TrainingSampler
+DATASETS:
+  ACTION_GENOME:
+    ANNOTATIONS: ''
+    FILTER_DUPLICATE_RELATIONS: true
+    FILTER_EMPTY_RELATIONS: true
+    FILTER_NON_OVERLAP: true
+    FORMAT_VID_WISE: false
+    FRAMES: ''
+    NUM_VIDEOS_TRAIN: -1
+    NUM_VIDEOS_VAL: 400
+    VAL_SET_RANDOMIZED: false
+    VIDEOS: ''
+  MASK_TEST:
+  - coco_val_2017
+  MASK_TRAIN:
+  - coco_train_2017
+  MSCOCO:
+    ANNOTATIONS: ''
+    DATAROOT: ''
+  PRECOMPUTED_PROPOSAL_TOPK_TEST: 1000
+  PRECOMPUTED_PROPOSAL_TOPK_TRAIN: 2000
+  PROPOSAL_FILES_TEST: []
+  PROPOSAL_FILES_TRAIN: []
+  SEG_DATA_DIVISOR: 1
+  TEST:
+  - VG_test
+  TRAIN:
+  - VG_train
+  TRANSFER:
+  - coco_train_2014
+  TYPE: VISUAL GENOME
+  VISUAL_GENOME:
+    BGNN: false
+    BOX_SCALE: 1024
+    CLIPPED: false
+    EXCLUDE_LEFT_RIGHT: false
+    FILTER_DUPLICATE_RELATIONS: true
+    FILTER_EMPTY_RELATIONS: true
+    FILTER_NON_OVERLAP: false
+    IMAGES: ./data/datasets/VG/VG_100K/
+    IMAGE_DATA: ./data/datasets/VG/image_data.json
+    MAPPING_DICTIONARY: ./data/datasets/VG/VG-SGG-dicts-with-attri.json
+    MAX_NUM_OBJECTS: -1
+    MAX_NUM_RELATIONS: -1
+    NUMBER_OF_VALIDATION_IMAGES: 5000
+    OVERSAMPLE_PARAM: 0.07
+    PER_CLASS_DATASET: false
+    SG_MAPPER: ''
+    SG_TRAIN_DATA: ''
+    SG_VAL_DATA: ''
+    TEST_MASKS: ''
+    TRAIN_MASKS: ''
+    UNDERSAMPLE_PARAM: 0.7
+    VAL_MASKS: ''
+    VG_ATTRIBUTE_H5: ./data/datasets/VG/VG-SGG-with-attri.h5
+DEV_RUN: false
+GLOBAL:
+  HACK: 1.0
+GLOVE_DIR: glove/
+INPUT:
+  CROP:
+    ENABLED: true
+    SIZE:
+    - 384
+    - 600
+    TYPE: absolute_range
+  FORMAT: RGB
+  MASK_FORMAT: polygon
+  MAX_SIZE_TEST: 1333
+  MAX_SIZE_TRAIN: 1333
+  MIN_SIZE_TEST: 800
+  MIN_SIZE_TRAIN:
+  - 480
+  - 512
+  - 544
+  - 576
+  - 608
+  - 640
+  - 672
+  - 704
+  - 736
+  - 768
+  - 800
+  MIN_SIZE_TRAIN_SAMPLING: choice
+  RANDOM_FLIP: horizontal
+MODEL:
+  ANCHOR_GENERATOR:
+    ANGLES:
+    - - -90
+      - 0
+      - 90
+    ASPECT_RATIOS:
+    - - 0.5
+      - 1.0
+      - 2.0
+    NAME: DefaultAnchorGenerator
+    OFFSET: 0.0
+    SIZES:
+    - - 32
+      - 64
+      - 128
+      - 256
+      - 512
+  BACKBONE:
+    FREEZE_AT: 2
+    NAME: build_resnet_backbone
+  DETR:
+    BETA: 1000
+    CLASS_AGNOSTIC_NMS: true
+    CLS_WEIGHT: 2.0
+    COST_CLASS: 1.0
+    COST_SELECTION: 1.0
+    CREATE_BG_PAIRS: false
+    CRITERION: IterativeRelationCriterion
+    DEC_LAYERS: 6
+    DEC_N_POINTS: 4
+    DEEP_SUPERVISION: true
+    DIM_FEEDFORWARD: 2048
+    DROPOUT: 0.1
+    ENC_LAYERS: 6
+    ENC_N_POINTS: 4
+    FOCAL_ALPHA: 0.25
+    FREEZE: false
+    FREEZE_LAYERS: []
+    FROZEN_WEIGHTS: ''
+    GIOU_WEIGHT: 2.0
+    HIDDEN_DIM: 256
+    INTERSECTION_IOU_LAMBDA: 1.0
+    INTERSECTION_IOU_THRESHOLD: 0.3
+    INTERSECTION_LOSS: false
+    L1_WEIGHT: 5.0
+    LATER_NMS_THRESHOLD: 0.3
+    MATCHER: SpeaQHungarianMatcher
+    MATCHER_TOPK: 1
+    MATCH_INDEPENDENT: true
+    MAX_RELATION_PAIRS: 16
+    MULTIPLY_QUERY: 2
+    NAME: IterativeRelationDETR
+    NEGATIVE_RELATION_FRACTION: 3.0
+    NHEADS: 8
+    NMS_WEIGHT: 0.2
+    NO_OBJECT_WEIGHT: 0.1
+    NO_REL_WEIGHT: 0.1
+    NUM_CLASSES: 150
+    NUM_FEATURE_LEVELS: 4
+    NUM_GROUPS: 8
+    NUM_OBJECT_QUERIES: 300
+    NUM_RELATION_CLASSES: 50
+    NUM_RELATION_QUERIES: 300
+    OBJECT_DEC_LAYERS: 6
+    ONE2MANY_DYNAMIC_SCHEME: max
+    ONE2MANY_K: 4
+    ONE2MANY_PREDICATE_SCORE: true
+    ONE2MANY_PREDICATE_WEIGHT: -0.5
+    ONE2MANY_SCHEME: dynamic
+    ONE_TO_MANY: false
+    ONLY_PREDICATE_MULTIPLY: true
+    OVERSAMPLE_PARAM: 0.07
+    POSITION_EMBEDDING: PositionEmbeddingSine
+    PRE_NORM: false
+    RELATION_DEC_LAYERS: 4
+    RELATION_HEAD: true
+    RELATION_LOSS_WEIGHT: 1.0
+    REWEIGHT_RELATIONS: true
+    REWEIGHT_REL_EOS_COEF: 0.1
+    REWEIGHT_USE_LOG: true
+    SGDET_USE_GT: false
+    TEST_INDEX: -1
+    TRANSFORMER: IterativeRelationTransformer
+    TWO_STAGE: false
+    TWO_STAGE_NUM_PROPOSALS: 300
+    UNDERSAMPLE_PARAM: 1.5
+    USE_FREQ_BIAS: true
+    USE_GROUP_MASK: true
+    WITH_BOX_REFINE: false
+  DEVICE: cuda
+  DF_DETR:
+    BACKBONE: resnet50
+    BBOX_LOSS_WEIGHT: 5.0
+    CLS_LOSS_WEIGHT: 2.0
+    DEC_LAYERS: 6
+    DEEP_SUPERVISION: true
+    DILATION: false
+    DIM_FEEDFORWARD: 1024
+    DROPOUT: 0.1
+    ENC_LAYERS: 6
+    FOCAL_ALPHA: 0.25
+    GIOU_LOSS_WEIGHT: 2.0
+    HIDDEN_DIM: 256
+    NHEADS: 8
+    NUM_CLASSES: 80
+    NUM_FEATURE_LEVELS: 4
+    NUM_OBJECT_QUERIES: 300
+    POSITIONAL_EMBEDDING: sine
+    PRE_NORM: false
+    RELATION_DEC_LAYERS: 4
+    RELATION_HEAD: true
+    RELATION_LOSS_WEIGHT: 1.0
+    SET_COST_BBOX: 5
+    SET_COST_CLASS: 2
+    SET_COST_GIOU: 2
+    TWO_STAGE: false
+    WITH_BOX_REFINE: false
+  FPN:
+    FUSE_TYPE: sum
+    IN_FEATURES: []
+    NORM: ''
+    OUT_CHANNELS: 256
+  FREEZE_LAYERS:
+    META_ARCH: []
+    ROI_HEADS: []
+  GROUP_NORM:
+    DIM_PER_GP: -1
+    EPSILON: 1.0e-05
+    NUM_GROUPS: 32
+  KEYPOINT_ON: false
+  LOAD_PROPOSALS: false
+  MASK_ON: false
+  META_ARCHITECTURE: IterativeRelationDetr
+  PANOPTIC_FPN:
+    COMBINE:
+      ENABLED: true
+      INSTANCES_CONFIDENCE_THRESH: 0.5
+      OVERLAP_THRESH: 0.5
+      STUFF_AREA_LIMIT: 4096
+    INSTANCE_LOSS_WEIGHT: 1.0
+  PIXEL_MEAN:
+  - 123.675
+  - 116.28
+  - 103.53
+  PIXEL_STD:
+  - 58.395
+  - 57.12
+  - 57.375
+  PROPOSAL_GENERATOR:
+    MIN_SIZE: 0
+    NAME: RPN
+  RESNETS:
+    DEFORM_MODULATED: false
+    DEFORM_NUM_GROUPS: 1
+    DEFORM_ON_PER_STAGE:
+    - false
+    - false
+    - false
+    - false
+    DEPTH: 101
+    NORM: FrozenBN
+    NUM_GROUPS: 1
+    OUT_FEATURES:
+    - res2
+    - res3
+    - res4
+    - res5
+    RES2_OUT_CHANNELS: 256
+    RES5_DILATION: 1
+    STEM_OUT_CHANNELS: 64
+    STRIDE_IN_1X1: false
+    WIDTH_PER_GROUP: 64
+  RETINANET:
+    BBOX_REG_LOSS_TYPE: smooth_l1
+    BBOX_REG_WEIGHTS: &id002
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    FOCAL_LOSS_ALPHA: 0.25
+    FOCAL_LOSS_GAMMA: 2.0
+    IN_FEATURES:
+    - p3
+    - p4
+    - p5
+    - p6
+    - p7
+    IOU_LABELS:
+    - 0
+    - -1
+    - 1
+    IOU_THRESHOLDS:
+    - 0.4
+    - 0.5
+    NMS_THRESH_TEST: 0.5
+    NORM: ''
+    NUM_CLASSES: 80
+    NUM_CONVS: 4
+    PRIOR_PROB: 0.01
+    SCORE_THRESH_TEST: 0.05
+    SMOOTH_L1_LOSS_BETA: 0.1
+    TOPK_CANDIDATES_TEST: 1000
+  ROI_BOX_CASCADE_HEAD:
+    BBOX_REG_WEIGHTS:
+    - &id001
+      - 10.0
+      - 10.0
+      - 5.0
+      - 5.0
+    - - 20.0
+      - 20.0
+      - 10.0
+      - 10.0
+    - - 30.0
+      - 30.0
+      - 15.0
+      - 15.0
+    IOUS:
+    - 0.5
+    - 0.6
+    - 0.7
+  ROI_BOX_FEATURE_EXTRACTORS:
+    BOX_FEATURE_MASK: true
+    CLASS_LOGITS_WITH_MASK: false
+    NAME: BoxFeatureExtractor
+    POOLER_RESOLUTION: 28
+    POOLER_SAMPLING_RATIO: 0
+    POOLER_TYPE: ROIAlignV2
+  ROI_BOX_HEAD:
+    BBOX_REG_LOSS_TYPE: smooth_l1
+    BBOX_REG_LOSS_WEIGHT: 1.0
+    BBOX_REG_WEIGHTS: *id001
+    CLS_AGNOSTIC_BBOX_REG: false
+    CONV_DIM: 256
+    FC_DIM: 1024
+    NAME: ''
+    NORM: ''
+    NUM_CONV: 0
+    NUM_FC: 0
+    POOLER_RESOLUTION: 14
+    POOLER_SAMPLING_RATIO: 0
+    POOLER_TYPE: ROIAlignV2
+    SMOOTH_L1_BETA: 0.0
+    TRAIN_ON_PRED_BOXES: true
+  ROI_HEADS:
+    BATCH_SIZE_PER_IMAGE: 512
+    EMBEDDINGS_PATH: ''
+    EMBEDDINGS_PATH_COCO: ''
+    FG_IOU_THRESHOLD: 0.5
+    IN_FEATURES:
+    - res4
+    IOU_LABELS:
+    - 0
+    - 1
+    IOU_THRESHOLDS:
+    - 0.5
+    LINGUAL_MATRIX_THRESHOLD: 0.05
+    MASK_NUM_CLASSES: 80
+    NAME: Res5ROIHeads
+    NMS_THRESH_TEST: 0.5
+    NUM_CLASSES: 80
+    NUM_OUTPUT_CLASSES: 80
+    OBJECTNESS_THRESH: 0.3
+    POSITIVE_FRACTION: 0.25
+    PROPOSAL_APPEND_GT: true
+    REFINE_SEG_MASKS: true
+    SCORE_THRESH_TEST: 0.05
+    SEGMENTATION_STEP_MASK_REFINE: true
+  ROI_KEYPOINT_HEAD:
+    CONV_DIMS:
+    - 512
+    - 512
+    - 512
+    - 512
+    - 512
+    - 512
+    - 512
+    - 512
+    LOSS_WEIGHT: 1.0
+    MIN_KEYPOINTS_PER_IMAGE: 1
+    NAME: KRCNNConvDeconvUpsampleHead
+    NORMALIZE_LOSS_BY_VISIBLE_KEYPOINTS: true
+    NUM_KEYPOINTS: 17
+    POOLER_RESOLUTION: 14
+    POOLER_SAMPLING_RATIO: 0
+    POOLER_TYPE: ROIAlignV2
+  ROI_MASK_HEAD:
+    CLS_AGNOSTIC_MASK: false
+    CONV_DIM: 256
+    NAME: MaskRCNNConvUpsampleHead
+    NORM: ''
+    NUM_CONV: 0
+    POOLER_RESOLUTION: 14
+    POOLER_SAMPLING_RATIO: 0
+    POOLER_TYPE: ROIAlignV2
+  ROI_RELATION_FEATURE_EXTRACTORS:
+    MULTIPLY_LOGITS_WITH_MASKS: true
+    NAME: RelationFeatureExtractor
+    USE_MASK_COMBINER: false
+  ROI_SCENEGRAPH_HEAD:
+    ADD_GTBOX_TO_PROPOSAL_IN_TRAIN: true
+    BATCH_SIZE_PER_IMAGE: 64
+    CONTEXT_DROPOUT_RATE: 0.2
+    CONTEXT_HIDDEN_DIM: 512
+    CONTEXT_OBJ_LAYER: 1
+    CONTEXT_POOLING_DIM: 4096
+    CONTEXT_REL_LAYER: 1
+    EMBED_DIM: 200
+    LABEL_SMOOTHING_LOSS: false
+    MASK_ATTENTION_TYPE: Self
+    MODE: predcls
+    NAME: SceneGraphHead
+    NMS_FILTER_DUPLICATES: true
+    NUM_CLASSES: 50
+    NUM_SAMPLE_PER_GT_REL: 4
+    POSITIVE_FRACTION: 0.25
+    PREDICTOR: MotifPredictor
+    PREDICT_USE_BIAS: true
+    PREDICT_USE_VISION: true
+    REL_PROP:
+    - 0.01858
+    - 0.00057
+    - 0.00051
+    - 0.00109
+    - 0.0015
+    - 0.00489
+    - 0.00432
+    - 0.02913
+    - 0.00245
+    - 0.00121
+    - 0.00404
+    - 0.0011
+    - 0.00132
+    - 0.00172
+    - 5.0e-05
+    - 0.00242
+    - 0.0005
+    - 0.00048
+    - 0.00208
+    - 0.15608
+    - 0.0265
+    - 0.06091
+    - 0.009
+    - 0.00183
+    - 0.00225
+    - 0.0009
+    - 0.00028
+    - 0.00077
+    - 0.04844
+    - 0.08645
+    - 0.31621
+    - 0.00088
+    - 0.00301
+    - 0.00042
+    - 0.00186
+    - 0.001
+    - 0.00027
+    - 0.01012
+    - 0.0001
+    - 0.01286
+    - 0.00647
+    - 0.00084
+    - 0.01077
+    - 0.00132
+    - 0.00069
+    - 0.00376
+    - 0.00214
+    - 0.11424
+    - 0.01205
+    - 0.02958
+    REQUIRE_BOX_OVERLAP: true
+    RETURN_SEG_ANNOS: false
+    RETURN_SEG_MASKS: false
+    SEG_BBOX_LOSS_MULTIPLIER: 1.0
+    SIGMOID_ATTENTION: true
+    TRANSFORMER:
+      DROPOUT_RATE: 0.1
+      INNER_DIM: 2048
+      KEY_DIM: 64
+      NUM_HEAD: 8
+      OBJ_LAYER: 4
+      REL_LAYER: 2
+      VAL_DIM: 64
+    USE_GT_BOX: false
+    USE_GT_OBJECT_LABEL: false
+    USE_MASK_ATTENTION: false
+    USE_ONLY_FG_PROPOSALS: true
+    ZERO_SHOT_TRIPLETS: evaluation/datasets/vg/zeroshot_triplet.pytorch
+  RPN:
+    BATCH_SIZE_PER_IMAGE: 256
+    BBOX_REG_LOSS_TYPE: smooth_l1
+    BBOX_REG_LOSS_WEIGHT: 1.0
+    BBOX_REG_WEIGHTS: *id002
+    BOUNDARY_THRESH: -1
+    CONV_DIMS:
+    - -1
+    HEAD_NAME: StandardRPNHead
+    IN_FEATURES:
+    - res4
+    IOU_LABELS:
+    - 0
+    - -1
+    - 1
+    IOU_THRESHOLDS:
+    - 0.3
+    - 0.7
+    LOSS_WEIGHT: 1.0
+    NMS_THRESH: 0.7
+    POSITIVE_FRACTION: 0.5
+    POST_NMS_TOPK_TEST: 1000
+    POST_NMS_TOPK_TRAIN: 2000
+    PRE_NMS_TOPK_TEST: 6000
+    PRE_NMS_TOPK_TRAIN: 12000
+    SMOOTH_L1_BETA: 0.0
+  SCENEGRAPH_LOSS:
+    NAME: TransformerRelatonLoss
+  SCENEGRAPH_ON: true
+  SCENEGRAPH_POST_PROCESSOR:
+    NAME: TransformerRelationPostProcesser
+  SCENEGRAPH_SAMPLER:
+    NAME: TransformerRelationSampler
+  SEM_SEG_HEAD:
+    COMMON_STRIDE: 4
+    CONVS_DIM: 128
+    IGNORE_VALUE: 255
+    IN_FEATURES:
+    - p2
+    - p3
+    - p4
+    - p5
+    LOSS_WEIGHT: 1.0
+    NAME: SemSegFPNHead
+    NORM: GN
+    NUM_CLASSES: 54
+  USE_MASK_ON_NODE: false
+  WEIGHTS: ./checkpoint/vg_objectdetector_pretrained.pth
+OUTPUT_DIR: ./speaq_checkpoints/
+SEED: -1
+SOLVER:
+  AMP:
+    ENABLED: true
+  BACKBONE_MULTIPLIER: 0.1
+  BASE_LR: 0.0001
+  BIAS_LR_FACTOR: 1.0
+  CHECKPOINT_PERIOD: 1000
+  CLIP_GRADIENTS:
+    CLIP_TYPE: full_model
+    CLIP_VALUE: 0.01
+    ENABLED: true
+    NORM_TYPE: 2.0
+  ENTITY_MULTIPLIER: 1.0
+  GAMMA: 0.1
+  IMS_PER_BATCH: 20
+  LR_SCHEDULER_NAME: WarmupMultiStepLR
+  MAX_ITER: 150000
+  MAX_TO_KEEP: 2
+  MOMENTUM: 0.9
+  NESTEROV: false
+  OPTIMIZER: ADAMW
+  REFERENCE_WORLD_SIZE: 0
+  RELATION_MULTIPLIER: 1.0
+  STEPS:
+  - 96000
+  WARMUP_FACTOR: 1.0
+  WARMUP_ITERS: 10
+  WARMUP_METHOD: linear
+  WEIGHT_DECAY: 0.0001
+  WEIGHT_DECAY_BIAS: null
+  WEIGHT_DECAY_NORM: 0.0
+TEST:
+  AUG:
+    ENABLED: false
+    FLIP: true
+    MAX_SIZE: 4000
+    MIN_SIZES:
+    - 400
+    - 500
+    - 600
+    - 700
+    - 800
+    - 900
+    - 1000
+    - 1100
+    - 1200
+  DETECTIONS_PER_IMAGE: 100
+  EVAL_PERIOD: 6000
+  EXPECTED_RESULTS: []
+  KEYPOINT_OKS_SIGMAS: []
+  NUM_REL: 1
+  PNMS: false
+  PRECISE_BN:
+    ENABLED: false
+    NUM_ITER: 200
+  RELATION:
+    IOU_THRESHOLD: 0.5
+    LATER_NMS_PREDICTION_THRES: 0.3
+    MULTIPLE_PREDS: false
+    REQUIRE_OVERLAP: true
+VERSION: 2
+VIS_PERIOD: 0
+WANDB:
+  ENTITY: your_entity
+  EXP_NAME: default_exp_name
+  GROUP: speaq
+  PROJECT: speaq
+  USE_WANDB: false
+
+[07/01 19:11:05] detectron2 INFO: Full config saved to ./speaq_checkpoints/config.yaml
+[07/01 19:11:05] d2.utils.env INFO: Using a generated random seed 5553223
+[07/01 19:11:06] d2.engine.defaults INFO: Model:
+IterativeRelationDetr(
+  (detr): IterativeRelationDETR(
+    (transformer): IterativeRelationTransformer(
+      (encoder): TransformerEncoder(
+        (layers): ModuleList(
+          (0): TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+          (1): TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+          (2): TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+          (3): TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+          (4): TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+          (5): TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+      (decoder): IterativeRelationDecoder(
+        (subject_layers): ModuleList(
+          (0): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (1): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (2): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (3): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (4): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (5): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+        )
+        (object_layers): ModuleList(
+          (0): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (1): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (2): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (3): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (4): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (5): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+        )
+        (relation_layers): ModuleList(
+          (0): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (1): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (2): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (3): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (4): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+          (5): TransformerDecoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (multihead_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+            )
+            (linear1): Linear(in_features=256, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=256, bias=True)
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+            (dropout3): Dropout(p=0.1, inplace=False)
+          )
+        )
+        (subject_norm): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+        (relation_norm): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+        (object_pos_attn): ModuleList(
+          (0): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (1): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (2): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (3): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (4): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (5): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+        )
+        (object_pos_linear): ModuleList(
+          (0): Linear(in_features=256, out_features=256, bias=True)
+          (1): Linear(in_features=256, out_features=256, bias=True)
+          (2): Linear(in_features=256, out_features=256, bias=True)
+          (3): Linear(in_features=256, out_features=256, bias=True)
+          (4): Linear(in_features=256, out_features=256, bias=True)
+          (5): Linear(in_features=256, out_features=256, bias=True)
+        )
+        (object_pos_dropout): ModuleList(
+          (0): Dropout(p=0.1, inplace=False)
+          (1): Dropout(p=0.1, inplace=False)
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Dropout(p=0.1, inplace=False)
+          (4): Dropout(p=0.1, inplace=False)
+          (5): Dropout(p=0.1, inplace=False)
+        )
+        (relation_pos_attn): ModuleList(
+          (0): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (1): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (2): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (3): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (4): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (5): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+        )
+        (relation_pos_linear): ModuleList(
+          (0): Linear(in_features=256, out_features=256, bias=True)
+          (1): Linear(in_features=256, out_features=256, bias=True)
+          (2): Linear(in_features=256, out_features=256, bias=True)
+          (3): Linear(in_features=256, out_features=256, bias=True)
+          (4): Linear(in_features=256, out_features=256, bias=True)
+          (5): Linear(in_features=256, out_features=256, bias=True)
+        )
+        (relation_pos_dropout): ModuleList(
+          (0): Dropout(p=0.1, inplace=False)
+          (1): Dropout(p=0.1, inplace=False)
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Dropout(p=0.1, inplace=False)
+          (4): Dropout(p=0.1, inplace=False)
+          (5): Dropout(p=0.1, inplace=False)
+        )
+        (subject_graph_query_attn): ModuleList(
+          (0): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (1): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (2): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (3): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (4): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+        )
+        (subject_graph_query_residual): ModuleList(
+          (0): Linear(in_features=256, out_features=256, bias=True)
+          (1): Linear(in_features=256, out_features=256, bias=True)
+          (2): Linear(in_features=256, out_features=256, bias=True)
+          (3): Linear(in_features=256, out_features=256, bias=True)
+          (4): Linear(in_features=256, out_features=256, bias=True)
+        )
+        (subject_graph_query_norm): ModuleList(
+          (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (4): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+        )
+        (subject_graph_query_dropout): ModuleList(
+          (0): Dropout(p=0.1, inplace=False)
+          (1): Dropout(p=0.1, inplace=False)
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Dropout(p=0.1, inplace=False)
+          (4): Dropout(p=0.1, inplace=False)
+        )
+        (object_graph_query_attn): ModuleList(
+          (0): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (1): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (2): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (3): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (4): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+        )
+        (object_graph_query_residual): ModuleList(
+          (0): Linear(in_features=256, out_features=256, bias=True)
+          (1): Linear(in_features=256, out_features=256, bias=True)
+          (2): Linear(in_features=256, out_features=256, bias=True)
+          (3): Linear(in_features=256, out_features=256, bias=True)
+          (4): Linear(in_features=256, out_features=256, bias=True)
+        )
+        (object_graph_query_norm): ModuleList(
+          (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (4): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+        )
+        (object_graph_query_dropout): ModuleList(
+          (0): Dropout(p=0.1, inplace=False)
+          (1): Dropout(p=0.1, inplace=False)
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Dropout(p=0.1, inplace=False)
+          (4): Dropout(p=0.1, inplace=False)
+        )
+        (relation_graph_query_attn): ModuleList(
+          (0): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (1): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (2): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (3): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (4): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+        )
+        (relation_graph_query_residual): ModuleList(
+          (0): Linear(in_features=256, out_features=256, bias=True)
+          (1): Linear(in_features=256, out_features=256, bias=True)
+          (2): Linear(in_features=256, out_features=256, bias=True)
+          (3): Linear(in_features=256, out_features=256, bias=True)
+          (4): Linear(in_features=256, out_features=256, bias=True)
+        )
+        (relation_graph_query_norm): ModuleList(
+          (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (4): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+        )
+        (relation_graph_query_dropout): ModuleList(
+          (0): Dropout(p=0.1, inplace=False)
+          (1): Dropout(p=0.1, inplace=False)
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Dropout(p=0.1, inplace=False)
+          (4): Dropout(p=0.1, inplace=False)
+        )
+      )
+      (object_embed): Linear(in_features=256, out_features=151, bias=True)
+      (object_bbox_coords): MLP(
+        (layers): ModuleList(
+          (0): Linear(in_features=256, out_features=256, bias=True)
+          (1): Linear(in_features=256, out_features=256, bias=True)
+          (2): Linear(in_features=256, out_features=4, bias=True)
+        )
+      )
+      (relation_embed): Linear(in_features=256, out_features=51, bias=True)
+    )
+    (query_embed): Embedding(300, 256)
+    (input_proj): Conv2d(2048, 256, kernel_size=(1, 1), stride=(1, 1))
+    (backbone): Joiner(
+      (0): MaskedBackbone(
+        (backbone): ResNet(
+          (stem): BasicStem(
+            (conv1): Conv2d(
+              3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False
+              (norm): FrozenBatchNorm2d(num_features=64, eps=1e-05)
+            )
+          )
+          (res2): Sequential(
+            (0): BottleneckBlock(
+              (shortcut): Conv2d(
+                64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv1): Conv2d(
+                64, 64, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=64, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=64, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+            )
+            (1): BottleneckBlock(
+              (conv1): Conv2d(
+                256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=64, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=64, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+            )
+            (2): BottleneckBlock(
+              (conv1): Conv2d(
+                256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=64, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=64, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+            )
+          )
+          (res3): Sequential(
+            (0): BottleneckBlock(
+              (shortcut): Conv2d(
+                256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+              (conv1): Conv2d(
+                256, 128, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=128, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                128, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=128, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+            )
+            (1): BottleneckBlock(
+              (conv1): Conv2d(
+                512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=128, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=128, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+            )
+            (2): BottleneckBlock(
+              (conv1): Conv2d(
+                512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=128, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=128, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+            )
+            (3): BottleneckBlock(
+              (conv1): Conv2d(
+                512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=128, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=128, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+            )
+          )
+          (res4): Sequential(
+            (0): BottleneckBlock(
+              (shortcut): Conv2d(
+                512, 1024, kernel_size=(1, 1), stride=(2, 2), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+              (conv1): Conv2d(
+                512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (1): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (2): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (3): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (4): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (5): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (6): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (7): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (8): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (9): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (10): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (11): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (12): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (13): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (14): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (15): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (16): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (17): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (18): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (19): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (20): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (21): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+            (22): BottleneckBlock(
+              (conv1): Conv2d(
+                1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=256, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=1024, eps=1e-05)
+              )
+            )
+          )
+          (res5): Sequential(
+            (0): BottleneckBlock(
+              (shortcut): Conv2d(
+                1024, 2048, kernel_size=(1, 1), stride=(2, 2), bias=False
+                (norm): FrozenBatchNorm2d(num_features=2048, eps=1e-05)
+              )
+              (conv1): Conv2d(
+                1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                512, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=2048, eps=1e-05)
+              )
+            )
+            (1): BottleneckBlock(
+              (conv1): Conv2d(
+                2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=2048, eps=1e-05)
+              )
+            )
+            (2): BottleneckBlock(
+              (conv1): Conv2d(
+                2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+              (conv2): Conv2d(
+                512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=512, eps=1e-05)
+              )
+              (conv3): Conv2d(
+                512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False
+                (norm): FrozenBatchNorm2d(num_features=2048, eps=1e-05)
+              )
+            )
+          )
+        )
+      )
+      (1): PositionEmbeddingSine()
+    )
+    (relation_query_embed): Embedding(600, 256)
+    (object_query_embed): Embedding(300, 256)
+  )
+  (criterion): IterativeRelationCriterion(
+    (matcher): SpeaQHungarianMatcher()
+  )
+)
+[07/01 19:11:06] fvcore.common.checkpoint INFO: [Checkpointer] Loading from ./speaq_checkpoints/model_final.pth ...
+[07/01 19:11:07] d2.data.common INFO: Serializing 26446 elements to byte tensors and concatenating them all ...
+[07/01 19:11:09] d2.data.common INFO: Serialized dataset takes 69.66 MiB
+[07/01 19:11:09] detectron2 INFO: Following metrics will be use for evaluation
+[07/01 19:11:09] detectron2 INFO: ('SGRecall', 'SGNoGraphConstraintRecall', 'SGZeroShotRecall', 'SGPairAccuracy', 'SGMeanRecall', 'query_count_per_rel_class', 'rel_class_info_per_query', 'recall_per_class')
+[07/01 19:11:09] d2.evaluation.coco_evaluation WARNING: COCO Evaluator instantiated using config, this is deprecated behavior. Please pass in explicit arguments instead.
+[07/01 19:11:09] d2.evaluation.coco_evaluation INFO: Trying to convert 'VG_test' to COCO format ...
+[07/01 19:11:09] d2.data.datasets.coco INFO: Converting annotations of dataset 'VG_test' to COCO format ...)
+[07/01 19:11:09] d2.data.datasets.coco INFO: Converting dataset dicts into COCO format
+[07/01 19:11:56] d2.data.datasets.coco INFO: Conversion finished, #images: 26446, #annotations: 325570
+[07/01 19:11:56] d2.data.datasets.coco INFO: Caching COCO format annotations at './speaq_checkpoints/inference/VG_test_coco_format.json' ...
+[07/01 19:12:04] detectron2 INFO: Loading zero shot triplets
+[07/01 19:12:04] detectron2 INFO: Start inference on 26446 images
+[07/01 19:12:07] detectron2 INFO: Inference done 11/26446. 0.1857 s / img. ETA=1:23:03
+[07/01 19:12:12] detectron2 INFO: Inference done 39/26446. 0.1805 s / img. ETA=1:20:57
+[07/01 19:12:17] detectron2 INFO: Inference done 67/26446. 0.1789 s / img. ETA=1:20:09
+[07/01 19:12:22] detectron2 INFO: Inference done 94/26446. 0.1800 s / img. ETA=1:20:33
+[07/01 19:12:27] detectron2 INFO: Inference done 122/26446. 0.1799 s / img. ETA=1:20:24
+[07/01 19:12:32] detectron2 INFO: Inference done 150/26446. 0.1796 s / img. ETA=1:20:10
+[07/01 19:12:37] detectron2 INFO: Inference done 178/26446. 0.1793 s / img. ETA=1:19:57
+[07/01 19:12:42] detectron2 INFO: Inference done 206/26446. 0.1795 s / img. ETA=1:19:58
+[07/01 19:12:47] detectron2 INFO: Inference done 233/26446. 0.1798 s / img. ETA=1:20:01
+[07/01 19:12:52] detectron2 INFO: Inference done 260/26446. 0.1802 s / img. ETA=1:20:09
+[07/01 19:12:57] detectron2 INFO: Inference done 288/26446. 0.1800 s / img. ETA=1:19:58
+[07/01 19:13:02] detectron2 INFO: Inference done 315/26446. 0.1802 s / img. ETA=1:19:59
+[07/01 19:13:07] detectron2 INFO: Inference done 342/26446. 0.1806 s / img. ETA=1:20:02
+[07/01 19:13:12] detectron2 INFO: Inference done 369/26446. 0.1807 s / img. ETA=1:20:01
+[07/01 19:13:17] detectron2 INFO: Inference done 395/26446. 0.1813 s / img. ETA=1:20:12
+[07/01 19:13:23] detectron2 INFO: Inference done 423/26446. 0.1812 s / img. ETA=1:20:05
+[07/01 19:13:28] detectron2 INFO: Inference done 450/26446. 0.1813 s / img. ETA=1:20:02
+[07/01 19:13:33] detectron2 INFO: Inference done 477/26446. 0.1815 s / img. ETA=1:20:01
+[07/01 19:13:38] detectron2 INFO: Inference done 505/26446. 0.1811 s / img. ETA=1:19:47
+[07/01 19:13:43] detectron2 INFO: Inference done 533/26446. 0.1809 s / img. ETA=1:19:35
+[07/01 19:13:48] detectron2 INFO: Inference done 561/26446. 0.1809 s / img. ETA=1:19:30
+[07/01 19:13:53] detectron2 INFO: Inference done 588/26446. 0.1811 s / img. ETA=1:19:31
+[07/01 19:13:58] detectron2 INFO: Inference done 614/26446. 0.1815 s / img. ETA=1:19:37
+[07/01 19:14:03] detectron2 INFO: Inference done 642/26446. 0.1815 s / img. ETA=1:19:31
+[07/01 19:14:08] detectron2 INFO: Inference done 670/26446. 0.1813 s / img. ETA=1:19:21
+[07/01 19:14:13] detectron2 INFO: Inference done 698/26446. 0.1813 s / img. ETA=1:19:16
+[07/01 19:14:19] detectron2 INFO: Inference done 726/26446. 0.1812 s / img. ETA=1:19:07
+[07/01 19:14:24] detectron2 INFO: Inference done 754/26446. 0.1811 s / img. ETA=1:19:00
+[07/01 19:14:29] detectron2 INFO: Inference done 781/26446. 0.1811 s / img. ETA=1:18:55
+[07/01 19:14:34] detectron2 INFO: Inference done 808/26446. 0.1812 s / img. ETA=1:18:51
+[07/01 19:14:39] detectron2 INFO: Inference done 838/26446. 0.1808 s / img. ETA=1:18:35
+[07/01 19:14:44] detectron2 INFO: Inference done 865/26446. 0.1810 s / img. ETA=1:18:37
+[07/01 19:14:49] detectron2 INFO: Inference done 892/26446. 0.1812 s / img. ETA=1:18:37
+[07/01 19:14:54] detectron2 INFO: Inference done 919/26446. 0.1814 s / img. ETA=1:18:37
+[07/01 19:14:59] detectron2 INFO: Inference done 947/26446. 0.1814 s / img. ETA=1:18:31
+[07/01 19:15:05] detectron2 INFO: Inference done 975/26446. 0.1813 s / img. ETA=1:18:24
+[07/01 19:15:10] detectron2 INFO: Inference done 1003/26446. 0.1813 s / img. ETA=1:18:18
+[07/01 19:15:15] detectron2 INFO: Inference done 1031/26446. 0.1812 s / img. ETA=1:18:12
+[07/01 19:15:20] detectron2 INFO: Inference done 1059/26446. 0.1812 s / img. ETA=1:18:05
+[07/01 19:15:25] detectron2 INFO: Inference done 1087/26446. 0.1812 s / img. ETA=1:18:00
+[07/01 19:15:30] detectron2 INFO: Inference done 1115/26446. 0.1811 s / img. ETA=1:17:52
+[07/01 19:15:35] detectron2 INFO: Inference done 1142/26446. 0.1811 s / img. ETA=1:17:49
+[07/01 19:15:40] detectron2 INFO: Inference done 1170/26446. 0.1811 s / img. ETA=1:17:43
+[07/01 19:15:46] detectron2 INFO: Inference done 1198/26446. 0.1811 s / img. ETA=1:17:38
+[07/01 19:15:51] detectron2 INFO: Inference done 1224/26446. 0.1813 s / img. ETA=1:17:38
+[07/01 19:15:56] detectron2 INFO: Inference done 1251/26446. 0.1815 s / img. ETA=1:17:37
+[07/01 19:16:01] detectron2 INFO: Inference done 1278/26446. 0.1816 s / img. ETA=1:17:35
+[07/01 19:16:06] detectron2 INFO: Inference done 1306/26446. 0.1815 s / img. ETA=1:17:28
+[07/01 19:16:11] detectron2 INFO: Inference done 1333/26446. 0.1815 s / img. ETA=1:17:23
+[07/01 19:16:16] detectron2 INFO: Inference done 1361/26446. 0.1815 s / img. ETA=1:17:18
+[07/01 19:16:21] detectron2 INFO: Inference done 1389/26446. 0.1814 s / img. ETA=1:17:10
+[07/01 19:16:26] detectron2 INFO: Inference done 1416/26446. 0.1815 s / img. ETA=1:17:06
+[07/01 19:16:31] detectron2 INFO: Inference done 1444/26446. 0.1814 s / img. ETA=1:17:00
+[07/01 19:16:37] detectron2 INFO: Inference done 1472/26446. 0.1814 s / img. ETA=1:16:54
+[07/01 19:16:42] detectron2 INFO: Inference done 1500/26446. 0.1813 s / img. ETA=1:16:47
+[07/01 19:16:47] detectron2 INFO: Inference done 1528/26446. 0.1813 s / img. ETA=1:16:40
+[07/01 19:16:52] detectron2 INFO: Inference done 1555/26446. 0.1813 s / img. ETA=1:16:36
+[07/01 19:16:57] detectron2 INFO: Inference done 1583/26446. 0.1813 s / img. ETA=1:16:30
+[07/01 19:17:02] detectron2 INFO: Inference done 1609/26446. 0.1814 s / img. ETA=1:16:30
+[07/01 19:17:07] detectron2 INFO: Inference done 1635/26446. 0.1816 s / img. ETA=1:16:29
+[07/01 19:17:12] detectron2 INFO: Inference done 1662/26446. 0.1816 s / img. ETA=1:16:25
+[07/01 19:17:17] detectron2 INFO: Inference done 1689/26446. 0.1817 s / img. ETA=1:16:22
+[07/01 19:17:22] detectron2 INFO: Inference done 1717/26446. 0.1816 s / img. ETA=1:16:14
+[07/01 19:17:27] detectron2 INFO: Inference done 1744/26446. 0.1817 s / img. ETA=1:16:11
+[07/01 19:17:32] detectron2 INFO: Inference done 1772/26446. 0.1816 s / img. ETA=1:16:05
+[07/01 19:17:38] detectron2 INFO: Inference done 1799/26446. 0.1817 s / img. ETA=1:16:02
+[07/01 19:17:43] detectron2 INFO: Inference done 1826/26446. 0.1818 s / img. ETA=1:15:58
+[07/01 19:17:48] detectron2 INFO: Inference done 1853/26446. 0.1818 s / img. ETA=1:15:54
+[07/01 19:17:53] detectron2 INFO: Inference done 1880/26446. 0.1819 s / img. ETA=1:15:50
+[07/01 19:17:58] detectron2 INFO: Inference done 1908/26446. 0.1818 s / img. ETA=1:15:44
+[07/01 19:18:03] detectron2 INFO: Inference done 1934/26446. 0.1819 s / img. ETA=1:15:42
+[07/01 19:18:08] detectron2 INFO: Inference done 1962/26446. 0.1819 s / img. ETA=1:15:36
+[07/01 19:18:13] detectron2 INFO: Inference done 1989/26446. 0.1820 s / img. ETA=1:15:32
+[07/01 19:18:18] detectron2 INFO: Inference done 2016/26446. 0.1820 s / img. ETA=1:15:28
+[07/01 19:18:23] detectron2 INFO: Inference done 2043/26446. 0.1820 s / img. ETA=1:15:24
+[07/01 19:18:28] detectron2 INFO: Inference done 2070/26446. 0.1821 s / img. ETA=1:15:20
+[07/01 19:18:34] detectron2 INFO: Inference done 2097/26446. 0.1821 s / img. ETA=1:15:16
+[07/01 19:18:39] detectron2 INFO: Inference done 2124/26446. 0.1822 s / img. ETA=1:15:12
+[07/01 19:18:44] detectron2 INFO: Inference done 2152/26446. 0.1821 s / img. ETA=1:15:06
+[07/01 19:18:49] detectron2 INFO: Inference done 2180/26446. 0.1821 s / img. ETA=1:14:59
+[07/01 19:18:54] detectron2 INFO: Inference done 2208/26446. 0.1820 s / img. ETA=1:14:54
+[07/01 19:18:59] detectron2 INFO: Inference done 2235/26446. 0.1820 s / img. ETA=1:14:49
+[07/01 19:19:04] detectron2 INFO: Inference done 2261/26446. 0.1821 s / img. ETA=1:14:46
+[07/01 19:19:09] detectron2 INFO: Inference done 2287/26446. 0.1822 s / img. ETA=1:14:44
+[07/01 19:19:14] detectron2 INFO: Inference done 2314/26446. 0.1823 s / img. ETA=1:14:40
+[07/01 19:19:19] detectron2 INFO: Inference done 2340/26446. 0.1824 s / img. ETA=1:14:38
+[07/01 19:19:24] detectron2 INFO: Inference done 2367/26446. 0.1824 s / img. ETA=1:14:33
+[07/01 19:19:29] detectron2 INFO: Inference done 2395/26446. 0.1824 s / img. ETA=1:14:27
+[07/01 19:19:35] detectron2 INFO: Inference done 2421/26446. 0.1825 s / img. ETA=1:14:25
+[07/01 19:19:40] detectron2 INFO: Inference done 2447/26446. 0.1826 s / img. ETA=1:14:23
+[07/01 19:19:45] detectron2 INFO: Inference done 2474/26446. 0.1826 s / img. ETA=1:14:18
+[07/01 19:19:50] detectron2 INFO: Inference done 2501/26446. 0.1826 s / img. ETA=1:14:14
+[07/01 19:19:55] detectron2 INFO: Inference done 2529/26446. 0.1826 s / img. ETA=1:14:08
+[07/01 19:20:00] detectron2 INFO: Inference done 2556/26446. 0.1826 s / img. ETA=1:14:04
+[07/01 19:20:05] detectron2 INFO: Inference done 2583/26446. 0.1826 s / img. ETA=1:13:58
+[07/01 19:20:10] detectron2 INFO: Inference done 2612/26446. 0.1825 s / img. ETA=1:13:51
+[07/01 19:20:15] detectron2 INFO: Inference done 2639/26446. 0.1825 s / img. ETA=1:13:46
+[07/01 19:20:20] detectron2 INFO: Inference done 2666/26446. 0.1826 s / img. ETA=1:13:43
+[07/01 19:20:25] detectron2 INFO: Inference done 2692/26446. 0.1827 s / img. ETA=1:13:40
+[07/01 19:20:31] detectron2 INFO: Inference done 2720/26446. 0.1827 s / img. ETA=1:13:34
+[07/01 19:20:36] detectron2 INFO: Inference done 2747/26446. 0.1827 s / img. ETA=1:13:29
+[07/01 19:20:41] detectron2 INFO: Inference done 2774/26446. 0.1827 s / img. ETA=1:13:24
+[07/01 19:20:46] detectron2 INFO: Inference done 2802/26446. 0.1826 s / img. ETA=1:13:18
+[07/01 19:20:51] detectron2 INFO: Inference done 2830/26446. 0.1826 s / img. ETA=1:13:12
+[07/01 19:20:56] detectron2 INFO: Inference done 2857/26446. 0.1826 s / img. ETA=1:13:07
+[07/01 19:21:01] detectron2 INFO: Inference done 2885/26446. 0.1825 s / img. ETA=1:13:01
+[07/01 19:21:06] detectron2 INFO: Inference done 2913/26446. 0.1825 s / img. ETA=1:12:55
+[07/01 19:21:11] detectron2 INFO: Inference done 2940/26446. 0.1825 s / img. ETA=1:12:50
+[07/01 19:21:16] detectron2 INFO: Inference done 2967/26446. 0.1826 s / img. ETA=1:12:46
+[07/01 19:21:21] detectron2 INFO: Inference done 2994/26446. 0.1826 s / img. ETA=1:12:41
+[07/01 19:21:26] detectron2 INFO: Inference done 3021/26446. 0.1826 s / img. ETA=1:12:37
+[07/01 19:21:32] detectron2 INFO: Inference done 3049/26446. 0.1826 s / img. ETA=1:12:31
+[07/01 19:21:37] detectron2 INFO: Inference done 3075/26446. 0.1827 s / img. ETA=1:12:28
+[07/01 19:21:42] detectron2 INFO: Inference done 3093/26446. 0.1832 s / img. ETA=1:12:37
+[07/01 19:21:47] detectron2 INFO: Inference done 3119/26446. 0.1832 s / img. ETA=1:12:33
+[07/01 19:21:52] detectron2 INFO: Inference done 3147/26446. 0.1832 s / img. ETA=1:12:28
+[07/01 19:21:57] detectron2 INFO: Inference done 3174/26446. 0.1833 s / img. ETA=1:12:23
+[07/01 19:22:02] detectron2 INFO: Inference done 3201/26446. 0.1833 s / img. ETA=1:12:18
+[07/01 19:22:07] detectron2 INFO: Inference done 3228/26446. 0.1832 s / img. ETA=1:12:13
+[07/01 19:22:12] detectron2 INFO: Inference done 3256/26446. 0.1832 s / img. ETA=1:12:08
+[07/01 19:22:17] detectron2 INFO: Inference done 3282/26446. 0.1833 s / img. ETA=1:12:04
+[07/01 19:22:22] detectron2 INFO: Inference done 3310/26446. 0.1832 s / img. ETA=1:11:58
+[07/01 19:22:27] detectron2 INFO: Inference done 3338/26446. 0.1832 s / img. ETA=1:11:52
+[07/01 19:22:33] detectron2 INFO: Inference done 3365/26446. 0.1833 s / img. ETA=1:11:48
+[07/01 19:22:38] detectron2 INFO: Inference done 3392/26446. 0.1833 s / img. ETA=1:11:42
+[07/01 19:22:43] detectron2 INFO: Inference done 3419/26446. 0.1833 s / img. ETA=1:11:38
+[07/01 19:22:48] detectron2 INFO: Inference done 3446/26446. 0.1833 s / img. ETA=1:11:33
+[07/01 19:22:53] detectron2 INFO: Inference done 3474/26446. 0.1833 s / img. ETA=1:11:27
+[07/01 19:22:58] detectron2 INFO: Inference done 3502/26446. 0.1832 s / img. ETA=1:11:22
+[07/01 19:23:03] detectron2 INFO: Inference done 3528/26446. 0.1833 s / img. ETA=1:11:18
+[07/01 19:23:08] detectron2 INFO: Inference done 3555/26446. 0.1833 s / img. ETA=1:11:13
+[07/01 19:23:13] detectron2 INFO: Inference done 3583/26446. 0.1833 s / img. ETA=1:11:08
+[07/01 19:23:19] detectron2 INFO: Inference done 3611/26446. 0.1833 s / img. ETA=1:11:02
+[07/01 19:23:24] detectron2 INFO: Inference done 3638/26446. 0.1833 s / img. ETA=1:10:57
+[07/01 19:23:29] detectron2 INFO: Inference done 3665/26446. 0.1833 s / img. ETA=1:10:53
+[07/01 19:23:34] detectron2 INFO: Inference done 3692/26446. 0.1833 s / img. ETA=1:10:48
+[07/01 19:23:39] detectron2 INFO: Inference done 3719/26446. 0.1833 s / img. ETA=1:10:44
+[07/01 19:23:44] detectron2 INFO: Inference done 3745/26446. 0.1834 s / img. ETA=1:10:40
+[07/01 19:23:49] detectron2 INFO: Inference done 3771/26446. 0.1834 s / img. ETA=1:10:36
+[07/01 19:23:54] detectron2 INFO: Inference done 3799/26446. 0.1834 s / img. ETA=1:10:30
+[07/01 19:23:59] detectron2 INFO: Inference done 3827/26446. 0.1834 s / img. ETA=1:10:24
+[07/01 19:24:04] detectron2 INFO: Inference done 3855/26446. 0.1833 s / img. ETA=1:10:18
+[07/01 19:24:09] detectron2 INFO: Inference done 3883/26446. 0.1833 s / img. ETA=1:10:12
+[07/01 19:24:15] detectron2 INFO: Inference done 3911/26446. 0.1833 s / img. ETA=1:10:06
+[07/01 19:24:20] detectron2 INFO: Inference done 3939/26446. 0.1832 s / img. ETA=1:10:00
+[07/01 19:24:25] detectron2 INFO: Inference done 3967/26446. 0.1832 s / img. ETA=1:09:54
+[07/01 19:24:30] detectron2 INFO: Inference done 3996/26446. 0.1831 s / img. ETA=1:09:47
+[07/01 19:24:35] detectron2 INFO: Inference done 4023/26446. 0.1831 s / img. ETA=1:09:42
+[07/01 19:24:40] detectron2 INFO: Inference done 4051/26446. 0.1831 s / img. ETA=1:09:36
+[07/01 19:24:45] detectron2 INFO: Inference done 4079/26446. 0.1831 s / img. ETA=1:09:31
+[07/01 19:24:50] detectron2 INFO: Inference done 4106/26446. 0.1831 s / img. ETA=1:09:26
+[07/01 19:24:55] detectron2 INFO: Inference done 4134/26446. 0.1831 s / img. ETA=1:09:20
+[07/01 19:25:00] detectron2 INFO: Inference done 4162/26446. 0.1830 s / img. ETA=1:09:14
+[07/01 19:25:06] detectron2 INFO: Inference done 4189/26446. 0.1831 s / img. ETA=1:09:09
+[07/01 19:25:11] detectron2 INFO: Inference done 4217/26446. 0.1830 s / img. ETA=1:09:03
+[07/01 19:25:16] detectron2 INFO: Inference done 4244/26446. 0.1831 s / img. ETA=1:08:59
+[07/01 19:25:21] detectron2 INFO: Inference done 4272/26446. 0.1831 s / img. ETA=1:08:54
+[07/01 19:25:26] detectron2 INFO: Inference done 4298/26446. 0.1831 s / img. ETA=1:08:50
+[07/01 19:25:31] detectron2 INFO: Inference done 4326/26446. 0.1831 s / img. ETA=1:08:45
+[07/01 19:25:36] detectron2 INFO: Inference done 4354/26446. 0.1831 s / img. ETA=1:08:39
+[07/01 19:25:41] detectron2 INFO: Inference done 4382/26446. 0.1830 s / img. ETA=1:08:33
+[07/01 19:25:47] detectron2 INFO: Inference done 4410/26446. 0.1830 s / img. ETA=1:08:27
+[07/01 19:25:52] detectron2 INFO: Inference done 4437/26446. 0.1830 s / img. ETA=1:08:22
+[07/01 19:25:57] detectron2 INFO: Inference done 4465/26446. 0.1830 s / img. ETA=1:08:17
+[07/01 19:26:02] detectron2 INFO: Inference done 4493/26446. 0.1830 s / img. ETA=1:08:11
+[07/01 19:26:07] detectron2 INFO: Inference done 4521/26446. 0.1830 s / img. ETA=1:08:05
+[07/01 19:26:12] detectron2 INFO: Inference done 4548/26446. 0.1830 s / img. ETA=1:08:01
+[07/01 19:26:17] detectron2 INFO: Inference done 4575/26446. 0.1830 s / img. ETA=1:07:56
+[07/01 19:26:22] detectron2 INFO: Inference done 4603/26446. 0.1829 s / img. ETA=1:07:50
+[07/01 19:26:27] detectron2 INFO: Inference done 4631/26446. 0.1829 s / img. ETA=1:07:44
+[07/01 19:26:32] detectron2 INFO: Inference done 4658/26446. 0.1829 s / img. ETA=1:07:39
+[07/01 19:26:37] detectron2 INFO: Inference done 4685/26446. 0.1829 s / img. ETA=1:07:34
+[07/01 19:26:43] detectron2 INFO: Inference done 4711/26446. 0.1830 s / img. ETA=1:07:30
+[07/01 19:26:48] detectron2 INFO: Inference done 4738/26446. 0.1830 s / img. ETA=1:07:26
+[07/01 19:26:53] detectron2 INFO: Inference done 4765/26446. 0.1830 s / img. ETA=1:07:21
+[07/01 19:26:58] detectron2 INFO: Inference done 4792/26446. 0.1830 s / img. ETA=1:07:17
+[07/01 19:27:03] detectron2 INFO: Inference done 4819/26446. 0.1831 s / img. ETA=1:07:12
+[07/01 19:27:08] detectron2 INFO: Inference done 4846/26446. 0.1831 s / img. ETA=1:07:07
+[07/01 19:27:13] detectron2 INFO: Inference done 4873/26446. 0.1831 s / img. ETA=1:07:03
+[07/01 19:27:18] detectron2 INFO: Inference done 4900/26446. 0.1831 s / img. ETA=1:06:58
+[07/01 19:27:24] detectron2 INFO: Inference done 4926/26446. 0.1832 s / img. ETA=1:06:54
+[07/01 19:27:29] detectron2 INFO: Inference done 4953/26446. 0.1832 s / img. ETA=1:06:49
+[07/01 19:27:34] detectron2 INFO: Inference done 4980/26446. 0.1832 s / img. ETA=1:06:45
+[07/01 19:27:39] detectron2 INFO: Inference done 5007/26446. 0.1832 s / img. ETA=1:06:40
+[07/01 19:27:44] detectron2 INFO: Inference done 5034/26446. 0.1832 s / img. ETA=1:06:35
+[07/01 19:27:49] detectron2 INFO: Inference done 5062/26446. 0.1832 s / img. ETA=1:06:30
+[07/01 19:27:54] detectron2 INFO: Inference done 5089/26446. 0.1832 s / img. ETA=1:06:24
+[07/01 19:27:59] detectron2 INFO: Inference done 5116/26446. 0.1832 s / img. ETA=1:06:20
+[07/01 19:28:04] detectron2 INFO: Inference done 5142/26446. 0.1833 s / img. ETA=1:06:17
+[07/01 19:28:09] detectron2 INFO: Inference done 5168/26446. 0.1833 s / img. ETA=1:06:13
+[07/01 19:28:15] detectron2 INFO: Inference done 5196/26446. 0.1833 s / img. ETA=1:06:07
+[07/01 19:28:20] detectron2 INFO: Inference done 5223/26446. 0.1833 s / img. ETA=1:06:02
+[07/01 19:28:25] detectron2 INFO: Inference done 5249/26446. 0.1833 s / img. ETA=1:05:58
+[07/01 19:28:30] detectron2 INFO: Inference done 5276/26446. 0.1833 s / img. ETA=1:05:53
+[07/01 19:28:35] detectron2 INFO: Inference done 5304/26446. 0.1833 s / img. ETA=1:05:47
+[07/01 19:28:40] detectron2 INFO: Inference done 5331/26446. 0.1833 s / img. ETA=1:05:42
+[07/01 19:28:45] detectron2 INFO: Inference done 5357/26446. 0.1834 s / img. ETA=1:05:38
+[07/01 19:28:50] detectron2 INFO: Inference done 5383/26446. 0.1834 s / img. ETA=1:05:35
+[07/01 19:28:55] detectron2 INFO: Inference done 5409/26446. 0.1835 s / img. ETA=1:05:31
+[07/01 19:29:00] detectron2 INFO: Inference done 5436/26446. 0.1835 s / img. ETA=1:05:26
+[07/01 19:29:05] detectron2 INFO: Inference done 5463/26446. 0.1835 s / img. ETA=1:05:21
+[07/01 19:29:10] detectron2 INFO: Inference done 5491/26446. 0.1834 s / img. ETA=1:05:15
+[07/01 19:29:16] detectron2 INFO: Inference done 5519/26446. 0.1834 s / img. ETA=1:05:09
+[07/01 19:29:21] detectron2 INFO: Inference done 5547/26446. 0.1834 s / img. ETA=1:05:03
+[07/01 19:29:26] detectron2 INFO: Inference done 5574/26446. 0.1834 s / img. ETA=1:04:59
+[07/01 19:29:31] detectron2 INFO: Inference done 5601/26446. 0.1834 s / img. ETA=1:04:54
+[07/01 19:29:36] detectron2 INFO: Inference done 5629/26446. 0.1834 s / img. ETA=1:04:48
+[07/01 19:29:41] detectron2 INFO: Inference done 5656/26446. 0.1834 s / img. ETA=1:04:44
+[07/01 19:29:46] detectron2 INFO: Inference done 5683/26446. 0.1834 s / img. ETA=1:04:39
+[07/01 19:29:51] detectron2 INFO: Inference done 5710/26446. 0.1835 s / img. ETA=1:04:34
+[07/01 19:29:57] detectron2 INFO: Inference done 5737/26446. 0.1835 s / img. ETA=1:04:29
+[07/01 19:30:02] detectron2 INFO: Inference done 5765/26446. 0.1834 s / img. ETA=1:04:24
+[07/01 19:30:07] detectron2 INFO: Inference done 5793/26446. 0.1834 s / img. ETA=1:04:18
+[07/01 19:30:12] detectron2 INFO: Inference done 5821/26446. 0.1834 s / img. ETA=1:04:12
+[07/01 19:30:17] detectron2 INFO: Inference done 5848/26446. 0.1834 s / img. ETA=1:04:07
+[07/01 19:30:22] detectron2 INFO: Inference done 5876/26446. 0.1834 s / img. ETA=1:04:01
+[07/01 19:30:27] detectron2 INFO: Inference done 5903/26446. 0.1834 s / img. ETA=1:03:56
+[07/01 19:30:32] detectron2 INFO: Inference done 5931/26446. 0.1833 s / img. ETA=1:03:51
+[07/01 19:30:37] detectron2 INFO: Inference done 5959/26446. 0.1833 s / img. ETA=1:03:45
+[07/01 19:30:42] detectron2 INFO: Inference done 5985/26446. 0.1833 s / img. ETA=1:03:41
+[07/01 19:30:47] detectron2 INFO: Inference done 6013/26446. 0.1833 s / img. ETA=1:03:35
+[07/01 19:30:52] detectron2 INFO: Inference done 6040/26446. 0.1833 s / img. ETA=1:03:30
+[07/01 19:30:57] detectron2 INFO: Inference done 6068/26446. 0.1833 s / img. ETA=1:03:24
+[07/01 19:31:03] detectron2 INFO: Inference done 6096/26446. 0.1833 s / img. ETA=1:03:19
+[07/01 19:31:08] detectron2 INFO: Inference done 6123/26446. 0.1833 s / img. ETA=1:03:14
+[07/01 19:31:13] detectron2 INFO: Inference done 6150/26446. 0.1833 s / img. ETA=1:03:09
+[07/01 19:31:18] detectron2 INFO: Inference done 6178/26446. 0.1833 s / img. ETA=1:03:03
+[07/01 19:31:23] detectron2 INFO: Inference done 6204/26446. 0.1833 s / img. ETA=1:02:59
+[07/01 19:31:28] detectron2 INFO: Inference done 6231/26446. 0.1833 s / img. ETA=1:02:54
+[07/01 19:31:33] detectron2 INFO: Inference done 6259/26446. 0.1833 s / img. ETA=1:02:48
+[07/01 19:31:38] detectron2 INFO: Inference done 6286/26446. 0.1833 s / img. ETA=1:02:43
+[07/01 19:31:43] detectron2 INFO: Inference done 6314/26446. 0.1833 s / img. ETA=1:02:38
+[07/01 19:31:48] detectron2 INFO: Inference done 6341/26446. 0.1833 s / img. ETA=1:02:33
+[07/01 19:31:53] detectron2 INFO: Inference done 6368/26446. 0.1833 s / img. ETA=1:02:28
+[07/01 19:31:58] detectron2 INFO: Inference done 6396/26446. 0.1833 s / img. ETA=1:02:22
+[07/01 19:32:04] detectron2 INFO: Inference done 6425/26446. 0.1832 s / img. ETA=1:02:16
+[07/01 19:32:09] detectron2 INFO: Inference done 6452/26446. 0.1832 s / img. ETA=1:02:11
+[07/01 19:32:14] detectron2 INFO: Inference done 6480/26446. 0.1832 s / img. ETA=1:02:06
+[07/01 19:32:19] detectron2 INFO: Inference done 6507/26446. 0.1832 s / img. ETA=1:02:01
+[07/01 19:32:24] detectron2 INFO: Inference done 6534/26446. 0.1832 s / img. ETA=1:01:56
+[07/01 19:32:29] detectron2 INFO: Inference done 6560/26446. 0.1833 s / img. ETA=1:01:52
+[07/01 19:32:34] detectron2 INFO: Inference done 6588/26446. 0.1833 s / img. ETA=1:01:46
+[07/01 19:32:39] detectron2 INFO: Inference done 6616/26446. 0.1832 s / img. ETA=1:01:41
+[07/01 19:32:44] detectron2 INFO: Inference done 6644/26446. 0.1832 s / img. ETA=1:01:35
+[07/01 19:32:50] detectron2 INFO: Inference done 6672/26446. 0.1832 s / img. ETA=1:01:30
+[07/01 19:32:55] detectron2 INFO: Inference done 6700/26446. 0.1832 s / img. ETA=1:01:24
+[07/01 19:33:00] detectron2 INFO: Inference done 6727/26446. 0.1832 s / img. ETA=1:01:19
+[07/01 19:33:05] detectron2 INFO: Inference done 6755/26446. 0.1832 s / img. ETA=1:01:14
+[07/01 19:33:10] detectron2 INFO: Inference done 6783/26446. 0.1832 s / img. ETA=1:01:09
+[07/01 19:33:15] detectron2 INFO: Inference done 6811/26446. 0.1832 s / img. ETA=1:01:03
+[07/01 19:33:20] detectron2 INFO: Inference done 6838/26446. 0.1832 s / img. ETA=1:00:58
+[07/01 19:33:25] detectron2 INFO: Inference done 6865/26446. 0.1832 s / img. ETA=1:00:53
+[07/01 19:33:31] detectron2 INFO: Inference done 6893/26446. 0.1832 s / img. ETA=1:00:47
+[07/01 19:33:36] detectron2 INFO: Inference done 6919/26446. 0.1832 s / img. ETA=1:00:43
+[07/01 19:33:41] detectron2 INFO: Inference done 6946/26446. 0.1832 s / img. ETA=1:00:38
+[07/01 19:33:46] detectron2 INFO: Inference done 6972/26446. 0.1832 s / img. ETA=1:00:34
+[07/01 19:33:51] detectron2 INFO: Inference done 6999/26446. 0.1832 s / img. ETA=1:00:29
+[07/01 19:33:56] detectron2 INFO: Inference done 7027/26446. 0.1832 s / img. ETA=1:00:24
+[07/01 19:34:01] detectron2 INFO: Inference done 7055/26446. 0.1832 s / img. ETA=1:00:18
+[07/01 19:34:06] detectron2 INFO: Inference done 7083/26446. 0.1832 s / img. ETA=1:00:13
+[07/01 19:34:11] detectron2 INFO: Inference done 7111/26446. 0.1832 s / img. ETA=1:00:07
+[07/01 19:34:17] detectron2 INFO: Inference done 7139/26446. 0.1832 s / img. ETA=1:00:02
+[07/01 19:34:22] detectron2 INFO: Inference done 7167/26446. 0.1832 s / img. ETA=0:59:56
+[07/01 19:34:27] detectron2 INFO: Inference done 7194/26446. 0.1832 s / img. ETA=0:59:52
+[07/01 19:34:32] detectron2 INFO: Inference done 7221/26446. 0.1832 s / img. ETA=0:59:47
+[07/01 19:34:37] detectron2 INFO: Inference done 7248/26446. 0.1832 s / img. ETA=0:59:42
+[07/01 19:34:42] detectron2 INFO: Inference done 7274/26446. 0.1832 s / img. ETA=0:59:37
+[07/01 19:34:47] detectron2 INFO: Inference done 7300/26446. 0.1832 s / img. ETA=0:59:33
+[07/01 19:34:52] detectron2 INFO: Inference done 7327/26446. 0.1833 s / img. ETA=0:59:28
+[07/01 19:34:57] detectron2 INFO: Inference done 7352/26446. 0.1833 s / img. ETA=0:59:24
+[07/01 19:35:02] detectron2 INFO: Inference done 7379/26446. 0.1833 s / img. ETA=0:59:19
+[07/01 19:35:07] detectron2 INFO: Inference done 7406/26446. 0.1833 s / img. ETA=0:59:14
+[07/01 19:35:12] detectron2 INFO: Inference done 7432/26446. 0.1833 s / img. ETA=0:59:10
+[07/01 19:35:18] detectron2 INFO: Inference done 7460/26446. 0.1833 s / img. ETA=0:59:05
+[07/01 19:35:23] detectron2 INFO: Inference done 7487/26446. 0.1833 s / img. ETA=0:59:00
+[07/01 19:35:28] detectron2 INFO: Inference done 7514/26446. 0.1833 s / img. ETA=0:58:55
+[07/01 19:35:33] detectron2 INFO: Inference done 7540/26446. 0.1834 s / img. ETA=0:58:51
+[07/01 19:35:38] detectron2 INFO: Inference done 7567/26446. 0.1834 s / img. ETA=0:58:46
+[07/01 19:35:43] detectron2 INFO: Inference done 7594/26446. 0.1834 s / img. ETA=0:58:41
+[07/01 19:35:48] detectron2 INFO: Inference done 7620/26446. 0.1834 s / img. ETA=0:58:36
+[07/01 19:35:53] detectron2 INFO: Inference done 7647/26446. 0.1834 s / img. ETA=0:58:31
+[07/01 19:35:58] detectron2 INFO: Inference done 7675/26446. 0.1834 s / img. ETA=0:58:26
+[07/01 19:36:03] detectron2 INFO: Inference done 7703/26446. 0.1834 s / img. ETA=0:58:20
+[07/01 19:36:08] detectron2 INFO: Inference done 7730/26446. 0.1834 s / img. ETA=0:58:15
+[07/01 19:36:13] detectron2 INFO: Inference done 7756/26446. 0.1834 s / img. ETA=0:58:11
+[07/01 19:36:18] detectron2 INFO: Inference done 7783/26446. 0.1834 s / img. ETA=0:58:06
+[07/01 19:36:24] detectron2 INFO: Inference done 7810/26446. 0.1834 s / img. ETA=0:58:01
+[07/01 19:36:29] detectron2 INFO: Inference done 7837/26446. 0.1834 s / img. ETA=0:57:56
+[07/01 19:36:34] detectron2 INFO: Inference done 7865/26446. 0.1834 s / img. ETA=0:57:50
+[07/01 19:36:39] detectron2 INFO: Inference done 7892/26446. 0.1834 s / img. ETA=0:57:46
+[07/01 19:36:44] detectron2 INFO: Inference done 7919/26446. 0.1834 s / img. ETA=0:57:41
+[07/01 19:36:49] detectron2 INFO: Inference done 7946/26446. 0.1834 s / img. ETA=0:57:36
+[07/01 19:36:54] detectron2 INFO: Inference done 7973/26446. 0.1834 s / img. ETA=0:57:31
+[07/01 19:36:59] detectron2 INFO: Inference done 8001/26446. 0.1834 s / img. ETA=0:57:25
+[07/01 19:37:04] detectron2 INFO: Inference done 8028/26446. 0.1834 s / img. ETA=0:57:20
+[07/01 19:37:09] detectron2 INFO: Inference done 8054/26446. 0.1834 s / img. ETA=0:57:16
+[07/01 19:37:14] detectron2 INFO: Inference done 8080/26446. 0.1834 s / img. ETA=0:57:11
+[07/01 19:37:19] detectron2 INFO: Inference done 8107/26446. 0.1834 s / img. ETA=0:57:06
+[07/01 19:37:24] detectron2 INFO: Inference done 8134/26446. 0.1835 s / img. ETA=0:57:01
+[07/01 19:37:30] detectron2 INFO: Inference done 8162/26446. 0.1834 s / img. ETA=0:56:56
+[07/01 19:37:35] detectron2 INFO: Inference done 8190/26446. 0.1834 s / img. ETA=0:56:50
+[07/01 19:37:40] detectron2 INFO: Inference done 8217/26446. 0.1834 s / img. ETA=0:56:45
+[07/01 19:37:45] detectron2 INFO: Inference done 8245/26446. 0.1834 s / img. ETA=0:56:40
+[07/01 19:37:50] detectron2 INFO: Inference done 8271/26446. 0.1834 s / img. ETA=0:56:35
+[07/01 19:37:55] detectron2 INFO: Inference done 8298/26446. 0.1834 s / img. ETA=0:56:30
+[07/01 19:38:00] detectron2 INFO: Inference done 8325/26446. 0.1834 s / img. ETA=0:56:26
+[07/01 19:38:05] detectron2 INFO: Inference done 8352/26446. 0.1835 s / img. ETA=0:56:21
+[07/01 19:38:10] detectron2 INFO: Inference done 8379/26446. 0.1835 s / img. ETA=0:56:16
+[07/01 19:38:15] detectron2 INFO: Inference done 8406/26446. 0.1835 s / img. ETA=0:56:11
+[07/01 19:38:20] detectron2 INFO: Inference done 8434/26446. 0.1835 s / img. ETA=0:56:05
+[07/01 19:38:26] detectron2 INFO: Inference done 8461/26446. 0.1835 s / img. ETA=0:56:00
+[07/01 19:38:31] detectron2 INFO: Inference done 8489/26446. 0.1834 s / img. ETA=0:55:55
+[07/01 19:38:36] detectron2 INFO: Inference done 8516/26446. 0.1834 s / img. ETA=0:55:50
+[07/01 19:38:41] detectron2 INFO: Inference done 8544/26446. 0.1834 s / img. ETA=0:55:44
+[07/01 19:38:46] detectron2 INFO: Inference done 8571/26446. 0.1834 s / img. ETA=0:55:39
+[07/01 19:38:51] detectron2 INFO: Inference done 8599/26446. 0.1834 s / img. ETA=0:55:34
+[07/01 19:38:56] detectron2 INFO: Inference done 8626/26446. 0.1834 s / img. ETA=0:55:28
+[07/01 19:39:01] detectron2 INFO: Inference done 8653/26446. 0.1834 s / img. ETA=0:55:24
+[07/01 19:39:06] detectron2 INFO: Inference done 8680/26446. 0.1834 s / img. ETA=0:55:19
+[07/01 19:39:11] detectron2 INFO: Inference done 8707/26446. 0.1834 s / img. ETA=0:55:14
+[07/01 19:39:17] detectron2 INFO: Inference done 8734/26446. 0.1834 s / img. ETA=0:55:09
+[07/01 19:39:22] detectron2 INFO: Inference done 8761/26446. 0.1835 s / img. ETA=0:55:04
+[07/01 19:39:27] detectron2 INFO: Inference done 8789/26446. 0.1834 s / img. ETA=0:54:59
+[07/01 19:39:32] detectron2 INFO: Inference done 8816/26446. 0.1834 s / img. ETA=0:54:54
+[07/01 19:39:37] detectron2 INFO: Inference done 8845/26446. 0.1834 s / img. ETA=0:54:48
+[07/01 19:39:42] detectron2 INFO: Inference done 8872/26446. 0.1834 s / img. ETA=0:54:43
+[07/01 19:39:47] detectron2 INFO: Inference done 8899/26446. 0.1834 s / img. ETA=0:54:38
+[07/01 19:39:52] detectron2 INFO: Inference done 8927/26446. 0.1834 s / img. ETA=0:54:32
+[07/01 19:39:57] detectron2 INFO: Inference done 8955/26446. 0.1834 s / img. ETA=0:54:27
+[07/01 19:40:03] detectron2 INFO: Inference done 8982/26446. 0.1834 s / img. ETA=0:54:22
+[07/01 19:40:08] detectron2 INFO: Inference done 9010/26446. 0.1834 s / img. ETA=0:54:17
+[07/01 19:40:13] detectron2 INFO: Inference done 9037/26446. 0.1834 s / img. ETA=0:54:12
+[07/01 19:40:18] detectron2 INFO: Inference done 9064/26446. 0.1834 s / img. ETA=0:54:07
+[07/01 19:40:23] detectron2 INFO: Inference done 9093/26446. 0.1834 s / img. ETA=0:54:01
+[07/01 19:40:28] detectron2 INFO: Inference done 9121/26446. 0.1834 s / img. ETA=0:53:55
+[07/01 19:40:33] detectron2 INFO: Inference done 9149/26446. 0.1833 s / img. ETA=0:53:50
+[07/01 19:40:40] detectron2 INFO: Inference done 9175/26446. 0.1833 s / img. ETA=0:53:48
+[07/01 19:40:45] detectron2 INFO: Inference done 9203/26446. 0.1833 s / img. ETA=0:53:43
+[07/01 19:40:50] detectron2 INFO: Inference done 9229/26446. 0.1833 s / img. ETA=0:53:38
+[07/01 19:40:55] detectron2 INFO: Inference done 9257/26446. 0.1833 s / img. ETA=0:53:33
+[07/01 19:41:00] detectron2 INFO: Inference done 9284/26446. 0.1833 s / img. ETA=0:53:28
+[07/01 19:41:05] detectron2 INFO: Inference done 9311/26446. 0.1833 s / img. ETA=0:53:23
+[07/01 19:41:10] detectron2 INFO: Inference done 9338/26446. 0.1833 s / img. ETA=0:53:17
+[07/01 19:41:15] detectron2 INFO: Inference done 9366/26446. 0.1833 s / img. ETA=0:53:12
+[07/01 19:41:20] detectron2 INFO: Inference done 9392/26446. 0.1833 s / img. ETA=0:53:07
+[07/01 19:41:25] detectron2 INFO: Inference done 9419/26446. 0.1833 s / img. ETA=0:53:02
+[07/01 19:41:30] detectron2 INFO: Inference done 9446/26446. 0.1833 s / img. ETA=0:52:58
+[07/01 19:41:36] detectron2 INFO: Inference done 9474/26446. 0.1833 s / img. ETA=0:52:52
+[07/01 19:41:41] detectron2 INFO: Inference done 9502/26446. 0.1833 s / img. ETA=0:52:47
+[07/01 19:41:46] detectron2 INFO: Inference done 9528/26446. 0.1833 s / img. ETA=0:52:42
+[07/01 19:41:51] detectron2 INFO: Inference done 9554/26446. 0.1834 s / img. ETA=0:52:38
+[07/01 19:41:56] detectron2 INFO: Inference done 9582/26446. 0.1834 s / img. ETA=0:52:32
+[07/01 19:42:01] detectron2 INFO: Inference done 9609/26446. 0.1834 s / img. ETA=0:52:27
+[07/01 19:42:06] detectron2 INFO: Inference done 9635/26446. 0.1834 s / img. ETA=0:52:23
+[07/01 19:42:11] detectron2 INFO: Inference done 9661/26446. 0.1834 s / img. ETA=0:52:18
+[07/01 19:42:16] detectron2 INFO: Inference done 9689/26446. 0.1834 s / img. ETA=0:52:13
+[07/01 19:42:21] detectron2 INFO: Inference done 9716/26446. 0.1834 s / img. ETA=0:52:08
+[07/01 19:42:26] detectron2 INFO: Inference done 9744/26446. 0.1834 s / img. ETA=0:52:02
+[07/01 19:42:32] detectron2 INFO: Inference done 9771/26446. 0.1834 s / img. ETA=0:51:58
+[07/01 19:42:37] detectron2 INFO: Inference done 9798/26446. 0.1834 s / img. ETA=0:51:52
+[07/01 19:42:42] detectron2 INFO: Inference done 9825/26446. 0.1834 s / img. ETA=0:51:47
+[07/01 19:42:47] detectron2 INFO: Inference done 9852/26446. 0.1834 s / img. ETA=0:51:42
+[07/01 19:42:52] detectron2 INFO: Inference done 9880/26446. 0.1834 s / img. ETA=0:51:37
+[07/01 19:42:57] detectron2 INFO: Inference done 9907/26446. 0.1834 s / img. ETA=0:51:32
+[07/01 19:43:02] detectron2 INFO: Inference done 9935/26446. 0.1834 s / img. ETA=0:51:26
+[07/01 19:43:07] detectron2 INFO: Inference done 9963/26446. 0.1834 s / img. ETA=0:51:21
+[07/01 19:43:12] detectron2 INFO: Inference done 9990/26446. 0.1834 s / img. ETA=0:51:16
+[07/01 19:43:17] detectron2 INFO: Inference done 10017/26446. 0.1834 s / img. ETA=0:51:11
+[07/01 19:43:22] detectron2 INFO: Inference done 10045/26446. 0.1834 s / img. ETA=0:51:06
+[07/01 19:43:27] detectron2 INFO: Inference done 10072/26446. 0.1834 s / img. ETA=0:51:01
+[07/01 19:43:32] detectron2 INFO: Inference done 10098/26446. 0.1834 s / img. ETA=0:50:56
+[07/01 19:43:38] detectron2 INFO: Inference done 10126/26446. 0.1834 s / img. ETA=0:50:51
+[07/01 19:43:43] detectron2 INFO: Inference done 10154/26446. 0.1834 s / img. ETA=0:50:45
+[07/01 19:43:48] detectron2 INFO: Inference done 10182/26446. 0.1833 s / img. ETA=0:50:40
+[07/01 19:43:53] detectron2 INFO: Inference done 10209/26446. 0.1833 s / img. ETA=0:50:35
+[07/01 19:43:58] detectron2 INFO: Inference done 10236/26446. 0.1833 s / img. ETA=0:50:30
+[07/01 19:44:03] detectron2 INFO: Inference done 10263/26446. 0.1833 s / img. ETA=0:50:25
+[07/01 19:44:08] detectron2 INFO: Inference done 10290/26446. 0.1834 s / img. ETA=0:50:20
+[07/01 19:44:13] detectron2 INFO: Inference done 10318/26446. 0.1833 s / img. ETA=0:50:14
+[07/01 19:44:18] detectron2 INFO: Inference done 10346/26446. 0.1833 s / img. ETA=0:50:09
+[07/01 19:44:24] detectron2 INFO: Inference done 10372/26446. 0.1834 s / img. ETA=0:50:05
+[07/01 19:44:29] detectron2 INFO: Inference done 10399/26446. 0.1834 s / img. ETA=0:49:59
+[07/01 19:44:34] detectron2 INFO: Inference done 10427/26446. 0.1834 s / img. ETA=0:49:54
+[07/01 19:44:39] detectron2 INFO: Inference done 10454/26446. 0.1834 s / img. ETA=0:49:49
+[07/01 19:44:44] detectron2 INFO: Inference done 10480/26446. 0.1834 s / img. ETA=0:49:45
+[07/01 19:44:49] detectron2 INFO: Inference done 10507/26446. 0.1834 s / img. ETA=0:49:40
+[07/01 19:44:54] detectron2 INFO: Inference done 10535/26446. 0.1834 s / img. ETA=0:49:34
+[07/01 19:44:59] detectron2 INFO: Inference done 10562/26446. 0.1834 s / img. ETA=0:49:29
+[07/01 19:45:04] detectron2 INFO: Inference done 10589/26446. 0.1834 s / img. ETA=0:49:24
+[07/01 19:45:09] detectron2 INFO: Inference done 10617/26446. 0.1834 s / img. ETA=0:49:19
+[07/01 19:45:14] detectron2 INFO: Inference done 10645/26446. 0.1834 s / img. ETA=0:49:13
+[07/01 19:45:20] detectron2 INFO: Inference done 10673/26446. 0.1833 s / img. ETA=0:49:08
+[07/01 19:45:25] detectron2 INFO: Inference done 10699/26446. 0.1834 s / img. ETA=0:49:03
+[07/01 19:45:30] detectron2 INFO: Inference done 10727/26446. 0.1834 s / img. ETA=0:48:58
+[07/01 19:45:35] detectron2 INFO: Inference done 10754/26446. 0.1834 s / img. ETA=0:48:53
+[07/01 19:45:40] detectron2 INFO: Inference done 10781/26446. 0.1834 s / img. ETA=0:48:48
+[07/01 19:45:45] detectron2 INFO: Inference done 10809/26446. 0.1834 s / img. ETA=0:48:43
+[07/01 19:45:50] detectron2 INFO: Inference done 10837/26446. 0.1833 s / img. ETA=0:48:37
+[07/01 19:45:55] detectron2 INFO: Inference done 10864/26446. 0.1833 s / img. ETA=0:48:32
+[07/01 19:46:00] detectron2 INFO: Inference done 10893/26446. 0.1833 s / img. ETA=0:48:26
+[07/01 19:46:05] detectron2 INFO: Inference done 10920/26446. 0.1833 s / img. ETA=0:48:21
+[07/01 19:46:11] detectron2 INFO: Inference done 10946/26446. 0.1834 s / img. ETA=0:48:17
+[07/01 19:46:16] detectron2 INFO: Inference done 10973/26446. 0.1834 s / img. ETA=0:48:12
+[07/01 19:46:21] detectron2 INFO: Inference done 11000/26446. 0.1834 s / img. ETA=0:48:07
+[07/01 19:46:26] detectron2 INFO: Inference done 11028/26446. 0.1834 s / img. ETA=0:48:02
+[07/01 19:46:31] detectron2 INFO: Inference done 11055/26446. 0.1834 s / img. ETA=0:47:57
+[07/01 19:46:36] detectron2 INFO: Inference done 11083/26446. 0.1834 s / img. ETA=0:47:51
+[07/01 19:46:41] detectron2 INFO: Inference done 11111/26446. 0.1833 s / img. ETA=0:47:46
+[07/01 19:46:47] detectron2 INFO: Inference done 11138/26446. 0.1834 s / img. ETA=0:47:41
+[07/01 19:46:52] detectron2 INFO: Inference done 11165/26446. 0.1834 s / img. ETA=0:47:36
+[07/01 19:46:57] detectron2 INFO: Inference done 11193/26446. 0.1834 s / img. ETA=0:47:31
+[07/01 19:47:02] detectron2 INFO: Inference done 11221/26446. 0.1833 s / img. ETA=0:47:25
+[07/01 19:47:07] detectron2 INFO: Inference done 11248/26446. 0.1833 s / img. ETA=0:47:20
+[07/01 19:47:12] detectron2 INFO: Inference done 11275/26446. 0.1833 s / img. ETA=0:47:15
+[07/01 19:47:17] detectron2 INFO: Inference done 11301/26446. 0.1834 s / img. ETA=0:47:11
+[07/01 19:47:22] detectron2 INFO: Inference done 11328/26446. 0.1834 s / img. ETA=0:47:06
+[07/01 19:47:27] detectron2 INFO: Inference done 11356/26446. 0.1834 s / img. ETA=0:47:00
+[07/01 19:47:32] detectron2 INFO: Inference done 11383/26446. 0.1834 s / img. ETA=0:46:55
+[07/01 19:47:37] detectron2 INFO: Inference done 11411/26446. 0.1833 s / img. ETA=0:46:50
+[07/01 19:47:43] detectron2 INFO: Inference done 11439/26446. 0.1833 s / img. ETA=0:46:44
+[07/01 19:47:48] detectron2 INFO: Inference done 11465/26446. 0.1834 s / img. ETA=0:46:40
+[07/01 19:47:53] detectron2 INFO: Inference done 11492/26446. 0.1834 s / img. ETA=0:46:35
+[07/01 19:47:58] detectron2 INFO: Inference done 11520/26446. 0.1834 s / img. ETA=0:46:30
+[07/01 19:48:03] detectron2 INFO: Inference done 11547/26446. 0.1834 s / img. ETA=0:46:25
+[07/01 19:48:08] detectron2 INFO: Inference done 11573/26446. 0.1834 s / img. ETA=0:46:20
+[07/01 19:48:13] detectron2 INFO: Inference done 11601/26446. 0.1834 s / img. ETA=0:46:15
+[07/01 19:48:18] detectron2 INFO: Inference done 11628/26446. 0.1834 s / img. ETA=0:46:10
+[07/01 19:48:23] detectron2 INFO: Inference done 11655/26446. 0.1834 s / img. ETA=0:46:04
+[07/01 19:48:28] detectron2 INFO: Inference done 11682/26446. 0.1834 s / img. ETA=0:45:59
+[07/01 19:48:33] detectron2 INFO: Inference done 11708/26446. 0.1834 s / img. ETA=0:45:55
+[07/01 19:48:38] detectron2 INFO: Inference done 11735/26446. 0.1834 s / img. ETA=0:45:50
+[07/01 19:48:43] detectron2 INFO: Inference done 11762/26446. 0.1834 s / img. ETA=0:45:45
+[07/01 19:48:49] detectron2 INFO: Inference done 11790/26446. 0.1834 s / img. ETA=0:45:39
+[07/01 19:48:54] detectron2 INFO: Inference done 11817/26446. 0.1834 s / img. ETA=0:45:34
+[07/01 19:48:59] detectron2 INFO: Inference done 11845/26446. 0.1834 s / img. ETA=0:45:29
+[07/01 19:49:04] detectron2 INFO: Inference done 11872/26446. 0.1834 s / img. ETA=0:45:24
+[07/01 19:49:09] detectron2 INFO: Inference done 11899/26446. 0.1833 s / img. ETA=0:45:19
+[07/01 19:49:14] detectron2 INFO: Inference done 11927/26446. 0.1833 s / img. ETA=0:45:13
+[07/01 19:49:19] detectron2 INFO: Inference done 11955/26446. 0.1833 s / img. ETA=0:45:08
+[07/01 19:49:24] detectron2 INFO: Inference done 11982/26446. 0.1833 s / img. ETA=0:45:03
+[07/01 19:49:29] detectron2 INFO: Inference done 12010/26446. 0.1833 s / img. ETA=0:44:57
+[07/01 19:49:34] detectron2 INFO: Inference done 12035/26446. 0.1834 s / img. ETA=0:44:53
+[07/01 19:49:39] detectron2 INFO: Inference done 12062/26446. 0.1833 s / img. ETA=0:44:48
+[07/01 19:49:44] detectron2 INFO: Inference done 12088/26446. 0.1834 s / img. ETA=0:44:43
+[07/01 19:49:49] detectron2 INFO: Inference done 12115/26446. 0.1834 s / img. ETA=0:44:38
+[07/01 19:49:54] detectron2 INFO: Inference done 12142/26446. 0.1834 s / img. ETA=0:44:33
+[07/01 19:49:59] detectron2 INFO: Inference done 12170/26446. 0.1834 s / img. ETA=0:44:28
+[07/01 19:50:04] detectron2 INFO: Inference done 12197/26446. 0.1834 s / img. ETA=0:44:23
+[07/01 19:50:09] detectron2 INFO: Inference done 12225/26446. 0.1833 s / img. ETA=0:44:17
+[07/01 19:50:14] detectron2 INFO: Inference done 12251/26446. 0.1834 s / img. ETA=0:44:13
+[07/01 19:50:19] detectron2 INFO: Inference done 12278/26446. 0.1834 s / img. ETA=0:44:08
+[07/01 19:50:25] detectron2 INFO: Inference done 12305/26446. 0.1834 s / img. ETA=0:44:03
+[07/01 19:50:30] detectron2 INFO: Inference done 12332/26446. 0.1834 s / img. ETA=0:43:58
+[07/01 19:50:35] detectron2 INFO: Inference done 12358/26446. 0.1834 s / img. ETA=0:43:53
+[07/01 19:50:40] detectron2 INFO: Inference done 12385/26446. 0.1834 s / img. ETA=0:43:48
+[07/01 19:50:45] detectron2 INFO: Inference done 12412/26446. 0.1834 s / img. ETA=0:43:43
+[07/01 19:50:50] detectron2 INFO: Inference done 12438/26446. 0.1834 s / img. ETA=0:43:39
+[07/01 19:50:55] detectron2 INFO: Inference done 12466/26446. 0.1834 s / img. ETA=0:43:33
+[07/01 19:51:00] detectron2 INFO: Inference done 12493/26446. 0.1834 s / img. ETA=0:43:28
+[07/01 19:51:05] detectron2 INFO: Inference done 12521/26446. 0.1834 s / img. ETA=0:43:23
+[07/01 19:51:11] detectron2 INFO: Inference done 12549/26446. 0.1834 s / img. ETA=0:43:18
+[07/01 19:51:16] detectron2 INFO: Inference done 12576/26446. 0.1834 s / img. ETA=0:43:12
+[07/01 19:51:21] detectron2 INFO: Inference done 12602/26446. 0.1834 s / img. ETA=0:43:08
+[07/01 19:51:26] detectron2 INFO: Inference done 12628/26446. 0.1834 s / img. ETA=0:43:03
+[07/01 19:51:31] detectron2 INFO: Inference done 12655/26446. 0.1834 s / img. ETA=0:42:58
+[07/01 19:51:36] detectron2 INFO: Inference done 12682/26446. 0.1834 s / img. ETA=0:42:53
+[07/01 19:51:41] detectron2 INFO: Inference done 12710/26446. 0.1834 s / img. ETA=0:42:48
+[07/01 19:51:46] detectron2 INFO: Inference done 12737/26446. 0.1834 s / img. ETA=0:42:43
+[07/01 19:51:51] detectron2 INFO: Inference done 12764/26446. 0.1834 s / img. ETA=0:42:38
+[07/01 19:51:56] detectron2 INFO: Inference done 12791/26446. 0.1834 s / img. ETA=0:42:33
+[07/01 19:52:01] detectron2 INFO: Inference done 12819/26446. 0.1834 s / img. ETA=0:42:27
+[07/01 19:52:06] detectron2 INFO: Inference done 12847/26446. 0.1834 s / img. ETA=0:42:22
+[07/01 19:52:12] detectron2 INFO: Inference done 12874/26446. 0.1834 s / img. ETA=0:42:17
+[07/01 19:52:17] detectron2 INFO: Inference done 12902/26446. 0.1834 s / img. ETA=0:42:12
+[07/01 19:52:22] detectron2 INFO: Inference done 12930/26446. 0.1834 s / img. ETA=0:42:06
+[07/01 19:52:27] detectron2 INFO: Inference done 12958/26446. 0.1834 s / img. ETA=0:42:01
+[07/01 19:52:32] detectron2 INFO: Inference done 12985/26446. 0.1834 s / img. ETA=0:41:56
+[07/01 19:52:37] detectron2 INFO: Inference done 13012/26446. 0.1834 s / img. ETA=0:41:51
+[07/01 19:52:42] detectron2 INFO: Inference done 13039/26446. 0.1834 s / img. ETA=0:41:46
+[07/01 19:52:47] detectron2 INFO: Inference done 13067/26446. 0.1834 s / img. ETA=0:41:41
+[07/01 19:52:53] detectron2 INFO: Inference done 13095/26446. 0.1834 s / img. ETA=0:41:35
+[07/01 19:52:58] detectron2 INFO: Inference done 13123/26446. 0.1834 s / img. ETA=0:41:30
+[07/01 19:53:03] detectron2 INFO: Inference done 13150/26446. 0.1834 s / img. ETA=0:41:25
+[07/01 19:53:08] detectron2 INFO: Inference done 13178/26446. 0.1834 s / img. ETA=0:41:20
+[07/01 19:53:13] detectron2 INFO: Inference done 13206/26446. 0.1834 s / img. ETA=0:41:14
+[07/01 19:53:18] detectron2 INFO: Inference done 13235/26446. 0.1834 s / img. ETA=0:41:09
+[07/01 19:53:23] detectron2 INFO: Inference done 13263/26446. 0.1833 s / img. ETA=0:41:03
+[07/01 19:53:28] detectron2 INFO: Inference done 13290/26446. 0.1834 s / img. ETA=0:40:58
+[07/01 19:53:33] detectron2 INFO: Inference done 13317/26446. 0.1833 s / img. ETA=0:40:53
+[07/01 19:53:39] detectron2 INFO: Inference done 13344/26446. 0.1834 s / img. ETA=0:40:48
+[07/01 19:53:44] detectron2 INFO: Inference done 13372/26446. 0.1833 s / img. ETA=0:40:43
+[07/01 19:53:49] detectron2 INFO: Inference done 13400/26446. 0.1833 s / img. ETA=0:40:38
+[07/01 19:53:54] detectron2 INFO: Inference done 13427/26446. 0.1833 s / img. ETA=0:40:33
+[07/01 19:53:59] detectron2 INFO: Inference done 13455/26446. 0.1833 s / img. ETA=0:40:27
+[07/01 19:54:04] detectron2 INFO: Inference done 13483/26446. 0.1833 s / img. ETA=0:40:22
+[07/01 19:54:09] detectron2 INFO: Inference done 13511/26446. 0.1833 s / img. ETA=0:40:17
+[07/01 19:54:14] detectron2 INFO: Inference done 13539/26446. 0.1833 s / img. ETA=0:40:11
+[07/01 19:54:19] detectron2 INFO: Inference done 13567/26446. 0.1833 s / img. ETA=0:40:06
+[07/01 19:54:24] detectron2 INFO: Inference done 13593/26446. 0.1833 s / img. ETA=0:40:01
+[07/01 19:54:29] detectron2 INFO: Inference done 13621/26446. 0.1833 s / img. ETA=0:39:56
+[07/01 19:54:35] detectron2 INFO: Inference done 13649/26446. 0.1833 s / img. ETA=0:39:50
+[07/01 19:54:40] detectron2 INFO: Inference done 13676/26446. 0.1833 s / img. ETA=0:39:45
+[07/01 19:54:45] detectron2 INFO: Inference done 13702/26446. 0.1833 s / img. ETA=0:39:41
+[07/01 19:54:50] detectron2 INFO: Inference done 13728/26446. 0.1833 s / img. ETA=0:39:36
+[07/01 19:54:55] detectron2 INFO: Inference done 13754/26446. 0.1833 s / img. ETA=0:39:32
+[07/01 19:55:00] detectron2 INFO: Inference done 13781/26446. 0.1833 s / img. ETA=0:39:27
+[07/01 19:55:05] detectron2 INFO: Inference done 13808/26446. 0.1833 s / img. ETA=0:39:22
+[07/01 19:55:10] detectron2 INFO: Inference done 13836/26446. 0.1833 s / img. ETA=0:39:16
+[07/01 19:55:15] detectron2 INFO: Inference done 13864/26446. 0.1833 s / img. ETA=0:39:11
+[07/01 19:55:20] detectron2 INFO: Inference done 13891/26446. 0.1833 s / img. ETA=0:39:06
+[07/01 19:55:26] detectron2 INFO: Inference done 13919/26446. 0.1833 s / img. ETA=0:39:00
+[07/01 19:55:31] detectron2 INFO: Inference done 13946/26446. 0.1833 s / img. ETA=0:38:55
+[07/01 19:55:36] detectron2 INFO: Inference done 13972/26446. 0.1833 s / img. ETA=0:38:51
+[07/01 19:55:41] detectron2 INFO: Inference done 13998/26446. 0.1834 s / img. ETA=0:38:46
+[07/01 19:55:46] detectron2 INFO: Inference done 14024/26446. 0.1834 s / img. ETA=0:38:42
+[07/01 19:55:51] detectron2 INFO: Inference done 14051/26446. 0.1834 s / img. ETA=0:38:36
+[07/01 19:55:56] detectron2 INFO: Inference done 14078/26446. 0.1834 s / img. ETA=0:38:31
+[07/01 19:56:01] detectron2 INFO: Inference done 14106/26446. 0.1834 s / img. ETA=0:38:26
+[07/01 19:56:06] detectron2 INFO: Inference done 14133/26446. 0.1834 s / img. ETA=0:38:21
+[07/01 19:56:12] detectron2 INFO: Inference done 14160/26446. 0.1834 s / img. ETA=0:38:16
+[07/01 19:56:17] detectron2 INFO: Inference done 14186/26446. 0.1834 s / img. ETA=0:38:12
+[07/01 19:56:22] detectron2 INFO: Inference done 14213/26446. 0.1834 s / img. ETA=0:38:07
+[07/01 19:56:27] detectron2 INFO: Inference done 14239/26446. 0.1834 s / img. ETA=0:38:02
+[07/01 19:56:32] detectron2 INFO: Inference done 14266/26446. 0.1834 s / img. ETA=0:37:57
+[07/01 19:56:37] detectron2 INFO: Inference done 14293/26446. 0.1834 s / img. ETA=0:37:52
+[07/01 19:56:42] detectron2 INFO: Inference done 14320/26446. 0.1834 s / img. ETA=0:37:47
+[07/01 19:56:47] detectron2 INFO: Inference done 14347/26446. 0.1834 s / img. ETA=0:37:42
+[07/01 19:56:52] detectron2 INFO: Inference done 14375/26446. 0.1834 s / img. ETA=0:37:36
+[07/01 19:56:57] detectron2 INFO: Inference done 14403/26446. 0.1834 s / img. ETA=0:37:31
+[07/01 19:57:02] detectron2 INFO: Inference done 14429/26446. 0.1834 s / img. ETA=0:37:26
+[07/01 19:57:07] detectron2 INFO: Inference done 14456/26446. 0.1834 s / img. ETA=0:37:21
+[07/01 19:57:12] detectron2 INFO: Inference done 14484/26446. 0.1834 s / img. ETA=0:37:16
+[07/01 19:57:18] detectron2 INFO: Inference done 14512/26446. 0.1834 s / img. ETA=0:37:11
+[07/01 19:57:23] detectron2 INFO: Inference done 14540/26446. 0.1834 s / img. ETA=0:37:05
+[07/01 19:57:28] detectron2 INFO: Inference done 14566/26446. 0.1834 s / img. ETA=0:37:01
+[07/01 19:57:33] detectron2 INFO: Inference done 14594/26446. 0.1834 s / img. ETA=0:36:55
+[07/01 19:57:38] detectron2 INFO: Inference done 14621/26446. 0.1834 s / img. ETA=0:36:50
+[07/01 19:57:43] detectron2 INFO: Inference done 14648/26446. 0.1834 s / img. ETA=0:36:45
+[07/01 19:57:48] detectron2 INFO: Inference done 14674/26446. 0.1834 s / img. ETA=0:36:40
+[07/01 19:57:53] detectron2 INFO: Inference done 14701/26446. 0.1834 s / img. ETA=0:36:35
+[07/01 19:57:58] detectron2 INFO: Inference done 14726/26446. 0.1834 s / img. ETA=0:36:31
+[07/01 19:58:03] detectron2 INFO: Inference done 14753/26446. 0.1835 s / img. ETA=0:36:26
+[07/01 19:58:08] detectron2 INFO: Inference done 14780/26446. 0.1835 s / img. ETA=0:36:21
+[07/01 19:58:13] detectron2 INFO: Inference done 14808/26446. 0.1834 s / img. ETA=0:36:16
+[07/01 19:58:18] detectron2 INFO: Inference done 14835/26446. 0.1834 s / img. ETA=0:36:11
+[07/01 19:58:24] detectron2 INFO: Inference done 14863/26446. 0.1834 s / img. ETA=0:36:05
+[07/01 19:58:29] detectron2 INFO: Inference done 14891/26446. 0.1834 s / img. ETA=0:36:00
+[07/01 19:58:34] detectron2 INFO: Inference done 14919/26446. 0.1834 s / img. ETA=0:35:55
+[07/01 19:58:39] detectron2 INFO: Inference done 14947/26446. 0.1834 s / img. ETA=0:35:49
+[07/01 19:58:44] detectron2 INFO: Inference done 14975/26446. 0.1834 s / img. ETA=0:35:44
+[07/01 19:58:49] detectron2 INFO: Inference done 15002/26446. 0.1834 s / img. ETA=0:35:39
+[07/01 19:58:54] detectron2 INFO: Inference done 15030/26446. 0.1834 s / img. ETA=0:35:34
+[07/01 19:59:00] detectron2 INFO: Inference done 15058/26446. 0.1834 s / img. ETA=0:35:28
+[07/01 19:59:05] detectron2 INFO: Inference done 15085/26446. 0.1834 s / img. ETA=0:35:23
+[07/01 19:59:10] detectron2 INFO: Inference done 15112/26446. 0.1834 s / img. ETA=0:35:18
+[07/01 19:59:15] detectron2 INFO: Inference done 15140/26446. 0.1834 s / img. ETA=0:35:13
+[07/01 19:59:20] detectron2 INFO: Inference done 15168/26446. 0.1834 s / img. ETA=0:35:08
+[07/01 19:59:25] detectron2 INFO: Inference done 15195/26446. 0.1834 s / img. ETA=0:35:03
+[07/01 19:59:30] detectron2 INFO: Inference done 15221/26446. 0.1834 s / img. ETA=0:34:58
+[07/01 19:59:35] detectron2 INFO: Inference done 15249/26446. 0.1834 s / img. ETA=0:34:53
+[07/01 19:59:40] detectron2 INFO: Inference done 15276/26446. 0.1834 s / img. ETA=0:34:48
+[07/01 19:59:45] detectron2 INFO: Inference done 15302/26446. 0.1834 s / img. ETA=0:34:43
+[07/01 19:59:51] detectron2 INFO: Inference done 15329/26446. 0.1834 s / img. ETA=0:34:38
+[07/01 19:59:56] detectron2 INFO: Inference done 15357/26446. 0.1834 s / img. ETA=0:34:33
+[07/01 20:00:01] detectron2 INFO: Inference done 15384/26446. 0.1834 s / img. ETA=0:34:28
+[07/01 20:00:06] detectron2 INFO: Inference done 15412/26446. 0.1834 s / img. ETA=0:34:22
+[07/01 20:00:11] detectron2 INFO: Inference done 15441/26446. 0.1834 s / img. ETA=0:34:17
+[07/01 20:00:16] detectron2 INFO: Inference done 15469/26446. 0.1834 s / img. ETA=0:34:11
+[07/01 20:00:21] detectron2 INFO: Inference done 15497/26446. 0.1834 s / img. ETA=0:34:06
+[07/01 20:00:26] detectron2 INFO: Inference done 15524/26446. 0.1834 s / img. ETA=0:34:01
+[07/01 20:00:31] detectron2 INFO: Inference done 15550/26446. 0.1834 s / img. ETA=0:33:56
+[07/01 20:00:36] detectron2 INFO: Inference done 15577/26446. 0.1834 s / img. ETA=0:33:51
+[07/01 20:00:42] detectron2 INFO: Inference done 15604/26446. 0.1834 s / img. ETA=0:33:46
+[07/01 20:00:47] detectron2 INFO: Inference done 15631/26446. 0.1834 s / img. ETA=0:33:41
+[07/01 20:00:52] detectron2 INFO: Inference done 15659/26446. 0.1834 s / img. ETA=0:33:36
+[07/01 20:00:57] detectron2 INFO: Inference done 15687/26446. 0.1834 s / img. ETA=0:33:31
+[07/01 20:01:02] detectron2 INFO: Inference done 15715/26446. 0.1834 s / img. ETA=0:33:25
+[07/01 20:01:07] detectron2 INFO: Inference done 15743/26446. 0.1834 s / img. ETA=0:33:20
+[07/01 20:01:12] detectron2 INFO: Inference done 15771/26446. 0.1834 s / img. ETA=0:33:15
+[07/01 20:01:17] detectron2 INFO: Inference done 15799/26446. 0.1834 s / img. ETA=0:33:09
+[07/01 20:01:22] detectron2 INFO: Inference done 15825/26446. 0.1834 s / img. ETA=0:33:05
+[07/01 20:01:28] detectron2 INFO: Inference done 15852/26446. 0.1834 s / img. ETA=0:33:00
+[07/01 20:01:33] detectron2 INFO: Inference done 15880/26446. 0.1834 s / img. ETA=0:32:54
+[07/01 20:01:38] detectron2 INFO: Inference done 15908/26446. 0.1834 s / img. ETA=0:32:49
+[07/01 20:01:43] detectron2 INFO: Inference done 15936/26446. 0.1834 s / img. ETA=0:32:44
+[07/01 20:01:48] detectron2 INFO: Inference done 15964/26446. 0.1834 s / img. ETA=0:32:39
+[07/01 20:01:53] detectron2 INFO: Inference done 15991/26446. 0.1834 s / img. ETA=0:32:33
+[07/01 20:01:58] detectron2 INFO: Inference done 16018/26446. 0.1834 s / img. ETA=0:32:28
+[07/01 20:02:03] detectron2 INFO: Inference done 16044/26446. 0.1834 s / img. ETA=0:32:24
+[07/01 20:02:08] detectron2 INFO: Inference done 16071/26446. 0.1834 s / img. ETA=0:32:19
+[07/01 20:02:13] detectron2 INFO: Inference done 16098/26446. 0.1834 s / img. ETA=0:32:14
+[07/01 20:02:18] detectron2 INFO: Inference done 16125/26446. 0.1834 s / img. ETA=0:32:09
+[07/01 20:02:24] detectron2 INFO: Inference done 16153/26446. 0.1834 s / img. ETA=0:32:03
+[07/01 20:02:29] detectron2 INFO: Inference done 16181/26446. 0.1834 s / img. ETA=0:31:58
+[07/01 20:02:34] detectron2 INFO: Inference done 16208/26446. 0.1834 s / img. ETA=0:31:53
+[07/01 20:02:39] detectron2 INFO: Inference done 16235/26446. 0.1834 s / img. ETA=0:31:48
+[07/01 20:02:44] detectron2 INFO: Inference done 16263/26446. 0.1834 s / img. ETA=0:31:43
+[07/01 20:02:49] detectron2 INFO: Inference done 16291/26446. 0.1834 s / img. ETA=0:31:37
+[07/01 20:02:54] detectron2 INFO: Inference done 16319/26446. 0.1833 s / img. ETA=0:31:32
+[07/01 20:02:59] detectron2 INFO: Inference done 16346/26446. 0.1834 s / img. ETA=0:31:27
+[07/01 20:03:04] detectron2 INFO: Inference done 16372/26446. 0.1834 s / img. ETA=0:31:22
+[07/01 20:03:09] detectron2 INFO: Inference done 16400/26446. 0.1834 s / img. ETA=0:31:17
+[07/01 20:03:15] detectron2 INFO: Inference done 16427/26446. 0.1834 s / img. ETA=0:31:12
+[07/01 20:03:20] detectron2 INFO: Inference done 16455/26446. 0.1834 s / img. ETA=0:31:07
+[07/01 20:03:25] detectron2 INFO: Inference done 16482/26446. 0.1834 s / img. ETA=0:31:02
+[07/01 20:03:30] detectron2 INFO: Inference done 16510/26446. 0.1834 s / img. ETA=0:30:56
+[07/01 20:03:35] detectron2 INFO: Inference done 16537/26446. 0.1834 s / img. ETA=0:30:51
+[07/01 20:03:40] detectron2 INFO: Inference done 16563/26446. 0.1834 s / img. ETA=0:30:47
+[07/01 20:03:45] detectron2 INFO: Inference done 16591/26446. 0.1834 s / img. ETA=0:30:41
+[07/01 20:03:50] detectron2 INFO: Inference done 16618/26446. 0.1834 s / img. ETA=0:30:36
+[07/01 20:03:55] detectron2 INFO: Inference done 16644/26446. 0.1834 s / img. ETA=0:30:32
+[07/01 20:04:01] detectron2 INFO: Inference done 16671/26446. 0.1834 s / img. ETA=0:30:27
+[07/01 20:04:06] detectron2 INFO: Inference done 16699/26446. 0.1834 s / img. ETA=0:30:21
+[07/01 20:04:11] detectron2 INFO: Inference done 16727/26446. 0.1834 s / img. ETA=0:30:16
+[07/01 20:04:16] detectron2 INFO: Inference done 16744/26446. 0.1835 s / img. ETA=0:30:14
+[07/01 20:04:21] detectron2 INFO: Inference done 16772/26446. 0.1835 s / img. ETA=0:30:09
+[07/01 20:04:26] detectron2 INFO: Inference done 16800/26446. 0.1835 s / img. ETA=0:30:03
+[07/01 20:04:31] detectron2 INFO: Inference done 16827/26446. 0.1835 s / img. ETA=0:29:58
+[07/01 20:04:36] detectron2 INFO: Inference done 16854/26446. 0.1835 s / img. ETA=0:29:53
+[07/01 20:04:41] detectron2 INFO: Inference done 16881/26446. 0.1835 s / img. ETA=0:29:48
+[07/01 20:04:46] detectron2 INFO: Inference done 16908/26446. 0.1835 s / img. ETA=0:29:43
+[07/01 20:04:51] detectron2 INFO: Inference done 16936/26446. 0.1835 s / img. ETA=0:29:38
+[07/01 20:04:57] detectron2 INFO: Inference done 16963/26446. 0.1835 s / img. ETA=0:29:33
+[07/01 20:05:02] detectron2 INFO: Inference done 16990/26446. 0.1835 s / img. ETA=0:29:28
+[07/01 20:05:07] detectron2 INFO: Inference done 17018/26446. 0.1835 s / img. ETA=0:29:22
+[07/01 20:05:12] detectron2 INFO: Inference done 17044/26446. 0.1835 s / img. ETA=0:29:18
+[07/01 20:05:17] detectron2 INFO: Inference done 17071/26446. 0.1835 s / img. ETA=0:29:13
+[07/01 20:05:22] detectron2 INFO: Inference done 17098/26446. 0.1835 s / img. ETA=0:29:08
+[07/01 20:05:27] detectron2 INFO: Inference done 17125/26446. 0.1835 s / img. ETA=0:29:03
+[07/01 20:05:32] detectron2 INFO: Inference done 17153/26446. 0.1835 s / img. ETA=0:28:57
+[07/01 20:05:37] detectron2 INFO: Inference done 17182/26446. 0.1835 s / img. ETA=0:28:52
+[07/01 20:05:42] detectron2 INFO: Inference done 17210/26446. 0.1834 s / img. ETA=0:28:46
+[07/01 20:05:47] detectron2 INFO: Inference done 17238/26446. 0.1834 s / img. ETA=0:28:41
+[07/01 20:05:52] detectron2 INFO: Inference done 17265/26446. 0.1834 s / img. ETA=0:28:36
+[07/01 20:05:58] detectron2 INFO: Inference done 17293/26446. 0.1834 s / img. ETA=0:28:31
+[07/01 20:06:03] detectron2 INFO: Inference done 17321/26446. 0.1834 s / img. ETA=0:28:25
+[07/01 20:06:08] detectron2 INFO: Inference done 17348/26446. 0.1834 s / img. ETA=0:28:20
+[07/01 20:06:13] detectron2 INFO: Inference done 17374/26446. 0.1834 s / img. ETA=0:28:16
+[07/01 20:06:18] detectron2 INFO: Inference done 17401/26446. 0.1834 s / img. ETA=0:28:11
+[07/01 20:06:23] detectron2 INFO: Inference done 17429/26446. 0.1834 s / img. ETA=0:28:05
+[07/01 20:06:28] detectron2 INFO: Inference done 17456/26446. 0.1834 s / img. ETA=0:28:00
+[07/01 20:06:33] detectron2 INFO: Inference done 17484/26446. 0.1834 s / img. ETA=0:27:55
+[07/01 20:06:38] detectron2 INFO: Inference done 17511/26446. 0.1834 s / img. ETA=0:27:50
+[07/01 20:06:43] detectron2 INFO: Inference done 17538/26446. 0.1834 s / img. ETA=0:27:45
+[07/01 20:06:49] detectron2 INFO: Inference done 17565/26446. 0.1834 s / img. ETA=0:27:40
+[07/01 20:06:54] detectron2 INFO: Inference done 17593/26446. 0.1834 s / img. ETA=0:27:35
+[07/01 20:06:59] detectron2 INFO: Inference done 17621/26446. 0.1834 s / img. ETA=0:27:29
+[07/01 20:07:04] detectron2 INFO: Inference done 17647/26446. 0.1834 s / img. ETA=0:27:25
+[07/01 20:07:09] detectron2 INFO: Inference done 17674/26446. 0.1834 s / img. ETA=0:27:20
+[07/01 20:07:14] detectron2 INFO: Inference done 17702/26446. 0.1834 s / img. ETA=0:27:14
+[07/01 20:07:19] detectron2 INFO: Inference done 17730/26446. 0.1834 s / img. ETA=0:27:09
+[07/01 20:07:24] detectron2 INFO: Inference done 17757/26446. 0.1834 s / img. ETA=0:27:04
+[07/01 20:07:29] detectron2 INFO: Inference done 17784/26446. 0.1834 s / img. ETA=0:26:59
+[07/01 20:07:35] detectron2 INFO: Inference done 17812/26446. 0.1834 s / img. ETA=0:26:54
+[07/01 20:07:40] detectron2 INFO: Inference done 17839/26446. 0.1834 s / img. ETA=0:26:49
+[07/01 20:07:45] detectron2 INFO: Inference done 17866/26446. 0.1834 s / img. ETA=0:26:44
+[07/01 20:07:50] detectron2 INFO: Inference done 17893/26446. 0.1834 s / img. ETA=0:26:39
+[07/01 20:07:55] detectron2 INFO: Inference done 17921/26446. 0.1834 s / img. ETA=0:26:33
+[07/01 20:08:00] detectron2 INFO: Inference done 17949/26446. 0.1834 s / img. ETA=0:26:28
+[07/01 20:08:05] detectron2 INFO: Inference done 17977/26446. 0.1834 s / img. ETA=0:26:23
+[07/01 20:08:10] detectron2 INFO: Inference done 18005/26446. 0.1834 s / img. ETA=0:26:17
+[07/01 20:08:15] detectron2 INFO: Inference done 18033/26446. 0.1834 s / img. ETA=0:26:12
+[07/01 20:08:21] detectron2 INFO: Inference done 18061/26446. 0.1834 s / img. ETA=0:26:07
+[07/01 20:08:26] detectron2 INFO: Inference done 18088/26446. 0.1834 s / img. ETA=0:26:02
+[07/01 20:08:31] detectron2 INFO: Inference done 18115/26446. 0.1834 s / img. ETA=0:25:57
+[07/01 20:08:36] detectron2 INFO: Inference done 18143/26446. 0.1834 s / img. ETA=0:25:52
+[07/01 20:08:41] detectron2 INFO: Inference done 18170/26446. 0.1834 s / img. ETA=0:25:46
+[07/01 20:08:46] detectron2 INFO: Inference done 18197/26446. 0.1834 s / img. ETA=0:25:41
+[07/01 20:08:51] detectron2 INFO: Inference done 18225/26446. 0.1834 s / img. ETA=0:25:36
+[07/01 20:08:56] detectron2 INFO: Inference done 18253/26446. 0.1834 s / img. ETA=0:25:31
+[07/01 20:09:01] detectron2 INFO: Inference done 18281/26446. 0.1834 s / img. ETA=0:25:26
+[07/01 20:09:06] detectron2 INFO: Inference done 18309/26446. 0.1834 s / img. ETA=0:25:20
+[07/01 20:09:12] detectron2 INFO: Inference done 18337/26446. 0.1834 s / img. ETA=0:25:15
+[07/01 20:09:17] detectron2 INFO: Inference done 18365/26446. 0.1834 s / img. ETA=0:25:10
+[07/01 20:09:22] detectron2 INFO: Inference done 18393/26446. 0.1834 s / img. ETA=0:25:04
+[07/01 20:09:27] detectron2 INFO: Inference done 18421/26446. 0.1834 s / img. ETA=0:24:59
+[07/01 20:09:32] detectron2 INFO: Inference done 18449/26446. 0.1834 s / img. ETA=0:24:54
+[07/01 20:09:37] detectron2 INFO: Inference done 18477/26446. 0.1834 s / img. ETA=0:24:49
+[07/01 20:09:42] detectron2 INFO: Inference done 18505/26446. 0.1833 s / img. ETA=0:24:43
+[07/01 20:09:48] detectron2 INFO: Inference done 18532/26446. 0.1834 s / img. ETA=0:24:38
+[07/01 20:09:53] detectron2 INFO: Inference done 18560/26446. 0.1833 s / img. ETA=0:24:33
+[07/01 20:09:58] detectron2 INFO: Inference done 18587/26446. 0.1833 s / img. ETA=0:24:28
+[07/01 20:10:03] detectron2 INFO: Inference done 18615/26446. 0.1833 s / img. ETA=0:24:23
+[07/01 20:10:08] detectron2 INFO: Inference done 18643/26446. 0.1833 s / img. ETA=0:24:17
+[07/01 20:10:13] detectron2 INFO: Inference done 18671/26446. 0.1833 s / img. ETA=0:24:12
+[07/01 20:10:18] detectron2 INFO: Inference done 18698/26446. 0.1833 s / img. ETA=0:24:07
+[07/01 20:10:23] detectron2 INFO: Inference done 18725/26446. 0.1833 s / img. ETA=0:24:02
+[07/01 20:10:28] detectron2 INFO: Inference done 18753/26446. 0.1833 s / img. ETA=0:23:57
+[07/01 20:10:33] detectron2 INFO: Inference done 18781/26446. 0.1833 s / img. ETA=0:23:52
+[07/01 20:10:38] detectron2 INFO: Inference done 18808/26446. 0.1833 s / img. ETA=0:23:46
+[07/01 20:10:44] detectron2 INFO: Inference done 18836/26446. 0.1833 s / img. ETA=0:23:41
+[07/01 20:10:49] detectron2 INFO: Inference done 18864/26446. 0.1833 s / img. ETA=0:23:36
+[07/01 20:10:54] detectron2 INFO: Inference done 18892/26446. 0.1833 s / img. ETA=0:23:31
+[07/01 20:10:59] detectron2 INFO: Inference done 18921/26446. 0.1833 s / img. ETA=0:23:25
+[07/01 20:11:04] detectron2 INFO: Inference done 18949/26446. 0.1833 s / img. ETA=0:23:20
+[07/01 20:11:09] detectron2 INFO: Inference done 18976/26446. 0.1833 s / img. ETA=0:23:15
+[07/01 20:11:14] detectron2 INFO: Inference done 19004/26446. 0.1833 s / img. ETA=0:23:10
+[07/01 20:11:19] detectron2 INFO: Inference done 19031/26446. 0.1833 s / img. ETA=0:23:05
+[07/01 20:11:25] detectron2 INFO: Inference done 19059/26446. 0.1833 s / img. ETA=0:22:59
+[07/01 20:11:30] detectron2 INFO: Inference done 19086/26446. 0.1833 s / img. ETA=0:22:54
+[07/01 20:11:35] detectron2 INFO: Inference done 19114/26446. 0.1833 s / img. ETA=0:22:49
+[07/01 20:11:40] detectron2 INFO: Inference done 19141/26446. 0.1833 s / img. ETA=0:22:44
+[07/01 20:11:45] detectron2 INFO: Inference done 19170/26446. 0.1833 s / img. ETA=0:22:38
+[07/01 20:11:50] detectron2 INFO: Inference done 19197/26446. 0.1833 s / img. ETA=0:22:33
+[07/01 20:11:55] detectron2 INFO: Inference done 19225/26446. 0.1833 s / img. ETA=0:22:28
+[07/01 20:12:00] detectron2 INFO: Inference done 19252/26446. 0.1833 s / img. ETA=0:22:23
+[07/01 20:12:05] detectron2 INFO: Inference done 19279/26446. 0.1833 s / img. ETA=0:22:18
+[07/01 20:12:10] detectron2 INFO: Inference done 19307/26446. 0.1832 s / img. ETA=0:22:13
+[07/01 20:12:15] detectron2 INFO: Inference done 19335/26446. 0.1832 s / img. ETA=0:22:07
+[07/01 20:12:20] detectron2 INFO: Inference done 19362/26446. 0.1832 s / img. ETA=0:22:02
+[07/01 20:12:25] detectron2 INFO: Inference done 19390/26446. 0.1832 s / img. ETA=0:21:57
+[07/01 20:12:31] detectron2 INFO: Inference done 19418/26446. 0.1832 s / img. ETA=0:21:52
+[07/01 20:12:36] detectron2 INFO: Inference done 19445/26446. 0.1832 s / img. ETA=0:21:47
+[07/01 20:12:41] detectron2 INFO: Inference done 19471/26446. 0.1832 s / img. ETA=0:21:42
+[07/01 20:12:46] detectron2 INFO: Inference done 19498/26446. 0.1832 s / img. ETA=0:21:37
+[07/01 20:12:51] detectron2 INFO: Inference done 19526/26446. 0.1832 s / img. ETA=0:21:32
+[07/01 20:12:56] detectron2 INFO: Inference done 19552/26446. 0.1833 s / img. ETA=0:21:27
+[07/01 20:13:01] detectron2 INFO: Inference done 19578/26446. 0.1833 s / img. ETA=0:21:22
+[07/01 20:13:06] detectron2 INFO: Inference done 19606/26446. 0.1833 s / img. ETA=0:21:17
+[07/01 20:13:11] detectron2 INFO: Inference done 19634/26446. 0.1832 s / img. ETA=0:21:12
+[07/01 20:13:16] detectron2 INFO: Inference done 19662/26446. 0.1832 s / img. ETA=0:21:06
+[07/01 20:13:22] detectron2 INFO: Inference done 19690/26446. 0.1832 s / img. ETA=0:21:01
+[07/01 20:13:27] detectron2 INFO: Inference done 19718/26446. 0.1832 s / img. ETA=0:20:56
+[07/01 20:13:32] detectron2 INFO: Inference done 19745/26446. 0.1832 s / img. ETA=0:20:51
+[07/01 20:13:37] detectron2 INFO: Inference done 19773/26446. 0.1832 s / img. ETA=0:20:46
+[07/01 20:13:42] detectron2 INFO: Inference done 19800/26446. 0.1832 s / img. ETA=0:20:41
+[07/01 20:13:47] detectron2 INFO: Inference done 19827/26446. 0.1832 s / img. ETA=0:20:36
+[07/01 20:13:52] detectron2 INFO: Inference done 19854/26446. 0.1832 s / img. ETA=0:20:31
+[07/01 20:13:57] detectron2 INFO: Inference done 19882/26446. 0.1832 s / img. ETA=0:20:25
+[07/01 20:14:02] detectron2 INFO: Inference done 19910/26446. 0.1832 s / img. ETA=0:20:20
+[07/01 20:14:07] detectron2 INFO: Inference done 19937/26446. 0.1832 s / img. ETA=0:20:15
+[07/01 20:14:12] detectron2 INFO: Inference done 19964/26446. 0.1832 s / img. ETA=0:20:10
+[07/01 20:14:18] detectron2 INFO: Inference done 19991/26446. 0.1832 s / img. ETA=0:20:05
+[07/01 20:14:23] detectron2 INFO: Inference done 20018/26446. 0.1832 s / img. ETA=0:20:00
+[07/01 20:14:28] detectron2 INFO: Inference done 20045/26446. 0.1832 s / img. ETA=0:19:55
+[07/01 20:14:33] detectron2 INFO: Inference done 20072/26446. 0.1832 s / img. ETA=0:19:50
+[07/01 20:14:38] detectron2 INFO: Inference done 20099/26446. 0.1832 s / img. ETA=0:19:45
+[07/01 20:14:43] detectron2 INFO: Inference done 20126/26446. 0.1832 s / img. ETA=0:19:40
+[07/01 20:14:48] detectron2 INFO: Inference done 20153/26446. 0.1832 s / img. ETA=0:19:35
+[07/01 20:14:53] detectron2 INFO: Inference done 20180/26446. 0.1832 s / img. ETA=0:19:30
+[07/01 20:14:58] detectron2 INFO: Inference done 20206/26446. 0.1832 s / img. ETA=0:19:25
+[07/01 20:15:03] detectron2 INFO: Inference done 20232/26446. 0.1833 s / img. ETA=0:19:20
+[07/01 20:15:08] detectron2 INFO: Inference done 20259/26446. 0.1833 s / img. ETA=0:19:15
+[07/01 20:15:13] detectron2 INFO: Inference done 20287/26446. 0.1832 s / img. ETA=0:19:10
+[07/01 20:15:18] detectron2 INFO: Inference done 20315/26446. 0.1832 s / img. ETA=0:19:04
+[07/01 20:15:24] detectron2 INFO: Inference done 20342/26446. 0.1833 s / img. ETA=0:18:59
+[07/01 20:15:29] detectron2 INFO: Inference done 20369/26446. 0.1833 s / img. ETA=0:18:54
+[07/01 20:15:34] detectron2 INFO: Inference done 20397/26446. 0.1833 s / img. ETA=0:18:49
+[07/01 20:15:39] detectron2 INFO: Inference done 20425/26446. 0.1832 s / img. ETA=0:18:44
+[07/01 20:15:44] detectron2 INFO: Inference done 20453/26446. 0.1832 s / img. ETA=0:18:39
+[07/01 20:15:49] detectron2 INFO: Inference done 20480/26446. 0.1832 s / img. ETA=0:18:34
+[07/01 20:15:54] detectron2 INFO: Inference done 20508/26446. 0.1832 s / img. ETA=0:18:28
+[07/01 20:16:00] detectron2 INFO: Inference done 20536/26446. 0.1832 s / img. ETA=0:18:23
+[07/01 20:16:05] detectron2 INFO: Inference done 20563/26446. 0.1832 s / img. ETA=0:18:18
+[07/01 20:16:10] detectron2 INFO: Inference done 20591/26446. 0.1832 s / img. ETA=0:18:13
+[07/01 20:16:15] detectron2 INFO: Inference done 20618/26446. 0.1832 s / img. ETA=0:18:08
+[07/01 20:16:20] detectron2 INFO: Inference done 20646/26446. 0.1832 s / img. ETA=0:18:03
+[07/01 20:16:25] detectron2 INFO: Inference done 20673/26446. 0.1832 s / img. ETA=0:17:58
+[07/01 20:16:30] detectron2 INFO: Inference done 20701/26446. 0.1832 s / img. ETA=0:17:52
+[07/01 20:16:35] detectron2 INFO: Inference done 20728/26446. 0.1832 s / img. ETA=0:17:47
+[07/01 20:16:40] detectron2 INFO: Inference done 20755/26446. 0.1832 s / img. ETA=0:17:42
+[07/01 20:16:45] detectron2 INFO: Inference done 20782/26446. 0.1832 s / img. ETA=0:17:37
+[07/01 20:16:50] detectron2 INFO: Inference done 20810/26446. 0.1832 s / img. ETA=0:17:32
+[07/01 20:16:55] detectron2 INFO: Inference done 20837/26446. 0.1832 s / img. ETA=0:17:27
+[07/01 20:17:01] detectron2 INFO: Inference done 20863/26446. 0.1832 s / img. ETA=0:17:22
+[07/01 20:17:06] detectron2 INFO: Inference done 20889/26446. 0.1833 s / img. ETA=0:17:17
+[07/01 20:17:11] detectron2 INFO: Inference done 20917/26446. 0.1832 s / img. ETA=0:17:12
+[07/01 20:17:16] detectron2 INFO: Inference done 20945/26446. 0.1832 s / img. ETA=0:17:07
+[07/01 20:17:21] detectron2 INFO: Inference done 20972/26446. 0.1832 s / img. ETA=0:17:02
+[07/01 20:17:26] detectron2 INFO: Inference done 21000/26446. 0.1832 s / img. ETA=0:16:56
+[07/01 20:17:31] detectron2 INFO: Inference done 21028/26446. 0.1832 s / img. ETA=0:16:51
+[07/01 20:17:36] detectron2 INFO: Inference done 21055/26446. 0.1832 s / img. ETA=0:16:46
+[07/01 20:17:41] detectron2 INFO: Inference done 21082/26446. 0.1832 s / img. ETA=0:16:41
+[07/01 20:17:46] detectron2 INFO: Inference done 21109/26446. 0.1832 s / img. ETA=0:16:36
+[07/01 20:17:51] detectron2 INFO: Inference done 21135/26446. 0.1832 s / img. ETA=0:16:31
+[07/01 20:17:56] detectron2 INFO: Inference done 21162/26446. 0.1832 s / img. ETA=0:16:26
+[07/01 20:18:01] detectron2 INFO: Inference done 21190/26446. 0.1832 s / img. ETA=0:16:21
+[07/01 20:18:06] detectron2 INFO: Inference done 21217/26446. 0.1832 s / img. ETA=0:16:16
+[07/01 20:18:11] detectron2 INFO: Inference done 21245/26446. 0.1832 s / img. ETA=0:16:11
+[07/01 20:18:16] detectron2 INFO: Inference done 21272/26446. 0.1832 s / img. ETA=0:16:06
+[07/01 20:18:22] detectron2 INFO: Inference done 21299/26446. 0.1832 s / img. ETA=0:16:01
+[07/01 20:18:27] detectron2 INFO: Inference done 21327/26446. 0.1832 s / img. ETA=0:15:55
+[07/01 20:18:32] detectron2 INFO: Inference done 21354/26446. 0.1832 s / img. ETA=0:15:50
+[07/01 20:18:37] detectron2 INFO: Inference done 21381/26446. 0.1832 s / img. ETA=0:15:45
+[07/01 20:18:42] detectron2 INFO: Inference done 21409/26446. 0.1832 s / img. ETA=0:15:40
+[07/01 20:18:47] detectron2 INFO: Inference done 21438/26446. 0.1832 s / img. ETA=0:15:35
+[07/01 20:18:52] detectron2 INFO: Inference done 21465/26446. 0.1832 s / img. ETA=0:15:30
+[07/01 20:18:57] detectron2 INFO: Inference done 21492/26446. 0.1832 s / img. ETA=0:15:25
+[07/01 20:19:02] detectron2 INFO: Inference done 21519/26446. 0.1832 s / img. ETA=0:15:19
+[07/01 20:19:08] detectron2 INFO: Inference done 21547/26446. 0.1832 s / img. ETA=0:15:14
+[07/01 20:19:13] detectron2 INFO: Inference done 21574/26446. 0.1832 s / img. ETA=0:15:09
+[07/01 20:19:18] detectron2 INFO: Inference done 21601/26446. 0.1832 s / img. ETA=0:15:04
+[07/01 20:19:23] detectron2 INFO: Inference done 21629/26446. 0.1832 s / img. ETA=0:14:59
+[07/01 20:19:28] detectron2 INFO: Inference done 21656/26446. 0.1832 s / img. ETA=0:14:54
+[07/01 20:19:33] detectron2 INFO: Inference done 21683/26446. 0.1832 s / img. ETA=0:14:49
+[07/01 20:19:38] detectron2 INFO: Inference done 21711/26446. 0.1832 s / img. ETA=0:14:44
+[07/01 20:19:43] detectron2 INFO: Inference done 21739/26446. 0.1832 s / img. ETA=0:14:38
+[07/01 20:19:48] detectron2 INFO: Inference done 21767/26446. 0.1832 s / img. ETA=0:14:33
+[07/01 20:19:53] detectron2 INFO: Inference done 21794/26446. 0.1832 s / img. ETA=0:14:28
+[07/01 20:19:58] detectron2 INFO: Inference done 21820/26446. 0.1832 s / img. ETA=0:14:23
+[07/01 20:20:03] detectron2 INFO: Inference done 21847/26446. 0.1832 s / img. ETA=0:14:18
+[07/01 20:20:08] detectron2 INFO: Inference done 21875/26446. 0.1832 s / img. ETA=0:14:13
+[07/01 20:20:14] detectron2 INFO: Inference done 21902/26446. 0.1832 s / img. ETA=0:14:08
+[07/01 20:20:19] detectron2 INFO: Inference done 21930/26446. 0.1832 s / img. ETA=0:14:03
+[07/01 20:20:24] detectron2 INFO: Inference done 21958/26446. 0.1832 s / img. ETA=0:13:57
+[07/01 20:20:29] detectron2 INFO: Inference done 21984/26446. 0.1832 s / img. ETA=0:13:53
+[07/01 20:20:34] detectron2 INFO: Inference done 22011/26446. 0.1832 s / img. ETA=0:13:48
+[07/01 20:20:39] detectron2 INFO: Inference done 22039/26446. 0.1832 s / img. ETA=0:13:42
+[07/01 20:20:44] detectron2 INFO: Inference done 22066/26446. 0.1832 s / img. ETA=0:13:37
+[07/01 20:20:49] detectron2 INFO: Inference done 22094/26446. 0.1832 s / img. ETA=0:13:32
+[07/01 20:20:54] detectron2 INFO: Inference done 22121/26446. 0.1832 s / img. ETA=0:13:27
+[07/01 20:21:00] detectron2 INFO: Inference done 22147/26446. 0.1832 s / img. ETA=0:13:22
+[07/01 20:21:05] detectron2 INFO: Inference done 22174/26446. 0.1832 s / img. ETA=0:13:17
+[07/01 20:21:10] detectron2 INFO: Inference done 22202/26446. 0.1832 s / img. ETA=0:13:12
+[07/01 20:21:15] detectron2 INFO: Inference done 22230/26446. 0.1832 s / img. ETA=0:13:07
+[07/01 20:21:20] detectron2 INFO: Inference done 22257/26446. 0.1832 s / img. ETA=0:13:02
+[07/01 20:21:25] detectron2 INFO: Inference done 22285/26446. 0.1832 s / img. ETA=0:12:56
+[07/01 20:21:30] detectron2 INFO: Inference done 22312/26446. 0.1832 s / img. ETA=0:12:51
+[07/01 20:21:35] detectron2 INFO: Inference done 22340/26446. 0.1832 s / img. ETA=0:12:46
+[07/01 20:21:40] detectron2 INFO: Inference done 22366/26446. 0.1832 s / img. ETA=0:12:41
+[07/01 20:21:45] detectron2 INFO: Inference done 22394/26446. 0.1832 s / img. ETA=0:12:36
+[07/01 20:21:50] detectron2 INFO: Inference done 22421/26446. 0.1832 s / img. ETA=0:12:31
+[07/01 20:21:56] detectron2 INFO: Inference done 22448/26446. 0.1832 s / img. ETA=0:12:26
+[07/01 20:22:01] detectron2 INFO: Inference done 22475/26446. 0.1832 s / img. ETA=0:12:21
+[07/01 20:22:06] detectron2 INFO: Inference done 22502/26446. 0.1832 s / img. ETA=0:12:16
+[07/01 20:22:11] detectron2 INFO: Inference done 22530/26446. 0.1832 s / img. ETA=0:12:11
+[07/01 20:22:16] detectron2 INFO: Inference done 22557/26446. 0.1832 s / img. ETA=0:12:06
+[07/01 20:22:21] detectron2 INFO: Inference done 22585/26446. 0.1832 s / img. ETA=0:12:00
+[07/01 20:22:26] detectron2 INFO: Inference done 22613/26446. 0.1832 s / img. ETA=0:11:55
+[07/01 20:22:31] detectron2 INFO: Inference done 22640/26446. 0.1832 s / img. ETA=0:11:50
+[07/01 20:22:36] detectron2 INFO: Inference done 22668/26446. 0.1832 s / img. ETA=0:11:45
+[07/01 20:22:42] detectron2 INFO: Inference done 22696/26446. 0.1832 s / img. ETA=0:11:40
+[07/01 20:22:47] detectron2 INFO: Inference done 22724/26446. 0.1832 s / img. ETA=0:11:34
+[07/01 20:22:52] detectron2 INFO: Inference done 22751/26446. 0.1832 s / img. ETA=0:11:29
+[07/01 20:22:57] detectron2 INFO: Inference done 22777/26446. 0.1832 s / img. ETA=0:11:24
+[07/01 20:23:02] detectron2 INFO: Inference done 22804/26446. 0.1832 s / img. ETA=0:11:19
+[07/01 20:23:07] detectron2 INFO: Inference done 22831/26446. 0.1832 s / img. ETA=0:11:14
+[07/01 20:23:12] detectron2 INFO: Inference done 22858/26446. 0.1832 s / img. ETA=0:11:09
+[07/01 20:23:17] detectron2 INFO: Inference done 22885/26446. 0.1832 s / img. ETA=0:11:04
+[07/01 20:23:22] detectron2 INFO: Inference done 22911/26446. 0.1832 s / img. ETA=0:10:59
+[07/01 20:23:27] detectron2 INFO: Inference done 22938/26446. 0.1832 s / img. ETA=0:10:54
+[07/01 20:23:32] detectron2 INFO: Inference done 22965/26446. 0.1832 s / img. ETA=0:10:49
+[07/01 20:23:37] detectron2 INFO: Inference done 22993/26446. 0.1832 s / img. ETA=0:10:44
+[07/01 20:23:42] detectron2 INFO: Inference done 23021/26446. 0.1832 s / img. ETA=0:10:39
+[07/01 20:23:47] detectron2 INFO: Inference done 23048/26446. 0.1832 s / img. ETA=0:10:34
+[07/01 20:23:52] detectron2 INFO: Inference done 23075/26446. 0.1832 s / img. ETA=0:10:29
+[07/01 20:23:57] detectron2 INFO: Inference done 23102/26446. 0.1832 s / img. ETA=0:10:24
+[07/01 20:24:02] detectron2 INFO: Inference done 23128/26446. 0.1832 s / img. ETA=0:10:19
+[07/01 20:24:08] detectron2 INFO: Inference done 23155/26446. 0.1832 s / img. ETA=0:10:14
+[07/01 20:24:13] detectron2 INFO: Inference done 23182/26446. 0.1832 s / img. ETA=0:10:09
+[07/01 20:24:18] detectron2 INFO: Inference done 23210/26446. 0.1832 s / img. ETA=0:10:04
+[07/01 20:24:23] detectron2 INFO: Inference done 23238/26446. 0.1832 s / img. ETA=0:09:58
+[07/01 20:24:28] detectron2 INFO: Inference done 23266/26446. 0.1832 s / img. ETA=0:09:53
+[07/01 20:24:33] detectron2 INFO: Inference done 23294/26446. 0.1832 s / img. ETA=0:09:48
+[07/01 20:24:38] detectron2 INFO: Inference done 23320/26446. 0.1832 s / img. ETA=0:09:43
+[07/01 20:24:43] detectron2 INFO: Inference done 23347/26446. 0.1832 s / img. ETA=0:09:38
+[07/01 20:24:49] detectron2 INFO: Inference done 23374/26446. 0.1832 s / img. ETA=0:09:33
+[07/01 20:24:54] detectron2 INFO: Inference done 23401/26446. 0.1832 s / img. ETA=0:09:28
+[07/01 20:24:59] detectron2 INFO: Inference done 23429/26446. 0.1832 s / img. ETA=0:09:23
+[07/01 20:25:04] detectron2 INFO: Inference done 23456/26446. 0.1832 s / img. ETA=0:09:18
+[07/01 20:25:09] detectron2 INFO: Inference done 23483/26446. 0.1832 s / img. ETA=0:09:13
+[07/01 20:25:14] detectron2 INFO: Inference done 23511/26446. 0.1832 s / img. ETA=0:09:07
+[07/01 20:25:19] detectron2 INFO: Inference done 23538/26446. 0.1832 s / img. ETA=0:09:02
+[07/01 20:25:24] detectron2 INFO: Inference done 23565/26446. 0.1832 s / img. ETA=0:08:57
+[07/01 20:25:29] detectron2 INFO: Inference done 23592/26446. 0.1832 s / img. ETA=0:08:52
+[07/01 20:25:35] detectron2 INFO: Inference done 23620/26446. 0.1832 s / img. ETA=0:08:47
+[07/01 20:25:40] detectron2 INFO: Inference done 23648/26446. 0.1832 s / img. ETA=0:08:42
+[07/01 20:25:45] detectron2 INFO: Inference done 23676/26446. 0.1832 s / img. ETA=0:08:37
+[07/01 20:25:50] detectron2 INFO: Inference done 23703/26446. 0.1832 s / img. ETA=0:08:32
+[07/01 20:25:55] detectron2 INFO: Inference done 23732/26446. 0.1832 s / img. ETA=0:08:26
+[07/01 20:26:00] detectron2 INFO: Inference done 23759/26446. 0.1832 s / img. ETA=0:08:21
+[07/01 20:26:05] detectron2 INFO: Inference done 23787/26446. 0.1832 s / img. ETA=0:08:16
+[07/01 20:26:10] detectron2 INFO: Inference done 23815/26446. 0.1832 s / img. ETA=0:08:11
+[07/01 20:26:15] detectron2 INFO: Inference done 23843/26446. 0.1832 s / img. ETA=0:08:05
+[07/01 20:26:20] detectron2 INFO: Inference done 23869/26446. 0.1832 s / img. ETA=0:08:01
+[07/01 20:26:25] detectron2 INFO: Inference done 23896/26446. 0.1832 s / img. ETA=0:07:56
+[07/01 20:26:30] detectron2 INFO: Inference done 23923/26446. 0.1832 s / img. ETA=0:07:50
+[07/01 20:26:35] detectron2 INFO: Inference done 23950/26446. 0.1832 s / img. ETA=0:07:45
+[07/01 20:26:41] detectron2 INFO: Inference done 23977/26446. 0.1832 s / img. ETA=0:07:40
+[07/01 20:26:46] detectron2 INFO: Inference done 24004/26446. 0.1832 s / img. ETA=0:07:35
+[07/01 20:26:51] detectron2 INFO: Inference done 24031/26446. 0.1832 s / img. ETA=0:07:30
+[07/01 20:26:56] detectron2 INFO: Inference done 24059/26446. 0.1832 s / img. ETA=0:07:25
+[07/01 20:27:01] detectron2 INFO: Inference done 24086/26446. 0.1832 s / img. ETA=0:07:20
+[07/01 20:27:06] detectron2 INFO: Inference done 24113/26446. 0.1832 s / img. ETA=0:07:15
+[07/01 20:27:11] detectron2 INFO: Inference done 24140/26446. 0.1832 s / img. ETA=0:07:10
+[07/01 20:27:16] detectron2 INFO: Inference done 24167/26446. 0.1832 s / img. ETA=0:07:05
+[07/01 20:27:21] detectron2 INFO: Inference done 24193/26446. 0.1832 s / img. ETA=0:07:00
+[07/01 20:27:26] detectron2 INFO: Inference done 24221/26446. 0.1832 s / img. ETA=0:06:55
+[07/01 20:27:31] detectron2 INFO: Inference done 24247/26446. 0.1832 s / img. ETA=0:06:50
+[07/01 20:27:36] detectron2 INFO: Inference done 24274/26446. 0.1832 s / img. ETA=0:06:45
+[07/01 20:27:41] detectron2 INFO: Inference done 24301/26446. 0.1832 s / img. ETA=0:06:40
+[07/01 20:27:47] detectron2 INFO: Inference done 24328/26446. 0.1832 s / img. ETA=0:06:35
+[07/01 20:27:52] detectron2 INFO: Inference done 24356/26446. 0.1832 s / img. ETA=0:06:30
+[07/01 20:27:57] detectron2 INFO: Inference done 24384/26446. 0.1832 s / img. ETA=0:06:24
+[07/01 20:28:02] detectron2 INFO: Inference done 24411/26446. 0.1832 s / img. ETA=0:06:19
+[07/01 20:28:07] detectron2 INFO: Inference done 24440/26446. 0.1832 s / img. ETA=0:06:14
+[07/01 20:28:12] detectron2 INFO: Inference done 24468/26446. 0.1832 s / img. ETA=0:06:09
+[07/01 20:28:17] detectron2 INFO: Inference done 24495/26446. 0.1832 s / img. ETA=0:06:04
+[07/01 20:28:22] detectron2 INFO: Inference done 24523/26446. 0.1832 s / img. ETA=0:05:58
+[07/01 20:28:27] detectron2 INFO: Inference done 24550/26446. 0.1832 s / img. ETA=0:05:53
+[07/01 20:28:33] detectron2 INFO: Inference done 24578/26446. 0.1832 s / img. ETA=0:05:48
+[07/01 20:28:38] detectron2 INFO: Inference done 24605/26446. 0.1832 s / img. ETA=0:05:43
+[07/01 20:28:43] detectron2 INFO: Inference done 24631/26446. 0.1832 s / img. ETA=0:05:38
+[07/01 20:28:48] detectron2 INFO: Inference done 24658/26446. 0.1832 s / img. ETA=0:05:33
+[07/01 20:28:53] detectron2 INFO: Inference done 24685/26446. 0.1832 s / img. ETA=0:05:28
+[07/01 20:28:58] detectron2 INFO: Inference done 24713/26446. 0.1832 s / img. ETA=0:05:23
+[07/01 20:29:03] detectron2 INFO: Inference done 24740/26446. 0.1832 s / img. ETA=0:05:18
+[07/01 20:29:09] detectron2 INFO: Inference done 24768/26446. 0.1832 s / img. ETA=0:05:13
+[07/01 20:29:14] detectron2 INFO: Inference done 24795/26446. 0.1832 s / img. ETA=0:05:08
+[07/01 20:29:19] detectron2 INFO: Inference done 24823/26446. 0.1832 s / img. ETA=0:05:02
+[07/01 20:29:24] detectron2 INFO: Inference done 24850/26446. 0.1832 s / img. ETA=0:04:57
+[07/01 20:29:29] detectron2 INFO: Inference done 24876/26446. 0.1832 s / img. ETA=0:04:53
+[07/01 20:29:34] detectron2 INFO: Inference done 24904/26446. 0.1832 s / img. ETA=0:04:47
+[07/01 20:29:39] detectron2 INFO: Inference done 24932/26446. 0.1832 s / img. ETA=0:04:42
+[07/01 20:29:44] detectron2 INFO: Inference done 24960/26446. 0.1832 s / img. ETA=0:04:37
+[07/01 20:29:49] detectron2 INFO: Inference done 24988/26446. 0.1832 s / img. ETA=0:04:32
+[07/01 20:29:55] detectron2 INFO: Inference done 25017/26446. 0.1832 s / img. ETA=0:04:26
+[07/01 20:30:00] detectron2 INFO: Inference done 25044/26446. 0.1832 s / img. ETA=0:04:21
+[07/01 20:30:05] detectron2 INFO: Inference done 25072/26446. 0.1832 s / img. ETA=0:04:16
+[07/01 20:30:10] detectron2 INFO: Inference done 25099/26446. 0.1832 s / img. ETA=0:04:11
+[07/01 20:30:15] detectron2 INFO: Inference done 25127/26446. 0.1832 s / img. ETA=0:04:06
+[07/01 20:30:20] detectron2 INFO: Inference done 25154/26446. 0.1832 s / img. ETA=0:04:01
+[07/01 20:30:25] detectron2 INFO: Inference done 25182/26446. 0.1832 s / img. ETA=0:03:55
+[07/01 20:30:30] detectron2 INFO: Inference done 25210/26446. 0.1832 s / img. ETA=0:03:50
+[07/01 20:30:35] detectron2 INFO: Inference done 25237/26446. 0.1832 s / img. ETA=0:03:45
+[07/01 20:30:41] detectron2 INFO: Inference done 25265/26446. 0.1832 s / img. ETA=0:03:40
+[07/01 20:30:46] detectron2 INFO: Inference done 25292/26446. 0.1832 s / img. ETA=0:03:35
+[07/01 20:30:51] detectron2 INFO: Inference done 25320/26446. 0.1832 s / img. ETA=0:03:30
+[07/01 20:30:56] detectron2 INFO: Inference done 25347/26446. 0.1832 s / img. ETA=0:03:25
+[07/01 20:31:01] detectron2 INFO: Inference done 25375/26446. 0.1832 s / img. ETA=0:03:19
+[07/01 20:31:06] detectron2 INFO: Inference done 25402/26446. 0.1832 s / img. ETA=0:03:14
+[07/01 20:31:11] detectron2 INFO: Inference done 25430/26446. 0.1832 s / img. ETA=0:03:09
+[07/01 20:31:16] detectron2 INFO: Inference done 25458/26446. 0.1832 s / img. ETA=0:03:04
+[07/01 20:31:21] detectron2 INFO: Inference done 25485/26446. 0.1832 s / img. ETA=0:02:59
+[07/01 20:31:26] detectron2 INFO: Inference done 25513/26446. 0.1832 s / img. ETA=0:02:54
+[07/01 20:31:32] detectron2 INFO: Inference done 25540/26446. 0.1832 s / img. ETA=0:02:49
+[07/01 20:31:37] detectron2 INFO: Inference done 25568/26446. 0.1832 s / img. ETA=0:02:43
+[07/01 20:31:42] detectron2 INFO: Inference done 25595/26446. 0.1832 s / img. ETA=0:02:38
+[07/01 20:31:47] detectron2 INFO: Inference done 25623/26446. 0.1832 s / img. ETA=0:02:33
+[07/01 20:31:52] detectron2 INFO: Inference done 25651/26446. 0.1832 s / img. ETA=0:02:28
+[07/01 20:31:57] detectron2 INFO: Inference done 25679/26446. 0.1831 s / img. ETA=0:02:23
+[07/01 20:32:02] detectron2 INFO: Inference done 25706/26446. 0.1832 s / img. ETA=0:02:18
+[07/01 20:32:07] detectron2 INFO: Inference done 25734/26446. 0.1831 s / img. ETA=0:02:12
+[07/01 20:32:12] detectron2 INFO: Inference done 25762/26446. 0.1831 s / img. ETA=0:02:07
+[07/01 20:32:18] detectron2 INFO: Inference done 25790/26446. 0.1831 s / img. ETA=0:02:02
+[07/01 20:32:23] detectron2 INFO: Inference done 25817/26446. 0.1831 s / img. ETA=0:01:57
+[07/01 20:32:28] detectron2 INFO: Inference done 25844/26446. 0.1831 s / img. ETA=0:01:52
+[07/01 20:32:33] detectron2 INFO: Inference done 25870/26446. 0.1832 s / img. ETA=0:01:47
+[07/01 20:32:38] detectron2 INFO: Inference done 25898/26446. 0.1831 s / img. ETA=0:01:42
+[07/01 20:32:43] detectron2 INFO: Inference done 25925/26446. 0.1831 s / img. ETA=0:01:37
+[07/01 20:32:48] detectron2 INFO: Inference done 25953/26446. 0.1831 s / img. ETA=0:01:32
+[07/01 20:32:53] detectron2 INFO: Inference done 25980/26446. 0.1831 s / img. ETA=0:01:26
+[07/01 20:32:58] detectron2 INFO: Inference done 26006/26446. 0.1831 s / img. ETA=0:01:22
+[07/01 20:33:03] detectron2 INFO: Inference done 26032/26446. 0.1832 s / img. ETA=0:01:17
+[07/01 20:33:08] detectron2 INFO: Inference done 26060/26446. 0.1832 s / img. ETA=0:01:12
+[07/01 20:33:14] detectron2 INFO: Inference done 26088/26446. 0.1832 s / img. ETA=0:01:06
+[07/01 20:33:19] detectron2 INFO: Inference done 26103/26446. 0.1832 s / img. ETA=0:01:04
+[07/01 20:33:24] detectron2 INFO: Inference done 26131/26446. 0.1832 s / img. ETA=0:00:58
+[07/01 20:33:29] detectron2 INFO: Inference done 26159/26446. 0.1832 s / img. ETA=0:00:53
+[07/01 20:33:34] detectron2 INFO: Inference done 26186/26446. 0.1832 s / img. ETA=0:00:48
+[07/01 20:33:39] detectron2 INFO: Inference done 26214/26446. 0.1832 s / img. ETA=0:00:43
+[07/01 20:33:44] detectron2 INFO: Inference done 26242/26446. 0.1832 s / img. ETA=0:00:38
+[07/01 20:33:50] detectron2 INFO: Inference done 26271/26446. 0.1832 s / img. ETA=0:00:32
+[07/01 20:33:55] detectron2 INFO: Inference done 26298/26446. 0.1832 s / img. ETA=0:00:27
+[07/01 20:34:00] detectron2 INFO: Inference done 26325/26446. 0.1832 s / img. ETA=0:00:22
+[07/01 20:34:05] detectron2 INFO: Inference done 26353/26446. 0.1832 s / img. ETA=0:00:17
+[07/01 20:34:10] detectron2 INFO: Inference done 26381/26446. 0.1832 s / img. ETA=0:00:12
+[07/01 20:34:15] detectron2 INFO: Inference done 26409/26446. 0.1832 s / img. ETA=0:00:06
+[07/01 20:34:20] detectron2 INFO: Inference done 26436/26446. 0.1832 s / img. ETA=0:00:01
+[07/01 20:34:22] detectron2 INFO: Total inference time: 1:22:16.703777 (0.186706 s / img per device, on 1 devices)
+[07/01 20:34:22] detectron2 INFO: Total inference pure compute time: 1:20:44 (0.183217 s / img per device, on 1 devices)
+[07/01 20:34:30] d2.evaluation.coco_evaluation INFO: Preparing results for COCO format ...
+[07/01 20:34:30] d2.evaluation.coco_evaluation INFO: Saving results to ./speaq_checkpoints/inference/coco_instances_results.json
+[07/01 20:34:39] d2.evaluation.coco_evaluation INFO: Evaluating predictions with unofficial COCO API...
+[07/01 20:34:45] d2.evaluation.fast_eval_api INFO: Evaluate annotation type *bbox*
+[07/01 20:36:18] d2.evaluation.fast_eval_api INFO: COCOeval_opt.evaluate() finished in 92.59 seconds.
+[07/01 20:36:19] d2.evaluation.fast_eval_api INFO: Accumulating evaluation results...
+[07/01 20:36:34] d2.evaluation.fast_eval_api INFO: COCOeval_opt.accumulate() finished in 14.82 seconds.
+[07/01 20:36:34] d2.evaluation.coco_evaluation INFO: Evaluation results for bbox: 
+|   AP   |  AP50  |  AP75  |  APs  |  APm  |  APl   |
+|:------:|:------:|:------:|:-----:|:-----:|:------:|
+| 10.800 | 21.590 | 9.283  | 2.803 | 7.475 | 14.689 |
+[07/01 20:36:34] d2.evaluation.coco_evaluation INFO: Per-category bbox AP: 
+| category   | AP     | category   | AP     | category   | AP     |
+|:-----------|:-------|:-----------|:-------|:-----------|:-------|
+| airplane   | 0.990  | animal     | 0.780  | arm        | 1.896  |
+| bag        | 6.022  | banana     | 7.144  | basket     | 7.047  |
+| beach      | 28.535 | bear       | 21.598 | bed        | 37.001 |
+| bench      | 17.990 | bike       | 18.261 | bird       | 12.701 |
+| board      | 2.246  | boat       | 13.157 | book       | 4.309  |
+| boot       | 6.591  | bottle     | 11.697 | bowl       | 17.647 |
+| box        | 4.649  | boy        | 13.464 | branch     | 0.480  |
+| building   | 15.606 | bus        | 34.538 | cabinet    | 4.118  |
+| cap        | 1.534  | car        | 18.911 | cat        | 31.326 |
+| chair      | 15.848 | child      | 2.643  | clock      | 16.658 |
+| coat       | 2.508  | counter    | 9.258  | cow        | 22.070 |
+| cup        | 12.621 | curtain    | 8.239  | desk       | 16.066 |
+| dog        | 24.415 | door       | 5.829  | drawer     | 6.095  |
+| ear        | 9.234  | elephant   | 28.177 | engine     | 13.855 |
+| eye        | 6.237  | face       | 4.194  | fence      | 15.475 |
+| finger     | 1.211  | flag       | 3.819  | flower     | 3.707  |
+| food       | 9.637  | fork       | 17.237 | fruit      | 1.271  |
+| giraffe    | 28.506 | girl       | 8.125  | glass      | 9.173  |
+| glove      | 8.084  | guy        | 0.000  | hair       | 10.564 |
+| hand       | 9.315  | handle     | 3.061  | hat        | 7.485  |
+| head       | 7.620  | helmet     | 9.406  | hill       | 3.635  |
+| horse      | 25.497 | house      | 4.225  | jacket     | 12.700 |
+| jean       | 16.795 | kid        | 0.223  | kite       | 5.103  |
+| lady       | 0.000  | lamp       | 7.938  | laptop     | 31.066 |
+| leaf       | 1.099  | leg        | 4.797  | letter     | 0.713  |
+| light      | 1.292  | logo       | 2.128  | man        | 23.640 |
+| men        | 0.792  | motorcycle | 19.751 | mountain   | 5.036  |
+| mouth      | 4.450  | neck       | 5.446  | nose       | 8.217  |
+| number     | 2.078  | orange     | 10.518 | pant       | 17.639 |
+| paper      | 3.574  | paw        | 5.567  | people     | 1.000  |
+| person     | 4.198  | phone      | 6.749  | pillow     | 14.115 |
+| pizza      | 28.968 | plane      | 22.110 | plant      | 3.770  |
+| plate      | 28.097 | player     | 1.935  | pole       | 4.152  |
+| post       | 1.032  | pot        | 4.015  | racket     | 17.644 |
+| railing    | 1.186  | rock       | 4.919  | roof       | 3.677  |
+| room       | 20.452 | screen     | 13.027 | seat       | 6.023  |
+| sheep      | 16.858 | shelf      | 1.692  | shirt      | 21.029 |
+| shoe       | 11.429 | short      | 25.924 | sidewalk   | 9.582  |
+| sign       | 12.331 | sink       | 15.254 | skateboard | 21.968 |
+| ski        | 8.974  | skier      | 3.493  | sneaker    | 0.000  |
+| snow       | 18.606 | sock       | 9.084  | stand      | 1.387  |
+| street     | 16.209 | surfboard  | 13.166 | table      | 26.678 |
+| tail       | 9.648  | tie        | 17.007 | tile       | 0.815  |
+| tire       | 11.741 | toilet     | 32.129 | towel      | 6.770  |
+| tower      | 11.429 | track      | 10.357 | train      | 28.486 |
+| tree       | 6.590  | truck      | 18.468 | trunk      | 8.508  |
+| umbrella   | 11.156 | vase       | 19.226 | vegetable  | 0.942  |
+| vehicle    | 0.673  | wave       | 9.167  | wheel      | 8.887  |
+| window     | 3.930  | windshield | 6.898  | wing       | 7.066  |
+| wire       | 0.454  | woman      | 17.326 | zebra      | 29.743 |
+[07/01 20:36:42] detectron2 INFO: Gathering data
+[07/01 20:36:42] detectron2 INFO: Predictions Gathered
+[07/01 20:36:54] detectron2 INFO: Saving output prediction
+[07/01 20:36:54] detectron2 INFO: Computing Scene Graph Metrics
+[07/01 20:36:54] detectron2 INFO: Preparing Global Container
+[07/01 20:44:34] detectron2 INFO: Scene Graph Metric Evaluation Complete. Computing recall statistics...
+[07/01 20:45:29] detectron2 INFO: Scene Graph Results for mode: sgdet
+[07/01 20:45:38] d2.evaluation.testing INFO: copypaste: Task: bbox
+[07/01 20:45:38] d2.evaluation.testing INFO: copypaste: AP,AP50,AP75,APs,APm,APl
+[07/01 20:45:38] d2.evaluation.testing INFO: copypaste: 10.7997,21.5905,9.2834,2.8035,7.4746,14.6885
+[07/01 20:45:38] d2.evaluation.testing INFO: copypaste: Task: SG
+[07/01 20:45:38] d2.evaluation.testing INFO: copypaste: SGMeanRecall@20,SGMeanRecall@50,SGMeanRecall@100,SGRecall@20,SGRecall@50,SGRecall@100
+[07/01 20:45:38] d2.evaluation.testing INFO: copypaste: 0.0781,0.1127,0.1302,0.1924,0.2429,0.2680
