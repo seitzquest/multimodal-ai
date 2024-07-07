@@ -1,8 +1,8 @@
 Metric & Origin & SimInRL & SimNotRL & Seen 0.2 & Seen 0.5 & Seen 0.7 & Unlikely & Unseen 0.2 & Unseen 0.5 & Unseen 0.7 \\
 \hline
-AP & \cellcolor[HTML]{ccf699} 0.0014 & 0.0012 & 0.0012 & 0.0013 & 0.0013 & 0.0012 & 0.0012 & 0.0013 & 0.0011 & \cellcolor[HTML]{f69f99} 0.0009 \\
-AP50 & \cellcolor[HTML]{ccf699} 0.0026 & 0.0025 & 0.0025 & \cellcolor[HTML]{ccf699} 0.0026 & 0.0025 & 0.0023 & 0.0024 & \cellcolor[HTML]{ccf699} 0.0026 & 0.0023 & \cellcolor[HTML]{f69f99} 0.0019 \\
-AP75 & \cellcolor[HTML]{ccf699} 0.0012 & 0.0011 & 0.0011 & \cellcolor[HTML]{ccf699} 0.0012 & 0.0011 & 0.001 & 0.0011 & 0.0011 & 0.001 & \cellcolor[HTML]{f69f99} 0.0007 \\
-APs & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{ccf699} 0.0003 & \cellcolor[HTML]{f69f99} 0.0002 \\
-APm & \cellcolor[HTML]{ccf699} 0.0009 & 0.0008 & 0.0008 & \cellcolor[HTML]{ccf699} 0.0009 & 0.0008 & 0.0008 & 0.0008 & \cellcolor[HTML]{ccf699} 0.0009 & 0.0007 & \cellcolor[HTML]{f69f99} 0.0006 \\
-APl & \cellcolor[HTML]{ccf699} 0.0018 & 0.0017 & 0.0017 & \cellcolor[HTML]{ccf699} 0.0018 & 0.0017 & 0.0016 & 0.0017 & \cellcolor[HTML]{ccf699} 0.0018 & 0.0015 & \cellcolor[HTML]{f69f99} 0.0012 \\
+AP & \cellcolor[HTML]{ccf699} 0.135 & 0.124 & 0.124 & 0.131 & 0.126 & 0.117 & 0.123 & 0.131 & 0.114 & \cellcolor[HTML]{f69f99} 0.09 \\
+AP50 & \cellcolor[HTML]{ccf699} 0.264 & 0.247 & 0.247 & 0.257 & 0.248 & 0.232 & 0.243 & 0.258 & 0.229 & \cellcolor[HTML]{f69f99} 0.187 \\
+AP75 & \cellcolor[HTML]{ccf699} 0.119 & 0.108 & 0.108 & 0.116 & 0.111 & 0.102 & 0.108 & 0.115 & 0.097 & \cellcolor[HTML]{f69f99} 0.074 \\
+APs & \cellcolor[HTML]{ccf699} 0.033 & 0.03 & 0.029 & 0.032 & 0.031 & 0.028 & 0.03 & 0.032 & 0.028 & \cellcolor[HTML]{f69f99} 0.021 \\
+APm & \cellcolor[HTML]{ccf699} 0.089 & 0.079 & 0.079 & 0.085 & 0.081 & 0.075 & 0.079 & 0.085 & 0.074 & \cellcolor[HTML]{f69f99} 0.056 \\
+APl & \cellcolor[HTML]{ccf699} 0.183 & 0.173 & 0.171 & 0.181 & 0.173 & 0.162 & 0.17 & 0.18 & 0.153 & \cellcolor[HTML]{f69f99} 0.123 \\

@@ -130,12 +130,11 @@ def extract_and_plot(result_folder, model):
             recall_metrics, recall_values, ap_metrics, ap_values = extract_data_speaq(
                 file_name
             )
+            ap_values = [round(ap_value / 100, 4) for ap_value in ap_values]
         else:
             recall_metrics, recall_values, ap_metrics, ap_values = extract_data_reitr(
                 file_name
             )
-
-        ap_values = [round(ap_value / 100, 4) for ap_value in ap_values]
         recall_values = [round(recall_value, 4) for recall_value in recall_values]
         all_recall_values.append(recall_values)
         all_ap_values.append(ap_values)
