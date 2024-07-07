@@ -161,3 +161,12 @@ cython_debug/
 
 # Images
 *.jpg
+
+baseline_models/RelTR/ckpt/
+baseline_models/RelTR/*.json
+baseline_models/RelTR/.idea/
+baseline_models/RelTR/__pycache__/
+baseline_models/RelTR/logs/
+baseline_models/RelTR/demo/test
+baseline_models/RelTR/lib/evaluation/insert_objects
+baseline_models/RelTR/data/vg/images
