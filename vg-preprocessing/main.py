@@ -18,6 +18,18 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
+    """
+    Adds a transparent foreground image onto a background image using the Pillow library.
+
+    Parameters:
+        background (PIL.Image.Image): The base image
+        foreground (PIL.Image.Image): The foreground image containing the to be transplanted object. Needs to have an alpha channel.
+        x_offset (int, optional): The x-coordinate offset for the foreground image. If not provided, the foreground image will be centered horizontally. Defaults to None.
+        y_offset (int, optional): The y-coordinate offset for the foreground image. If not provided, the foreground image will be centered vertically. Defaults to None.
+
+    Returns:
+        PIL.Image.Image: The resulting image with the transplanted image.
+    """
 
     assert background.mode == 'RGB', f'background image should have exactly 3 channels (RGB). found:{background.mode}'
     assert foreground.mode == 'RGBA', f'foreground image should have exactly 4 channels (RGBA). found:{foreground.mode}'
@@ -33,6 +45,18 @@ def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset
     return background
 
 def scale_inpainted_image_pillow(source_image, target_image, scaling=0.2):
+    """
+    Scales the target image to be a fraction of the source image using the Pillow library.
+    The scaling is based on the width and height of the source image, taking into account the smaller value of the two.
+
+    Parameters:
+        source_image (PIL.Image.Image): The source image to scale the target image to.
+        target_image (PIL.Image.Image): The target image to be scaled.
+        scaling (float, optional): The scaling factor. Defaults to 0.2.
+
+    Returns:
+        PIL.Image.Image: The target image but scaled
+    """
     bg_w, bg_h = source_image.size
     fg_w, fg_h = target_image.size
 
@@ -47,11 +71,35 @@ def scale_inpainted_image_pillow(source_image, target_image, scaling=0.2):
     return scaled_foreground
 
 def rotate_image_pillow(img, angle):
+    """
+    Rotates the image :)
+
+    Parameters:
+        img (PIL.Image.Image): The input image to be rotated.
+        angle (float): The angle in degrees to rotate the image.
+
+    Returns:
+        PIL.Image.Image: The rotated image.
+    """
     return img.rotate(angle, expand=True)
 
 
 # for visualizing bounding boxes
+from PIL import ImageDraw
+
 def draw_bounding_box_pillow(image, bounding_box, color=(0, 255, 0), width=2):
+    """
+    Draws a bounding box on the given image using the PIL library.
+
+    Parameters:
+        image (PIL.Image.Image): The image on which to draw the bounding box.
+        bounding_box (tuple): A tuple (x, y, w, h) representing the coordinates and dimensions of the bounding box.
+        color (tuple): The color of the bounding box. Default is green.
+        width (int): The width of the bounding box lines. Default is 2.
+
+    Returns:
+        PIL.Image.Image: The modified image with the bounding box drawn on it.
+    """
     draw = ImageDraw.Draw(image)
     x, y, w, h = bounding_box
     draw.rectangle([x, y, x + w, y + h], fill=color)
@@ -59,19 +107,47 @@ def draw_bounding_box_pillow(image, bounding_box, color=(0, 255, 0), width=2):
 
 # Returns a heatmap which shows where bounding boxes are
 def find_bounding_boxes_area(height, width, objects):
+    """
+    Creates a heatmap of the bounding boxes/objects in an image.
+    For each pixel in the heatmap, the value represents the number of bounding boxes that are at that pixel.
+
+    Parameters:
+        height (int): The height of the image.
+        width (int): The width of the image.
+        objects (list): A list of dictionaries representing bounding boxes.
+            Each dictionary should have the keys 'x', 'y', 'w', and 'h',
+            representing the x-coordinate, y-coordinate, width, and height
+            of a bounding box, respectively.
+
+    Returns:
+        numpy.ndarray: An array of shape (height, width) where each element
+        represents the number of bounding boxes that overlap at that pixel.
+
+    """
     overlap_array = np.zeros((height, width), dtype=int)
     for o in objects:
         x, y, w, h = o['x'], o['y'], o['w'], o['h']
         overlap_array[y:y+h, x:x+w] += 1
-    
+
     return overlap_array
 
 # Finds the image patch with the minimal overlap of bounding boxes
 def find_minimal_patch(overlap_array, patch_size):
+    """
+    Finds the minimal patch in the given overlap array.
+    This uses a sliding window approach, which finds the patch area where the sum of values is minimal.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The heatmap array of bounding box overlaps.
+        patch_size (tuple): The size of the patch.
+
+    Returns:
+        tuple: The coordinates and size of the minimal patch.
+    """
     min_sum = float('inf')
     min_patch = None
 
-    # Sliding window approch for finding the minimal patch
+    # Sliding window approach for finding the minimal patch
     for y in range(overlap_array.shape[0] - patch_size[0] + 1):
         for x in range(overlap_array.shape[1] - patch_size[1] + 1):
             patch = overlap_array[y:y+patch_size[0], x:x+patch_size[1]]
@@ -85,6 +161,19 @@ def find_minimal_patch(overlap_array, patch_size):
 # Uses a heuristic to find the minimal patch
 # Assumes that the minimal patch has the minimal value in the overlap array
 def find_minimal_patch_heuristic(overlap_array, patch_size):
+    """
+    Finds the position of the minimal patch using a heuristic approach
+    This is necessary because find_minimal_patch() is too slow :(
+    The key assumption is that the minimal patch has the minimal value in the overlap array,
+    which narrows down the search space.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The heatmap array of bounding box overlaps.
+        patch_size (tuple): The size of the patch.
+
+    Returns:
+        tuple: The coordinates and size of the minimal patch.
+    """
     min_sum = float('inf')
     min_patch = None
     max_positions_threshold = 5000
@@ -115,10 +204,22 @@ def find_minimal_patch_heuristic(overlap_array, patch_size):
 
 # Finds the image patch with the maximal overlap of bounding boxes
 def find_maximal_patch(overlap_array, patch_size):
+    """
+    Finds the patch where the sum of overlap values is maximal.
+    Works similar to find_minimal_patch() but finds the maximal patch instead aka the patch
+    where the sum of overlap values is maximal.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The input array containing the overlap values.
+        patch_size (tuple): The size of the patch to be considered.
+
+    Returns:
+        tuple: A tuple representing the coordinates and size of the maximal patch in the format (x, y, width, height).
+    """
     max_sum = 0
     max_patch = None
 
-    # Sliding window approch for finding the maximal patch
+    # Sliding window approach for finding the maximal patch
     for y in range(overlap_array.shape[0] - patch_size[0] + 1):
         for x in range(overlap_array.shape[1] - patch_size[1] + 1):
             patch = overlap_array[y:y+patch_size[0], x:x+patch_size[1]]
@@ -129,6 +230,18 @@ def find_maximal_patch(overlap_array, patch_size):
     return max_patch
 
 def find_maximal_patch_heuristic(overlap_array, patch_size):
+    """
+    Finds the maximal patch in the given overlap array using a heuristic approach.
+    Similarly to find_minimal_patch_heuristic(), this function assumes that the maximal patch
+    has the maximal value in the overlap array.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The heatmap array of bounding box overlaps.
+        patch_size (tuple): The size of the patch.
+
+    Returns:
+        tuple: The coordinates and size of the maximal patch.
+    """
     max_sum = 0
     max_patch = None
 
@@ -153,6 +266,17 @@ def find_maximal_patch_heuristic(overlap_array, patch_size):
 
 # Finds a random patch where the average overlap of bounding boxes is within one standard deviation of the mean
 def find_random_thresholded_patch(overlap_array, patch_size):
+    """
+    Finds a random patch in the given overlap array.
+    This uses a sliding window approach to calculate the average overlap of bounding boxes in each patch.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The heatmap array of bounding box overlaps.
+        patch_size (tuple): The size of the patch.
+
+    Returns:
+        tuple: The coordinates and size of the minimal patch.
+    """
     averages_array = np.zeros((overlap_array.shape[0] - patch_size[0] + 1, overlap_array.shape[1] - patch_size[1] + 1))
     for y in range(overlap_array.shape[0] - patch_size[0] + 1):
         for x in range(overlap_array.shape[1] - patch_size[1] + 1):
