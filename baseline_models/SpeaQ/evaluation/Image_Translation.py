@@ -1,15 +1,9 @@
 import cv2
 import numpy as np
-import os
 import random
-import argparse
-
-from PIL import Image
-from PIL import ImageDraw
 import matplotlib.pyplot as plt
 import torch
 import copy
-from tqdm import tqdm
 import pandas as pd
 import json
 import requests
@@ -26,6 +20,18 @@ from skimage.util.shape  import view_as_windows
 
 
 def draw_semantic_shape_without_Background(shape = "triangle"):
+    """
+        Generate the semantic shape without background
+
+        Parameters:
+            shape (string): the shape that should be generated.
+                Can be either "triangle" or "square"
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the generated picture.
+
+    """
     # Create a black background
     height, width = 700, 700
     background = np.zeros((height, width, 4), dtype=np.uint8)
@@ -51,6 +57,18 @@ def draw_semantic_shape_without_Background(shape = "triangle"):
     return background
 
 def draw_semantic_shape_with_Background(shape = "triangle"):
+    """
+        Generate the semantic shape with black background
+
+        Parameters:
+            shape (string): the shape that should be generated.
+                Can be either "triangle" or "square"
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the generated picture.
+
+    """
     # Create a black background
     height, width = 500, 500
     background = np.zeros((height, width, 3), dtype=np.uint8)
@@ -78,6 +96,16 @@ def draw_semantic_shape_with_Background(shape = "triangle"):
     return background
 
 def rotate_image(img, angle):
+    """
+    Rotates the image by the given angle.
+
+    Parameters:
+        img (cv2.Image): The input image to be rotated.
+        angle (float): The angle in degrees to rotate the image.
+
+    Returns:
+        cv2.Image: The rotated image.
+    """
     size_reverse = np.array(img.shape[1::-1]) # swap x with y
     M = cv2.getRotationMatrix2D(tuple(size_reverse / 2.), angle, 1.)
     MM = np.absolute(M[:,:2])
@@ -87,6 +115,18 @@ def rotate_image(img, angle):
     return rotated_image
 
 def scale_inpainted_image(source_image, target_image, scaling=1):
+    """
+    Scales the target image to be a fraction of the source image.
+    The scaling is based on the width and height of the source image, taking into account the smaller value of the two.
+
+    Parameters:
+        source_image (cv2.Image): The source image to scale the target image to.
+        target_image (cv2.Image): The target image to be scaled.
+        scaling (float, optional): The scaling factor. Defaults to 0.2.
+
+    Returns:
+        cv2.Image: The target image but scaled
+    """
     bg_h, bg_w = source_image.shape[:2]
     fg_h, fg_w = target_image.shape[:2]
 
@@ -101,6 +141,18 @@ def scale_inpainted_image(source_image, target_image, scaling=1):
     return scaled_foreground
 
 def scale_inpainted_image_pillow(source_image, target_image, scaling=0.2):
+    """
+    Scales the target image to be a fraction of the source image using the Pillow library.
+    The scaling is based on the width and height of the source image, taking into account the smaller value of the two.
+
+    Parameters:
+        source_image (PIL.Image.Image): The source image to scale the target image to.
+        target_image (PIL.Image.Image): The target image to be scaled.
+        scaling (float, optional): The scaling factor. Defaults to 0.2.
+
+    Returns:
+        PIL.Image.Image: The target image but scaled
+    """
     bg_w, bg_h = source_image.size
     fg_w, fg_h = target_image.size
 
@@ -115,6 +167,18 @@ def scale_inpainted_image_pillow(source_image, target_image, scaling=0.2):
     return scaled_foreground
 
 def add_transparent_image(background, foreground, x_offset=None, y_offset=None, rotation=0):
+    """
+    Adds a transparent foreground image onto a background image.
+
+    Parameters:
+        background (numpy.ndarray): The base image
+        foreground (numpy.ndarray): The foreground image containing the to be transplanted object. Needs to have an alpha channel.
+        x_offset (int, optional): The x-coordinate offset for the foreground image. If not provided, the foreground image will be centered horizontally. Defaults to None.
+        y_offset (int, optional): The y-coordinate offset for the foreground image. If not provided, the foreground image will be centered vertically. Defaults to None.
+
+    Returns:
+        numpy.ndarray: The resulting image with the transplanted image.
+    """
     bg_h, bg_w, bg_channels = background.shape
     fg_h, fg_w, fg_channels = foreground.shape
 
@@ -154,7 +218,18 @@ def add_transparent_image(background, foreground, x_offset=None, y_offset=None, 
     return background
 
 def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset=None):
+    """
+    Adds a transparent foreground image onto a background image using the Pillow library.
 
+    Parameters:
+        background (PIL.Image.Image): The base image
+        foreground (PIL.Image.Image): The foreground image containing the to be transplanted object. Needs to have an alpha channel.
+        x_offset (int, optional): The x-coordinate offset for the foreground image. If not provided, the foreground image will be centered horizontally. Defaults to None.
+        y_offset (int, optional): The y-coordinate offset for the foreground image. If not provided, the foreground image will be centered vertically. Defaults to None.
+
+    Returns:
+        PIL.Image.Image: The resulting image with the transplanted image.
+    """
     assert background.mode == 'RGB', f'background image should have exactly 3 channels (RGB). found:{background.mode}'
     assert foreground.mode == 'RGBA', f'foreground image should have exactly 4 channels (RGBA). found:{foreground.mode}'
 
@@ -170,6 +245,23 @@ def add_transparent_image_pillow(background, foreground, x_offset=None, y_offset
 
 
 def find_bounding_boxes_area(height, width, objects):
+    """
+    Creates a heatmap of the bounding boxes/objects in an image.
+    For each pixel in the heatmap, the value represents the number of bounding boxes that are at that pixel.
+
+    Parameters:
+        height (int): The height of the image.
+        width (int): The width of the image.
+        objects (list): A list of dictionaries representing bounding boxes.
+            Each dictionary should have the keys 'x', 'y', 'w', and 'h',
+            representing the x-coordinate, y-coordinate, width, and height
+            of a bounding box, respectively.
+
+    Returns:
+        numpy.ndarray: An array of shape (height, width) where each element
+        represents the number of bounding boxes that overlap at that pixel.
+
+    """
     overlap_array = np.zeros((height, width), dtype=int)
     for o in objects:
         x1, y1, x2, y2 = o
@@ -179,6 +271,17 @@ def find_bounding_boxes_area(height, width, objects):
 
 # Finds the image patch with the minimal overlap of bounding boxes
 def find_minimal_patch(overlap_array, patch_size):
+    """
+    Finds the minimal patch in the given overlap array.
+    This uses a sliding window approach, which finds the patch area where the sum of values is minimal.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The heatmap array of bounding box overlaps.
+        patch_size (tuple): The size of the patch.
+
+    Returns:
+        tuple: The coordinates and size of the minimal patch.
+    """
     min_sum = float('inf')
     min_patch = None
 
@@ -195,6 +298,18 @@ def find_minimal_patch(overlap_array, patch_size):
 
 # Finds the image patch with the maximal overlap of bounding boxes
 def find_maximal_patch(overlap_array, patch_size):
+    """
+    Finds the patch where the sum of overlap values is maximal.
+    Works similar to find_minimal_patch() but finds the maximal patch instead aka the patch
+    where the sum of overlap values is maximal.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The input array containing the overlap values.
+        patch_size (tuple): The size of the patch to be considered.
+
+    Returns:
+        tuple: A tuple representing the coordinates and size of the maximal patch in the format (x, y, width, height).
+    """
     max_sum = 0
     max_patch = None
 
@@ -211,6 +326,17 @@ def find_maximal_patch(overlap_array, patch_size):
 
 # Finds a random patch where the average overlap of bounding boxes is within one standard deviation of the mean
 def find_random_thresholded_patch(overlap_array, patch_size):
+    """
+    Finds a random patch in the given overlap array.
+    This uses a sliding window approach to calculate the average overlap of bounding boxes in each patch.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The heatmap array of bounding box overlaps.
+        patch_size (tuple): The size of the patch.
+
+    Returns:
+        tuple: The coordinates and size of the minimal patch.
+    """
     averages_array = np.zeros((overlap_array.shape[0] - patch_size[0] + 1, overlap_array.shape[1] - patch_size[1] + 1))
     for y in range(overlap_array.shape[0] - patch_size[0] + 1):
         for x in range(overlap_array.shape[1] - patch_size[1] + 1):
@@ -233,6 +359,19 @@ def find_random_thresholded_patch(overlap_array, patch_size):
 # Uses a heuristic to find the minimal patch
 # Assumes that the minimal patch has the minimal value in the overlap array
 def find_minimal_patch_heuristic(overlap_array, patch_size):
+    """
+    Finds the position of the minimal patch using a heuristic approach
+    This is necessary because find_minimal_patch() is too slow :(
+    The key assumption is that the minimal patch has the minimal value in the overlap array,
+    which narrows down the search space.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The heatmap array of bounding box overlaps.
+        patch_size (tuple): The size of the patch.
+
+    Returns:
+        tuple: The coordinates and size of the minimal patch.
+    """
     min_sum = float('inf')
     min_patch = None
 
@@ -254,6 +393,18 @@ def find_minimal_patch_heuristic(overlap_array, patch_size):
     return min_patch
 
 def find_maximal_patch_heuristic(overlap_array, patch_size):
+    """
+    Finds the maximal patch in the given overlap array using a heuristic approach.
+    Similarly to find_minimal_patch_heuristic(), this function assumes that the maximal patch
+    has the maximal value in the overlap array.
+
+    Parameters:
+        overlap_array (numpy.ndarray): The heatmap array of bounding box overlaps.
+        patch_size (tuple): The size of the patch.
+
+    Returns:
+        tuple: The coordinates and size of the maximal patch.
+    """
     max_sum = 0
     max_patch = None
 
@@ -288,64 +439,23 @@ def find_random_thresholded_patch_heuristic(overlap_array, patch_size):
     return (x, y, patch_size[1], patch_size[0])
 
 
-def find_minimal_patch_window(overlap_array, patch_size):
-    # Ensure the patch fits within the overlap array dimensions
-    if overlap_array.shape[0] < patch_size[0] or overlap_array.shape[1] < patch_size[1]:
-        return None
-
-    # Find the minimum value in the valid region where the patch can fit
-    cropped_height = overlap_array.shape[0] - patch_size[0] + 1
-    cropped_width = overlap_array.shape[1] - patch_size[1] + 1
-    cropped_array = overlap_array[:cropped_height, :cropped_width]
-
-    # Use view_as_windows to create sliding windows of the patch size
-    windows = view_as_windows(overlap_array, (patch_size[0], patch_size[1]))
-
-    # Calculate the sum of each window (patch)
-    patch_sums = windows.sum(axis=(2, 3))
-
-    # Find the index of the minimum sum
-    min_idx = np.unravel_index(np.argmin(patch_sums), patch_sums.shape)
-    min_sum = patch_sums[min_idx]
-
-    # Calculate the top-left corner of the minimal patch
-    y, x = min_idx
-    min_patch = (x, y, patch_size[1], patch_size[0])
-
-    return min_patch
-
-
-def find_minimal_patch_convolve(overlap_array, patch_size):
-    # Convert the input array to a PyTorch tensor
-    overlap_tensor = torch.tensor(overlap_array, dtype=torch.float32)
-
-    rows, cols = overlap_tensor.shape
-    patch_height, patch_width = patch_size
-
-    min_sum = float('inf')
-    min_patch = None
-
-    # Process patches in a row-by-row manner to manage memory usage
-    for y in range(rows - patch_height + 1):
-        for x in range(cols - patch_width + 1):
-            # Extract the current patch and move it to the GPU
-            patch = overlap_tensor[y:y + patch_height, x:x + patch_width].cuda()
-
-            # Compute the sum of the current patch
-            patch_sum = patch.sum().item()
-
-            # Move the patch back to the CPU to free up GPU memory
-            patch.cpu()
-
-            # Update the minimum patch if the current patch sum is smaller
-            if patch_sum < min_sum:
-                min_sum = patch_sum
-                min_patch = (x, y, patch_width, patch_height)
-
-    return min_patch
 
 def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", matrix = None):
+    """
+        Generate the transplanted object which is related to one existing object in the image,
+        either by duplicating the object or by choosing an object from the same class.
 
+        Parameters:
+            inputs (Dictionary): the input image and the object information
+            obj_in_rl (bool): if the object should be related to an object in the relation list
+            mode (string): the mode of the object generation.
+                Can be either "same object duplicate" to duplicate one object
+                or "same class different object" to choose an object from the same class
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the generated picture.
+    """
     #change the image to the right format for processing
     img = inputs['image']
     segment_background = copy.deepcopy(img.numpy())
@@ -409,6 +519,18 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
 
 
 def segment_object(segment_background, boxes):
+    """
+        Generate the segmented object based on the box information using SAM
+
+        Parameters:
+            segment_background (numpy.ndarray): the background image that is used for segmenting the object
+            boxes (list): the box inforamtion which is used for the segmentation
+            sam_predictor (SamPredictor): the predictor for the segment anything model
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the segmented obejct.
+    """
     # get the object from the image
     boxes = np.array(boxes)
     x1, y1, x2, y2 = boxes
@@ -430,6 +552,17 @@ def segment_object(segment_background, boxes):
     return rgba_image
 
 def find_least_likely_object(objects, cooccurrence_matrix, objects_in_image):
+    """
+        Find the unlikely object based on the object list in image and cooccurence matrix
+
+        Parameters:
+            objects (list): the list of objects that should be considered
+            cooccurrence_matrix (pandas.DataFrame): the cooccurence matrix of the objects
+            objects_in_image (list): the list of objects in the image
+
+        Returns:
+            string: the name of the unlikely object
+    """
     likelihoods = []
     for obj in objects:
         likelihood = cooccurrence_matrix.loc[obj, objects_in_image].sum()
@@ -440,16 +573,34 @@ def find_least_likely_object(objects, cooccurrence_matrix, objects_in_image):
 
 #Uses the cooccurence matrix to find the least likely object in the image and least likely object not in the image
 def find_correlated_object(cooccurrence_matrix, objects_in_image):
-    least_likely_image_object = find_least_likely_object(objects_in_image, cooccurrence_matrix, objects_in_image)
+    """
+        Find the correlated object based on the object list in image and cooccurence matrix
 
-    remaining_objects = [obj for obj in objects_in_image if obj != least_likely_image_object]
+        Parameters:
+            cooccurrence_matrix (pandas.DataFrame): the cooccurence matrix of the objects
+            objects_in_image (list): the list of objects in the image
+
+        Returns:
+            string: the name of the unlikely object
+    """
+
+    remaining_objects = [obj for obj in objects_in_image ]
     external_objects = [obj for obj in cooccurrence_matrix.index if obj not in objects_in_image]
     least_likely_external_object = find_least_likely_object(external_objects, cooccurrence_matrix, remaining_objects)
 
-    return least_likely_image_object, least_likely_external_object
+    return  least_likely_external_object
 
 
 def get_co_occurence_matrix(data_loader):
+    """
+        Generate the co-occurence matrix for the VG 150 Dataset used in the inference
+
+        Parameters:
+            data_loader (DataLoader): the data loader for the test data
+
+        Returns:
+            pandas.DataFrame: The generated co-occurence matrix
+    """
     "the input of the data_loader is the splited testdata for the vealuation"
     # get the object lists from json file
     vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
@@ -466,40 +617,46 @@ def get_co_occurence_matrix(data_loader):
 
     return cooccurence_matrix
 def generate_150_objects_overlays(object_labels):
+    """
+        Generate the segmented object for the 150 object classes in the VG 150 Dataset
+
+        Parameters:
+            object_labels (list): the list of object labels
+    """
     # Define the paths to the Visual Genome dataset annotation files
     image_data = json.load(open('data/datasets/image_data.json'))
     objects_data = json.load(open('data/datasets/objects.json'))
     # Find an image containing an object labeled as "person"
     for object in object_labels:
         name = object
-        person_image_id = None
-        person_bounding_box = None
+        label_image_id = None
+        label_bounding_box = None
         for obj in objects_data:
             for obj_item in obj['objects']:
                 if 'names' in obj_item and object in obj_item['names']:
-                    person_image_id = obj['image_id']
-                    person_bounding_box = obj_item['x'], obj_item['y'], obj_item['w'], obj_item['h']
+                    label_image_id = obj['image_id']
+                    label_bounding_box = obj_item['x'], obj_item['y'], obj_item['w'], obj_item['h']
                     break
-            if person_image_id:
+            if label_image_id:
                 break
 
-        if person_image_id is None:
+        if label_image_id is None:
             raise ValueError("No image with a " + object +" label found in the Visual Genome dataset.")
 
-        if person_bounding_box is None:
+        if label_bounding_box is None:
             raise ValueError(f"No bounding box found for " + object +" in image_id {person_image_id}.")
 
         # Find the corresponding image metadata
-        person_image_metadata = next((img for img in image_data if img['image_id'] == person_image_id), None)
+        label_image_metadata = next((img for img in image_data if img['image_id'] == label_image_id), None)
 
-        if person_image_metadata is None:
-            raise ValueError(f"No metadata found for image_id {person_image_id}.")
+        if label_image_metadata is None:
+            raise ValueError(f"No metadata found for image_id {label_image_id}.")
 
         # Construct the URL for the image
-        person_image_url = person_image_metadata['url']
+        label_image_url = label_image_metadata['url']
 
         # Download the image
-        response = requests.get(person_image_url)
+        response = requests.get(label_image_url)
         if response.status_code != 200:
             raise ValueError("Failed to download image from the Visual Genome dataset.")
 
@@ -508,9 +665,9 @@ def generate_150_objects_overlays(object_labels):
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
         # segment the bounding box on the image
-        x, y, w, h = person_bounding_box
-        boxes = [x, y, x + w, y + h]
+        x, y, w, h = label_bounding_box
         obj_in_image = image[y:y + h, x:x + w]
+        boxes = [x, y, x + w, y + h]
         segmented_object = segment_object(image, boxes)
 
 
@@ -518,11 +675,21 @@ def generate_150_objects_overlays(object_labels):
         cv2.imwrite('evaluation/insert_objects/'+name+'_without_bounding_box.jpg', segmented_object)
 
 
-
-
 def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
 
+    """
+        Generate the transplanted object which is related to one existing object in the image,
+        In this case, the most unlikely object is selected based on the co-occurrence matrix.
 
+        Parameters:
+            inputs (Dictionary): the input image and the object information
+            matrix (pandas.Dataframe): the generated co-occurrence matrix for the VG 150 Dataset
+            mode (string): the mode of the object generation. The mode in this case is "unlikely object"
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the generated picture.
+    """
 
 
 
@@ -532,7 +699,7 @@ def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
         vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
         idx2label = vocab_file['idx_to_label']
         object_labels = [idx2label[str(i + 1)] for i in inputs['instances'].get('gt_classes').tolist()]
-        least_likely_object, least_likely_external_object = find_correlated_object(matrix, object_labels)
+        least_likely_external_object = find_correlated_object(matrix, object_labels)
         translated_obj = cv2.imread('evaluation/insert_objects/'+least_likely_external_object+'_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
        # translated_obj = cv2.imread('evaluation/insert_objects/airplane_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
         translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
@@ -546,7 +713,23 @@ def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
 
 
 def image_translanting(inputs, matrix, mode = "trained_object", patch = None, obi_in_rl = False):
+    """
+        The obejct transplanting strategies for the image
 
+        Parameters:
+            inputs (Dictionary): the input image and the object information
+            matrix (pandas.Dataframe): the generated co-occurrence matrix for the VG 150 Dataset
+            mode (string): the mode of the object generation.
+                'mode can be: related_object_in_image,similar_object_in_image,unlikely_onject_in_image,trained_object, untrained_object'
+            patch(string): the patch strategy for the object transplanting
+                'patch could be minimal_heuristic,maximal_heuristic,random_heuristic'
+            obi_in_rl (bool): if the object should be related to an object in the relation list
+            scale (float): the scaling factor for the object
+
+
+        Returns:
+           Dictionary: the modified input image with the transplanted object
+    """
     img = inputs['image']
 
     background_img = copy.deepcopy(img.numpy())
@@ -588,7 +771,7 @@ def image_translanting(inputs, matrix, mode = "trained_object", patch = None, ob
     elif patch_strategy == "random":
         patch = find_random_thresholded_patch(overlaps, scaled_overlay.shape[:2])
     elif patch_strategy == "minimal_heuristic":
-        patch = find_minimal_patch_window(overlaps, scaled_overlay.shape[:2])
+        patch = find_minimal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
     elif patch_strategy == "maximal_heuristic":
         patch = find_maximal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
     elif patch_strategy == "random_heuristic":
