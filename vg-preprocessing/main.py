@@ -679,14 +679,17 @@ def select_object(inputs, mode = None, matrix = None):
 
 
 
-def image_translanting(inputs, occurence_matrix,mode = "trained_object"):
+def image_translanting(inputs, matrix, mode = "trained_object", patch = None, obi_in_rl = False, scale = 0.2):
     """
         The obejct transplanting strategies for the image
 
         Parameters:
             inputs (Dictionary): the input image and the object information
-            occurence_matrix (pandas.Dataframe): the generated co-occurrence matrix for the VG 150 Dataset
+            matrix (pandas.Dataframe): the generated co-occurrence matrix for the VG 150 Dataset
             mode (string): the mode of the object generation.
+            patch(string): the patch strategy for the object transplanting
+            obi_in_rl (bool): if the object should be related to an object in the relation list
+            scale (float): the scaling factor for the object
 
 
         Returns:
@@ -701,43 +704,56 @@ def image_translanting(inputs, occurence_matrix,mode = "trained_object"):
     if mode == "untrained_object":
         translated_obj = cv2.imread('evaluation/insert_objects/maikaefer.png', cv2.IMREAD_UNCHANGED)
         translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
-        scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.2)
+        scaled_overlay = scale_inpainted_image_pillow(background_img, translated_obj, scaling=scale)
     elif mode == "shape":
         translated_obj = draw_semantic_shape_without_Background(shape="square")
-        scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.2)
+        scaled_overlay = scale_inpainted_image_pillow(background_img, translated_obj, scaling=scale)
     elif mode == "trained_object":
         translated_obj = cv2.imread('evaluation/insert_objects/aiplane.png', cv2.IMREAD_UNCHANGED)
         translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
-        scaled_overlay = scale_inpainted_image(background_img, translated_obj, scaling=0.7)
+        scaled_overlay = scale_inpainted_image_pillow(background_img, translated_obj, scaling=scale)
     elif mode == "related_object_in_image":
         matrix = pd.read_pickle('evaluation/cooccurence_matrix.pkl')
-        scaled_overlay = duplicate_object(inputs, obj_in_rl=False, mode="same class different object", matrix=matrix)
-        scaled_overlay = scale_inpainted_image(background_img, rscaled_overlay, scaling=1)
+        scaled_overlay = duplicate_object(inputs, obj_in_rl=obi_in_rl, mode="same object duplicate", matrix=matrix)
+    elif mode == "similar_object_in_image":
+        matrix = pd.read_pickle('evaluation/cooccurence_matrix.pkl')
+        scaled_overlay = duplicate_object(inputs, obj_in_rl=obi_in_rl, mode="same class different object",
+                                          matrix=matrix)
 
     elif mode == "unlikely_onject_in_image":
         matrix = pd.read_pickle('evaluation/cooccurence_matrix.pkl')
+
         scaled_overlay = select_object(inputs, obj_in_rl=False, mode="unlikely object", matrix=matrix)
-        scaled_overlay = scale_inpainted_image(background_img, scaled_overlay, scaling=1)
-    else:
-        raise ValueError(f"Unknown mode for image tranplanting {mode}")
 
     # Find the bounding boxes of the objects in the image
     background_img_height, background_img_width = background_img.shape[:2]
-    overlaps = find_bounding_boxes_area(background_img_height, background_img_width, inputs['instances'].get('gt_boxes').tensor.tolist())
-    patch_strategy = "minimal"
+    overlaps = find_bounding_boxes_area(background_img_height, background_img_width,
+                                        inputs['instances'].get('gt_boxes').tensor.tolist())
+    patch_strategy = patch
     if patch_strategy == "minimal":
-        patch = find_minimal_patch(overlaps, scaled_overlay.shape[:2])
+        patch = find_minimal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
     elif patch_strategy == "maximal":
-        patch = find_maximal_patch(overlaps, scaled_overlay.size)
+        patch = find_maximal_patch(overlaps, scaled_overlay.shape[:2])
     elif patch_strategy == "random":
-        patch = find_random_thresholded_patch(overlaps, scaled_overlay.size)
+        patch = find_random_thresholded_patch(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "minimal_heuristic":
+        patch = find_minimal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "maximal_heuristic":
+        patch = find_maximal_patch_heuristic(overlaps, scaled_overlay.shape[:2])
+    elif patch_strategy == "random_heuristic":
+        patch = find_random_thresholded_patch_heuristic(overlaps, scaled_overlay.shape[:2])
     else:
         raise ValueError(f"Unknown patch strategy {patch_strategy}")
-    img_inpainting = add_transparent_image(background_img, scaled_overlay, patch[0], patch[1], rotation=rotation)
 
+
+    img_inpainting = add_transparent_image_pillow(background_img, scaled_overlay, patch[0], patch[1], rotation=0)
+
+    #  plt.figure(figsize=(20, 20))
+    #  plt.imshow(img_inpainting)
+    #  plt.axis('off')
+    #  plt.show()
     img_inpainting = np.transpose(img_inpainting, axes=[2, 0, 1])
-    inputs['image'] =  torch.from_numpy(img_inpainting)
-
+    inputs['image'] = torch.from_numpy(img_inpainting)
 
     return inputs
 
