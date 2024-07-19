@@ -75,9 +75,7 @@ Please consult the local `README.md` file for their setup and how to download th
 Additionally we use SAM for segmentation, which can be downloaded [here](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_h_4b8939.pth)
 - For RelTR, put the model into `baseline_models/RelTR/ckpt/sam_vit_h_4b8939.pth` along with the RelTR model checkpoint `checkpoint0149.pth`
 
-<div align="center">
-    <img src="figs/models.jpg" width="500"><br>
-</div>
+<img src="figs/models.jpg" width="800"><br>
 
 ### Setup Tips for RelTR
 For RelTR, we encountered a conda error with opencv when trying to add it to the python 3.6 conda environment. As described in [here](https://stackoverflow.com/a/63752514), fixing the version using `pip install opencv-python==3.4.13.47` resolved the issue.
