@@ -19,9 +19,9 @@ In this project, we examine how transplanting different types of objects, such a
 We hypothesize that transplanting objects will reduce the performance of the visual relationship detection compared to the unmodified counterpart. By analyzing the bounding boxes of the transplanted objects with respect to the scene objects, we additionally analyze how strong the effect is when no areas of the relationship are occluded, assuming spatial locality of the relationships.
 
 ## Limitations & Future work
-- Evaluation of different architecture models' performance​ (only transformer-based triplet-decoder approaches were used in this study)
-- Quantitative evaluation of patch strategies ​(especially minimal patch strategy)
-- Training for object transplanting robustness
+- Evaluation of different architecture models' performance​ (only transformer-based triplet-decoder approaches were used in this study).
+- Quantitative evaluation of patch strategies ​(especially minimal patch strategy).
+- Training for object transplanting robustness.
 
 ## Requirements
 There are some requirements needed to run the code in this repository, using conda is the easiest way.
