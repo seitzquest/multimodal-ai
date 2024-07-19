@@ -1,5 +1,7 @@
 # Evaluating the Robustness of Scene Graph Generation Models With Known and Unknown Objects Transplantation
+<div align="center">
 [Z Chen](https://github.com/ZiyuanChen-Zoey), [G Le](https://github.com/Gii-DE), [J Martini](https://github.com/japma), [M Sakharova](https://github.com/MarinaJim) and [P Seitz](https://github.com/seitzquest)
+</div>
 
 <div align="center">
     <img src="figs/motivation.jpg" width="500"><br>
@@ -83,4 +85,4 @@ For RelTR, we encountered a conda error with opencv when trying to add it to the
 Later on, we decided to use python 3.10 instead of the 3.6 in order to run the code on a modern GPU as it is required for installing pytorch nightly. The only adaptation that was necessary, was installing CoCo using `pip install pycocotools` instead of the CoCo Dataset PythonAPI `pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'`. Using 3.10 also resolved the version issue with opencv described above.
 
 ## Credits / Acknowledgements
-Our codebase is based on [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/groupwise-query-specialization-and-quality/scene-graph-generation-on-visual-genome)](https://paperswithcode.com/sota/scene-graph-generation-on-visual-genome?p=groupwise-query-specialization-and-quality): [SpeaQ](https://github.com/mlvlab/SpeaQ) and [RelTR](https://github.com/yrcong/RelTR).
+Our codebase is based on [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/groupwise-query-specialization-and-quality/scene-graph-generation-on-visual-genome)](https://paperswithcode.com/sota/scene-graph-generation-on-visual-genome?p=groupwise-query-specialization-and-quality) [SpeaQ](https://github.com/mlvlab/SpeaQ) and [RelTR](https://github.com/yrcong/RelTR).
