@@ -1,5 +1,5 @@
 # Evaluating the Robustness of Scene Graph Generation Models With Known and Unknown Objects Transplantation
-<strong>[Z Chen](https://github.com/ZiyuanChen-Zoey), [G Le](https://github.com/Gii-DE), [J Martini](https://github.com/japma), [M Sakharova](https://github.com/MarinaJim) and [P Seitz](https://github.com/seitzquest)</strong>
+<strong>© 2024 [Z Chen](https://github.com/ZiyuanChen-Zoey), [G Le](https://github.com/Gii-DE), [J Martini](https://github.com/japma), [M Sakharova](https://github.com/MarinaJim) and [P Seitz](https://github.com/seitzquest)</strong>
 
 <div align="center">
     <img src="figs/motivation.jpg" width="700"><br>
