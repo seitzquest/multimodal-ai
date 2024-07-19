@@ -54,6 +54,8 @@ In `baseline_models/` you can find our adapted code for the two evaluated SGG mo
 Please consult the local `README.md` file for their setup and how to download the VG dataset. Make sure that you also install the packages from `requirements.txt` in their respective conda environments.
 
 Additionally we use SAM for segmentation, which can be downloaded [here](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_h_4b8939.pth)
+- For RelTR, put the model into "./ckpt/sam_vit_h_4b8939.pth"
+
 
 ### Setup Tips for RelTR
 For RelTR, we encountered a conda error with opencv when trying to add it to the python 3.6 conda environment. As described in [here](https://stackoverflow.com/a/63752514), fixing the version using `pip install opencv-python==3.4.13.47` resolved the issue.
