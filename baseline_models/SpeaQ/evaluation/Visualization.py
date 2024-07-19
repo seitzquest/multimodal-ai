@@ -1,6 +1,5 @@
-import cv2
+
 import numpy as np
-import random
 from PIL import Image
 from PIL import ImageDraw, ImageFont
 import matplotlib.pyplot as plt
@@ -10,6 +9,27 @@ import torch
 import networkx as nx
 
 def get_info_by_idx(inputs, outputs, thres=0.6):
+    """
+        Get the information of the detected objects and relations by the index
+        The Groundtruth and prediction are stored in the input and output of the model
+
+        Parameters:
+            inputs (Dictionary): the stored the informatin of the input from the groundtruth
+            outputs (Dictionary): the stored the informatin of the output from the prediction
+            idx (int): the index of the image
+
+        Returns:
+            input_img(numpy.ndarray): The array of the input image
+            boxes(list): The list of the detected box coordinates
+            labels(list): The list of the ground truthlabels
+            box_labels(list): The list of the detected box labels
+            pred_scores(list): The list of the detected box scores
+            pred_rels(list): The list of the detected relations
+            gt_rels(list): The list of the ground truth relations
+            pred_rel_score(list): The list of the detected relation scores
+            pred_rel_label(list): The list of the detected relation labels
+            output_img_size(list): The list of the output image size
+    """
     #  groundtruth = det_input['groundtruths'][idx]
     #  prediction = det_input['predictions'][idx]
     # image path
@@ -61,15 +81,18 @@ def get_info_by_idx(inputs, outputs, thres=0.6):
     return input_img, boxes, labels, box_labels, pred_scores, pred_rels, gt_rels, pred_rel_score, pred_rel_label, output_img_size
 
 
-"""
-def show_selected(idx_list):
-    for select_idx in idx_list:
-        print(select_idx)
-        draw_image(*get_info_by_idx(select_idx, detected_origin_result))
-"""
 
 
 def show_all(inputs, outputs, mode):
+    """
+        Visualize the detected objects and relations by the index
+
+        Parameters:
+            inputs (Dictionary): the stored the informatin of the input from the groundtruth
+            outputs (Dictionary): the stored the informatin of the output from the prediction
+            mode (String): the mode of the object transplanting
+
+    """
     img_path, boxes, labels, box_labels, pred_scores, pred_rels, gt_rels, pred_rel_score, pred_rel_label, output_img_size = get_info_by_idx(
         inputs, outputs)
 
@@ -77,23 +100,22 @@ def show_all(inputs, outputs, mode):
                gt_rels=gt_rels, pred_rels=pred_rels, pred_rel_score=pred_rel_score, pred_rel_label=pred_rel_label, output_img_size=output_img_size,
                print_img=False, mode = mode)
 
-def box_cxcywh_to_xyxy(x):
-    x_c, y_c, w, h = x
-    b = [(x_c - 0.5 * w), (y_c - 0.5 * h),
-         (x_c + 0.5 * w), (y_c + 0.5 * h)]
-    return b
 
-def rescale_bboxes(out_bbox, size):
-    img_w, img_h = size
-    b = box_cxcywh_to_xyxy(out_bbox)
- #   for idx in range(len(b)):
- #       if idx% 2 == 0:
- #           b[idx] = b[idx] * img_w
- #       else:
- #           b[idx] = b[idx] * img_h
 
-    return b
+
 def draw_single_box(img, box, color='red', draw_info=None, scale_x=1, scale_y=1):
+    """
+        Draw a single box on the image
+
+        Parameters:
+            img (numpy.ndarray): the image array
+            box (List): the list of the box coordinates
+            color (String): the color of the box
+            draw_info (String): the information of the box
+            scale_x (int): the scale of the x-axis
+            scale_y (int): the scale of the y-axis
+
+    """
     #   img = Image.fromarray(pic)
     draw = ImageDraw.Draw(img)
     bboxes_scaled = box#rescale_bboxes(box, img.size)
@@ -109,6 +131,16 @@ def draw_single_box(img, box, color='red', draw_info=None, scale_x=1, scale_y=1)
 
 
 def print_list(name, input_list, scores):
+    """
+        print the list of the input
+
+        Parameters:
+            name (String): the name of the list
+            input_list (List): the list of the input
+            scores (List): the list of the scores
+
+
+    """
     for i, item in enumerate(input_list):
         if scores == None:
             print(name + ' ' + str(i) + ': ' + str(item))
@@ -118,6 +150,24 @@ def print_list(name, input_list, scores):
 
 def draw_image(img, boxes, labels, box_labels, pred_scores, gt_rels, pred_rels, pred_rel_score, pred_rel_label, output_img_size,
                print_img=False, mode = None):
+    """
+        Visualize the detected objects and relations by the index with the image
+
+        Parameters:
+            input_img(numpy.ndarray): The array of the input image
+            boxes(list): The list of the detected box coordinates
+            labels(list): The list of the ground truthlabels
+            box_labels(list): The list of the detected box labels
+            pred_scores(list): The list of the detected box scores
+            pred_rels(list): The list of the detected relations
+            gt_rels(list): The list of the ground truth relations
+            pred_rel_score(list): The list of the detected relation scores
+            pred_rel_label(list): The list of the detected relation labels
+            output_img_size(list): The list of the output image size
+            print_img(Boolean): the flag of the print image
+            mode (String): the mode of the object transplant
+
+    """
     pic = np.transpose(np.asarray(img), (1, 2, 0))
     pic_img = Image.fromarray(pic)
     acale_x = img.shape[1]/output_img_size[0]
@@ -151,6 +201,15 @@ def draw_image(img, boxes, labels, box_labels, pred_scores, gt_rels, pred_rels, 
     return None
 
 def draw_relationship(pred_rels, pred_rel_score, mode):
+    """
+        Plot the detected relations
+
+        Parameters:
+            pred_rels(list): The list of the detected relations
+            mode (String): the mode of the object transplant
+
+    """
+
     # Open a file in write mode
     with open(mode + '_relationship.txt', 'w') as file:
         for i, rel in enumerate(pred_rels):
@@ -158,8 +217,8 @@ def draw_relationship(pred_rels, pred_rel_score, mode):
     # Create a directed graph
     G = nx.Graph()
 
-    # Add edges to the graph based on the relations
-    for i in range(len(pred_rels)):
+    # Add edges to the graph based on the top 5 relations
+    for i in range(5):
         subject, predicate, obj = pred_rels[i]
         prob = pred_rel_score[i].item()
         G.add_edge(subject, obj, label=predicate, weight=prob)

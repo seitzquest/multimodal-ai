@@ -541,8 +541,6 @@ def get_co_occurence_matrix(data_loader):
         Parameters:
             data_loader (DataLoader): the data loader for the test data
 
-
-
         Returns:
             pandas.DataFrame: The generated co-occurence matrix
     """
@@ -687,7 +685,9 @@ def image_translanting(inputs, matrix, mode = "trained_object", patch = None, ob
             inputs (Dictionary): the input image and the object information
             matrix (pandas.Dataframe): the generated co-occurrence matrix for the VG 150 Dataset
             mode (string): the mode of the object generation.
+                'mode can be: related_object_in_image,similar_object_in_image,unlikely_onject_in_image,trained_object, untrained_object'
             patch(string): the patch strategy for the object transplanting
+                'patch could be minimal_heuristic,maximal_heuristic,random_heuristic'
             obi_in_rl (bool): if the object should be related to an object in the relation list
             scale (float): the scaling factor for the object
 
@@ -748,16 +748,13 @@ def image_translanting(inputs, matrix, mode = "trained_object", patch = None, ob
 
     img_inpainting = add_transparent_image_pillow(background_img, scaled_overlay, patch[0], patch[1], rotation=0)
 
-    #  plt.figure(figsize=(20, 20))
-    #  plt.imshow(img_inpainting)
-    #  plt.axis('off')
-    #  plt.show()
     img_inpainting = np.transpose(img_inpainting, axes=[2, 0, 1])
     inputs['image'] = torch.from_numpy(img_inpainting)
 
     return inputs
 
 def parse_args():
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--modified_directory", type=str, default="VG_100K_subset_modified", help="Directory to save modified images")
     parser.add_argument("--overlay_image_path", type=str, default="insert_objects/maikaefer.png", help="Path to overlay image")
@@ -782,9 +779,13 @@ def main():
     overlay_image_path = args.overlay_image_path
     seed = args.seed
     patch_strategy = args.patch_strategy
+    scale = args.scale
     number_of_images = args.num_images
     visualize_bb = args.visualize_bb
     correlate_overlay = args.correlate_overlay
+    mode = args.transplanting_strategy
+    obi_in_rl = args.in_Relationship
+
 
     os.makedirs(modified_directory, exist_ok=True)
 
