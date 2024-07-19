@@ -20,7 +20,7 @@ We hypothesize that transplanting objects will reduce the performance of the vis
 
 ## Limitations & Future work
 - Evaluation of different architecture models' performance​ (only transformer-based triplet-decoder approaches were used in this study)
-- Quantitative evaluation of patch strategies ​(esspecially minimal patch strategy)
+- Quantitative evaluation of patch strategies ​(especially minimal patch strategy)
 - Training for object transplanting robustness
 
 ## Requirements
