@@ -6,9 +6,6 @@
     "<i>Transplanting objects will reduce the performance of the visual relationship detection compared to the unmodified counterpart.</i>"
 </div>
 
-## About
-This repository contains the code needed for preprocessing the [Visual Genome dataset](https://homes.cs.washington.edu/~ranjay/visualgenome/index.html).
-
 ## Introduction
 The detection of objects in images and how they are related to each other is a fundamental challenge in reasoning about complex scenes. 
 Scene Graph Generation (SGG) refers to the multimodal AI tasks of detecting and classifying the objects in an image and generating a graph-structured representation that captures the object relationships. It is highly relevant for various applications like Image Captioning, Visual Question Answering (VQA) and Autonomous Navigation.
@@ -22,6 +19,9 @@ We hypothesize that transplanting objects will reduce the performance of the vis
 - Evaluation of different architecture models' performance​ (only transformer-based triplet-decoder approaches were used in this study).
 - Quantitative evaluation of patch strategies ​(especially minimal patch strategy).
 - Training for object transplanting robustness.
+
+## About
+This repository contains the code needed for preprocessing the [Visual Genome dataset](https://homes.cs.washington.edu/~ranjay/visualgenome/index.html).
 
 ## Requirements
 There are some requirements needed to run the code in this repository, using conda is the easiest way.
