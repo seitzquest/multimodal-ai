@@ -18,7 +18,7 @@ However, as shown by [Rosenfeld et al. (2018)](https://arxiv.org/pdf/1808.03305v
 In this project, we examine how transplanting different types of objects, such as seen and unseen objects, impacts the robustness of state-of-the-art SGG models, aiming to validate whether object relationship detection suffers from similar failure modes in the face of object transplantation, and how size, position and type of the transplanting affect the generated graph. 
 We hypothesize that transplanting objects will reduce the performance of the visual relationship detection compared to the unmodified counterpart. By analyzing the bounding boxes of the transplanted objects with respect to the scene objects, we additionally analyze how strong the effect is when no areas of the relationship are occluded, assuming spatial locality of the relationships.
 
-## Limitations & Future work
+## Limitations & Future Work
 - Evaluation of different architecture models' performance​ (only transformer-based triplet-decoder approaches were used in this study).
 - Quantitative evaluation of patch strategies ​(especially minimal patch strategy).
 - Training for object transplanting robustness.
