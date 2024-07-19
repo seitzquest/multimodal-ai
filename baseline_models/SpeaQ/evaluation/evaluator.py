@@ -59,7 +59,7 @@ def scenegraph_inference_on_dataset(cfg, model, data_loader, evaluator):
     start_time = time.perf_counter()
     total_compute_time = 0
     with inference_context(model), torch.no_grad():
-        "if we want to find the most likely object, we need to firtly calculate the co-occurence matrix"
+        "if we want to find the most likely object, we need to firstly calculate the co-occurence matrix"
 
       #  co_occurence_matrix = get_co_occurence_matrix(data_loader)
         for idx, inputs in enumerate(data_loader):
@@ -72,6 +72,7 @@ def scenegraph_inference_on_dataset(cfg, model, data_loader, evaluator):
             start_compute_time = time.perf_counter()
             'mode can be: related_object_in_image,similar_object_in_image,unlikely_onject_in_image,trained_object, untrained_object'
             'patch could be minimal_heuristic,maximal_heuristic,random_heuristic'
+            'obi_in_rl is used to determine whether the object is used in reinforcement learning'
             #the two code can be used to test the model with different mode and patch under debug mode,  the origin image can be remained by runnning it
             input_copy = copy.deepcopy(inputs)
             inputs = copy.deepcopy(input_copy)
