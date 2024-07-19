@@ -31,9 +31,22 @@ There are some parameters that can be passed to the script:
 - `--overlay_image_path`: Path to the overlay image.
 - `--seed`: Seed for the random number generator for reproducibility.
 - `--num_images`: Number of images to preprocess.
-- `--patch_strategy`: Strategy for finding patch. Can be 'minimal', 'maximal' or 'random'
+- `--patch_strategy`: Strategy for finding patch. Can be 'minimal', 'maximal' or 'random'. You can also use 'minimal_heuristic', 'maximal_heuristic' or 'random_heuristic' for the heuristic version.
 - `--correlate_overlay`: Overrides the overlay image and patch strategy by using a correlated object
 - `--visualize-bb`: Visualize bounding boxes
+
+### Additional Notes
+- There is a selection of possible objects that can be inserted in the folder `vg_preprocessing/insert_objects`. Some of these objects have a transparent background, while others are not fully segmented and still have a black background. These have the ending `*_with_bounding_box`.
+- You can use the `--overlay_image_path` parameter to specify the path to these images. If you do not specify this parameter, an image of a bug will be used as the transplanted object.
+- You can also run the script without any flags, in which case the default values will be used:
+   - `--modified_directory`: `VG_100K_subset_modified`
+    - `--overlay_image_path`: `vg_preprocessing/insert_objects/maikaefer.png`
+    - `--seed`: random seed
+    - `--num_images`: 100
+    - `--patch_strategy`: 'minimal'
+    - `--correlate_overlay`: False
+    - `--visualize-bb`: False
+
 
 
 ## Evaluation
