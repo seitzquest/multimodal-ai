@@ -84,8 +84,8 @@ def rotate_image_pillow(img, angle):
     return img.rotate(angle, expand=True)
 
 
-# for visualizing bounding boxes
-from PIL import ImageDraw
+
+
 
 def draw_bounding_box_pillow(image, bounding_box, color=(0, 255, 0), width=2):
     """
@@ -341,6 +341,18 @@ def extract_subimage(img, patch, sam_predictor):
     return trim_transparent_borders(Image.fromarray(segment_array))
 
 def draw_semantic_shape_without_Background(shape = "triangle"):
+    """
+        Generate the semantic shape without background
+
+        Parameters:
+            shape (string): the shape that should be generated.
+                Can be either "triangle" or "square"
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the generated picture.
+
+    """
     # Create a black background
     height, width = 700, 700
     background = np.zeros((height, width, 4), dtype=np.uint8)
@@ -364,6 +376,18 @@ def draw_semantic_shape_without_Background(shape = "triangle"):
     return background
 
 def draw_semantic_shape_with_Background(shape = "triangle"):
+    """
+        Generate the semantic shape with black background
+
+        Parameters:
+            shape (string): the shape that should be generated.
+                Can be either "triangle" or "square"
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the generated picture.
+
+    """
     # Create a black background
     height, width = 500, 500
     background = np.zeros((height, width, 3), dtype=np.uint8)
@@ -382,15 +406,25 @@ def draw_semantic_shape_with_Background(shape = "triangle"):
         cv2.fillPoly(background, [vertices], color=(0, 0, 255))
 
     background = cv2.cvtColor(background, cv2.COLOR_RGB2RGBA)
-    plt.figure(figsize=(20, 20))
-    plt.imshow(background)
-    plt.axis('off')
-    plt.show()
 
     return background
 
-def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", matrix = None):
+def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate"):
+    """
+        Generate the transplanted object which is related to one existing object in the image,
+        either by duplicating the object or by choosing an object from the same class.
 
+        Parameters:
+            inputs (Dictionary): the input image and the object information
+            obj_in_rl (bool): if the object should be related to an object in the relation list
+            mode (string): the mode of the object generation.
+                Can be either "same object duplicate" to duplicate one object
+                or "same class different object" to choose an object from the same class
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the generated picture.
+    """
     #change the image to the right format for processing
     img = inputs['image']
     segment_background = copy.deepcopy(img.numpy())
@@ -451,6 +485,10 @@ def duplicate_object(inputs,  obj_in_rl = True, mode = "same object duplicate", 
 
 
 def setup_sam_predictor():
+    """
+        Setup the segment anything model for segmenting the object
+
+    """
     #activate segment ANYTHING
     sam_checkpoint = "./path_to_sam_checkpoint/sam_vit_h_4b8939.pth"
     model_type = "vit_h"
@@ -462,6 +500,18 @@ def setup_sam_predictor():
     return SamPredictor(sam)
 
 def segment_object(segment_background, boxes, sam_predictor):
+    """
+        Generate the segmented object based on the box information using SAM
+
+        Parameters:
+            segment_background (numpy.ndarray): the background image that is used for segmenting the object
+            boxes (list): the box inforamtion which is used for the segmentation
+            sam_predictor (SamPredictor): the predictor for the segment anything model
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the segmented obejct.
+    """
     if sam_predictor is None:
         sam_predictor = setup_sam_predictor()
 
@@ -485,8 +535,18 @@ def segment_object(segment_background, boxes, sam_predictor):
 
 
 def get_co_occurence_matrix(data_loader):
-    "refactor the implemented cooccurence matrix function from main to be integrated in the evaluation part of the baseline"
-    "the input of the data_loader is the splited testdata for the vealuation"
+    """
+        Generate the co-occurence matrix for the VG 150 Dataset used in the inference
+
+        Parameters:
+            data_loader (DataLoader): the data loader for the test data
+
+
+
+        Returns:
+            pandas.DataFrame: The generated co-occurence matrix
+    """
+
     # get the object lists from json file
     vocab_file = json.load(open('data/datasets/VG/VG-SGG-dicts-with-attri.json'))
     idx2label = vocab_file['idx_to_label']
@@ -503,40 +563,46 @@ def get_co_occurence_matrix(data_loader):
 
 
 def generate_150_objects_overlays(object_labels):
+    """
+        Generate the segmented object for the 150 object classes in the VG 150 Dataset
+
+        Parameters:
+            object_labels (list): the list of object labels
+    """
     # Define the paths to the Visual Genome dataset annotation files
     image_data = json.load(open('data/datasets/image_data.json'))
     objects_data = json.load(open('data/datasets/objects.json'))
     # Find an image containing an object labeled as "person"
     for object in object_labels:
         name = object
-        person_image_id = None
-        person_bounding_box = None
+        label_image_id = None
+        label_bounding_box = None
         for obj in objects_data:
             for obj_item in obj['objects']:
                 if 'names' in obj_item and object in obj_item['names']:
-                    person_image_id = obj['image_id']
-                    person_bounding_box = obj_item['x'], obj_item['y'], obj_item['w'], obj_item['h']
+                    label_image_id = obj['image_id']
+                    label_bounding_box = obj_item['x'], obj_item['y'], obj_item['w'], obj_item['h']
                     break
-            if person_image_id:
+            if label_image_id:
                 break
 
-        if person_image_id is None:
+        if label_image_id is None:
             raise ValueError("No image with a " + object +" label found in the Visual Genome dataset.")
 
-        if person_bounding_box is None:
+        if label_bounding_box is None:
             raise ValueError(f"No bounding box found for " + object +" in image_id {person_image_id}.")
 
         # Find the corresponding image metadata
-        person_image_metadata = next((img for img in image_data if img['image_id'] == person_image_id), None)
+        label_image_metadata = next((img for img in image_data if img['image_id'] == label_image_id), None)
 
-        if person_image_metadata is None:
-            raise ValueError(f"No metadata found for image_id {person_image_id}.")
+        if label_image_metadata is None:
+            raise ValueError(f"No metadata found for image_id {label_image_id}.")
 
         # Construct the URL for the image
-        person_image_url = person_image_metadata['url']
+        label_image_url = label_image_metadata['url']
 
         # Download the image
-        response = requests.get(person_image_url)
+        response = requests.get(label_image_url)
         if response.status_code != 200:
             raise ValueError("Failed to download image from the Visual Genome dataset.")
 
@@ -545,7 +611,7 @@ def generate_150_objects_overlays(object_labels):
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
         # segment the bounding box on the image
-        x, y, w, h = person_bounding_box
+        x, y, w, h = label_bounding_box
         obj_in_image = image[y:y + h, x:x + w]
         boxes = [x, y, x + w, y + h]
         segmented_object = segment_object(image, boxes)
@@ -579,7 +645,20 @@ def trim_transparent_borders(image):
         # Return an empty image if there are no non-transparent pixels
         return Image.new('RGBA', (1, 1), (0, 0, 0, 0))
 
-def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
+def select_object(inputs, mode = None, matrix = None):
+    """
+        Generate the transplanted object which is related to one existing object in the image,
+        In this case, the most unlikely object is selected based on the co-occurrence matrix.
+
+        Parameters:
+            inputs (Dictionary): the input image and the object information
+            matrix (pandas.Dataframe): the generated co-occurrence matrix for the VG 150 Dataset
+            mode (string): the mode of the object generation. The mode in this case is "unlikely object"
+
+
+        Returns:
+            numpy.ndarray: An array of shape (height, width, 4) of the generated picture.
+    """
 
     if mode == "unlikely object":
         # get the object and predicate information from json file
@@ -588,7 +667,7 @@ def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
         object_labels = [idx2label[str(i + 1)] for i in inputs['instances'].get('gt_classes').tolist()]
         least_likely_object, least_likely_external_object = find_correlated_object(matrix, object_labels)
         translated_obj = cv2.imread('evaluation/insert_objects/'+least_likely_external_object+'_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
-       # translated_obj = cv2.imread('evaluation/insert_objects/airplane_without_bounding_box.jpg', cv2.IMREAD_UNCHANGED)
+
         translated_obj = cv2.cvtColor(translated_obj, cv2.COLOR_BGRA2RGBA)
         idx_black = np.where(
             (translated_obj[:, :, 0] == 0) & (translated_obj[:, :, 1] == 0) & (translated_obj[:, :, 2] == 0))
@@ -601,6 +680,18 @@ def select_object(inputs, obj_in_rl = False, mode = None, matrix = None):
 
 
 def image_translanting(inputs, occurence_matrix,mode = "trained_object"):
+    """
+        The obejct transplanting strategies for the image
+
+        Parameters:
+            inputs (Dictionary): the input image and the object information
+            occurence_matrix (pandas.Dataframe): the generated co-occurrence matrix for the VG 150 Dataset
+            mode (string): the mode of the object generation.
+
+
+        Returns:
+           Dictionary: the modified input image with the transplanted object
+    """
 
     img = inputs['image']
 
@@ -644,10 +735,6 @@ def image_translanting(inputs, occurence_matrix,mode = "trained_object"):
         raise ValueError(f"Unknown patch strategy {patch_strategy}")
     img_inpainting = add_transparent_image(background_img, scaled_overlay, patch[0], patch[1], rotation=rotation)
 
-    #plt.figure(figsize=(20, 20))
-    #plt.imshow(img_inpainting)
-    #plt.axis('off')
-    #plt.show()
     img_inpainting = np.transpose(img_inpainting, axes=[2, 0, 1])
     inputs['image'] =  torch.from_numpy(img_inpainting)
 
