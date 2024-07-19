@@ -1,7 +1,7 @@
 # Evaluating the Robustness of Scene Graph Generation Models With Known and Unknown Objects Transplantation
-<div align="center">
-    [Z Chen](https://github.com/ZiyuanChen-Zoey), [G Le](https://github.com/Gii-DE), [J Martini](https://github.com/japma), [M Sakharova](https://github.com/MarinaJim) and [P Seitz](https://github.com/seitzquest)
+<strong>[Z Chen](https://github.com/ZiyuanChen-Zoey), [G Le](https://github.com/Gii-DE), [J Martini](https://github.com/japma), [M Sakharova](https://github.com/MarinaJim) and [P Seitz](https://github.com/seitzquest)</strong>
 
+<div align="center">
     <img src="figs/motivation.jpg" width="500"><br>
     "<i>Transplanting objects will reduce the performance of the visual relationship detection compared to the unmodified counterpart.</i>"
 </div>
