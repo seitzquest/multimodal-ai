@@ -2,7 +2,7 @@
 <strong>[Z Chen](https://github.com/ZiyuanChen-Zoey), [G Le](https://github.com/Gii-DE), [J Martini](https://github.com/japma), [M Sakharova](https://github.com/MarinaJim) and [P Seitz](https://github.com/seitzquest)</strong>
 
 <div align="center">
-    <img src="figs/motivation.jpg" width="500"><br>
+    <img src="figs/motivation.jpg" width="700"><br>
     "<i>Transplanting objects will reduce the performance of the visual relationship detection compared to the unmodified counterpart.</i>"
 </div>
 
@@ -75,7 +75,9 @@ Please consult the local `README.md` file for their setup and how to download th
 Additionally we use SAM for segmentation, which can be downloaded [here](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_h_4b8939.pth)
 - For RelTR, put the model into `baseline_models/RelTR/ckpt/sam_vit_h_4b8939.pth` along with the RelTR model checkpoint `checkpoint0149.pth`
 
-<img src="figs/models.jpg" width="800"><br>
+<div align="center">
+    <img src="figs/models.jpg" width="700"><br>
+</div>
 
 ### Setup Tips for RelTR
 For RelTR, we encountered a conda error with opencv when trying to add it to the python 3.6 conda environment. As described in [here](https://stackoverflow.com/a/63752514), fixing the version using `pip install opencv-python==3.4.13.47` resolved the issue.
